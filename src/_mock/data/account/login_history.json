@@ -1,0 +1,26 @@
+[
+  {
+    "id": "login-uuid-001",
+    "userId": "user-uuid-001",
+    "timestamp": "2025-11-10T14:30:00Z",
+    "ipAddress": "75.128.10.1",
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) ...",
+    "status": "Success"
+  },
+  {
+    "id": "login-uuid-002",
+    "userId": "user-uuid-001",
+    "timestamp": "2025-11-10T14:29:55Z",
+    "ipAddress": "75.128.10.1",
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) ...",
+    "status": "Failed_Password"
+  },
+  {
+    "id": "login-uuid-003",
+    "userId": "user-uuid-002",
+    "timestamp": "2025-11-11T09:00:00Z",
+    "ipAddress": "192.168.1.10",
+    "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X) ...",
+    "status": "Success"
+  }
+]

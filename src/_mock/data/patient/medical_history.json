@@ -1,0 +1,79 @@
+[
+  {
+    "id": "mhs-uuid-001",
+    "patientId": "patient-uuid-001",
+    "submissionDate": "2024-01-15T09:05:00Z",
+    "submittedByUserId": "user-uuid-001",
+    "isCurrent": true,
+    "review": {
+      "isReviewedByClinician": true,
+      "reviewerId": "provider-uuid-001",
+      "reviewDate": "2024-01-15T09:15:00Z",
+      "notes": "Patient's hypertension is well-controlled. No contraindications."
+    },
+    
+    "primaryCarePhysician": {
+      "name": "Dr. Emily Smith",
+      "phone": "+15558889999",
+      "address": "123 Medical Plaza, Anytown, CA, 12345"
+    },
+    
+    "allergies": {
+      "noKnownDrugAllergies": false,
+      "noKnownEnvironmentalAllergies": false,
+      "items": [
+        { "id": "ma-item-001", "agent": "Penicillin", "reaction": "Hives", "type": "Drug" },
+        { "id": "ma-item-002", "agent": "Latex", "reaction": "Anaphylaxis", "type": "Environmental" },
+        { "id": "ma-item-003", "agent": "Peanuts", "reaction": "Anaphylaxis", "type": "Food" }
+      ],
+      "notes": "Patient carries an EpiPen."
+    },
+    
+    "medications": {
+      "noCurrentMedications": false,
+      "items": [
+        { "id": "med-item-001", "name": "Lisinopril", "dosage": "10mg Daily", "reason": "Hypertension" },
+        { "id": "med-item-002", "name": "Metformin", "dosage": "500mg 2x Daily", "reason": "Type 2 Diabetes" }
+      ]
+    },
+
+    "conditions": {
+      "noKnownConditions": false,
+      "items": [
+        { "id": "cond-item-001", "name": "Hypertension", "status": "Active" },
+        { "id": "cond-item-002", "name": "Type 2 Diabetes", "status": "Active" },
+        { "id": "cond-item-003", "name": "Joint Replacement (Knee)", "status": "Past", "details": "Right knee, 2018." }
+      ]
+    },
+
+    "surgeries": {
+      "noSurgeries": false,
+      "items": [
+        { "id": "surg-item-001", "type": "Appendectomy", "year": 2010 },
+        { "id": "surg-item-002", "type": "Knee Replacement", "year": 2018 }
+      ]
+    },
+
+    "socialHistory": [
+      { "type": "Tobacco", "status": "Former", "details": "Quit 5 years ago. Smoked 1 pack/day for 10 years." },
+      { "type": "Alcohol", "status": "Current", "details": "1-2 glasses of wine per week." },
+      { "type": "RecreationalDrugs", "status": "Never", "details": null }
+    ],
+    
+    "specificDentalQuestions": {
+      "isPregnant": false,
+      "pregnancyDueDate": null,
+      "isNursing": false,
+      "onBisphosphonates": false,
+      "requiresPremedication": false,
+      "hasDentalAnxiety": true
+    },
+
+    "familyHistory": [
+      { "relative": "Mother", "condition": "Heart Disease" },
+      { "relative": "Father", "condition": "Type 2 Diabetes" }
+    ],
+    
+    "generalNotes": "Patient is anxious about dental visits, prefers morning appointments."
+  }
+]

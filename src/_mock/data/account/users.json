@@ -1,0 +1,49 @@
+{
+  "id": "user-uuid-001",
+  "userType": "PATIENT_PORTAL",
+  "email": "parent@example.com",
+  "security": {
+    "passwordHash": "bcrypt-hash-string",
+    "status": "Active",
+    "emailVerified": true,
+    "phoneVerified": true,
+    "mfaEnabled": true,
+    "lastPasswordChange": "2025-10-01T08:00:00Z"
+  },
+  "contact": {
+    "recoveryEmail": null,
+    "recoveryPhone": "+15557654321"
+  },
+  "patientLinks": [
+    {
+      "patientId": "patient-uuid-001",
+      "relationship": "Self",
+      "permissions": ["FullAccess"]
+    },
+    {
+      "patientId": "patient-uuid-002",
+      "relationship": "Child",
+      "permissions": [
+        "ViewProfile",
+        "ManageAppointments",
+        "ViewBilling",
+        "SendMessage"
+      ]
+    }
+  ],
+  "preferences": {
+    "language": "en",
+    "timezone": "America/Los_Angeles",
+    "theme": "dark",
+    "notifications": {
+      "appointmentReminders": true,
+      "newMessageAlerts": true,
+      "billingAlerts": false
+    }
+  },
+  "systemInfo": {
+    "createdAt": "2024-01-15T09:00:00Z",
+    "updatedAt": "2025-10-01T08:00:00Z",
+    "lastLogin": "2025-11-10T14:30:00Z"
+  }
+}

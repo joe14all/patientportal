@@ -1,0 +1,72 @@
+[
+  {
+    "id": "proc-uuid-001",
+    "procedureCode": "D1110",
+    "codeSystem": "CDT",
+    "officialName": "Prophylaxis - Adult",
+    "patientFriendlyName": "Adult Cleaning & Polishing",
+    "description": "A routine dental cleaning...",
+    "category": "Preventive",
+    "subCategory": "Cleanings",
+    "clinicalContext": {
+      "requiresTooth": false,
+      "requiresSurface": false,
+      "isQuadrant": false,
+      "isArch": false
+    },
+    "scheduling": {
+      "averageDuration": 45,
+      "isMultiVisit": false
+    },
+    "billing": {
+      "ucrPrice": 120.00,
+      "insuranceFinancialCategory": "Preventive",
+      "isTaxable": false,
+      "defaultModifiers": [],
+      "discountEligibility": {
+        "membershipPlan": true,
+        "promotional": true
+      }
+    },
+    "systemInfo": {
+      "status": "Active",
+      "validFrom": "2020-01-01",
+      "validTo": null
+    }
+  },
+  {
+    "id": "proc-uuid-002",
+    "procedureCode": "D2740",
+    "codeSystem": "CDT",
+    "officialName": "Crown - Porcelain/Ceramic Substrate",
+    "patientFriendlyName": "Porcelain Crown",
+    "description": "A tooth-shaped cap placed over a tooth...",
+    "category": "Restorative",
+    "subCategory": "Crowns",
+    "clinicalContext": {
+      "requiresTooth": true,
+      "requiresSurface": false,
+      "isQuadrant": false,
+      "isArch": false
+    },
+    "scheduling": {
+      "averageDuration": 90,
+      "isMultiVisit": true
+    },
+    "billing": {
+      "ucrPrice": 1500.00,
+      "insuranceFinancialCategory": "Major",
+      "isTaxable": false,
+      "defaultModifiers": ["22"],
+      "discountEligibility": {
+        "membershipPlan": true,
+        "promotional": false
+      }
+    },
+    "systemInfo": {
+      "status": "Active",
+      "validFrom": "2018-01-01",
+      "validTo": null
+    }
+  }
+]

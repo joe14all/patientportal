@@ -1,0 +1,43 @@
+[
+  {
+    "id": "inv-uuid-001",
+    "invoiceNumber": "INV-2025-1001",
+    "patientId": "patient-uuid-001",
+    "appointmentId": "appt-uuid-001",
+    "status": "PartiallyPaid",
+    "invoiceDate": "2025-12-05",
+    "dueDate": "2026-01-05",
+    "lineItems": [
+      {
+        "id": "li-uuid-001",
+        "procedureId": "D1110",
+        "description": "Adult Prophylaxis",
+        "tooth": null,
+        "surface": null,
+        "chargeAmount": 120.00,
+        "insurancePaid": 96.00,
+        "patientPortion": 24.00
+      },
+      {
+        "id": "li-uuid-002",
+        "procedureId": "D0120",
+        "description": "Periodic Oral Evaluation",
+        "tooth": null,
+        "surface": null,
+        "chargeAmount": 50.00,
+        "insurancePaid": 40.00,
+        "patientPortion": 10.00
+      }
+    ],
+    "financialSummary": {
+      "totalCharges": 170.00,
+      "totalInsurancePaid": 136.00,
+      "patientResponsibility": 34.00,
+      "totalPaymentsMade": 20.00,
+      "amountDue": 14.00
+    },
+    "paymentIds": ["pay-uuid-001"],
+    "claimIds": ["claim-uuid-001"],
+    "notesToPatient": "Your insurance has paid. This invoice reflects your remaining co-payment."
+  }
+]

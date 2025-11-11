@@ -1,0 +1,35 @@
+[
+  {
+    "id": "alert-uuid-001",
+    "patientId": "patient-uuid-001",
+    "type": "Administrative",
+    "text": "Requires pre-payment for non-covered services.",
+    "status": "Active",
+    "createdAt": "2024-05-10T11:00:00Z",
+    "createdBy": "user-uuid-staff-001",
+    "resolvedAt": null,
+    "resolvedBy": null
+  },
+  {
+    "id": "alert-uuid-002",
+    "patientId": "patient-uuid-001",
+    "type": "Clinical Safety",
+    "text": "Allergic to Latex",
+    "status": "Active",
+    "createdAt": "2024-01-15T09:05:00Z",
+    "createdBy": "user-uuid-staff-002",
+    "resolvedAt": null,
+    "resolvedBy": null
+  },
+  {
+    "id": "alert-uuid-003",
+    "patientId": "patient-uuid-001",
+    "type": "Patient-Facing",
+    "text": "Patient has an outstanding balance.",
+    "status": "Resolved",
+    "createdAt": "2025-01-01T10:00:00Z",
+    "createdBy": "system-billing-bot",
+    "resolvedAt": "2025-01-15T14:30:00Z",
+    "resolvedBy": "system-billing-bot"
+  }
+]

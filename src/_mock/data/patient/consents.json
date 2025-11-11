@@ -1,0 +1,32 @@
+[
+  {
+    "id": "consent-uuid-001",
+    "patientId": "patient-uuid-001",
+    "type": "HIPAA_NOTICE",
+    "status": "Signed",
+    "documentVersion": "v1.2",
+    "dateSigned": "2024-01-15T09:00:00Z",
+    "dateRevoked": null,
+    "signedByUserId": "user-uuid-001"
+  },
+  {
+    "id": "consent-uuid-002",
+    "patientId": "patient-uuid-001",
+    "type": "TELEHEALTH_CONSENT",
+    "status": "Pending",
+    "documentVersion": "v1.0",
+    "dateSigned": null,
+    "dateRevoked": null,
+    "signedByUserId": null
+  },
+  {
+    "id": "consent-uuid-003",
+    "patientId": "patient-uuid-002",
+    "type": "HIPAA_NOTICE",
+    "status": "Signed",
+    "documentVersion": "v1.2",
+    "dateSigned": "2024-01-15T09:01:00Z",
+    "dateRevoked": null,
+    "signedByUserId": "user-uuid-001"
+  }
+]

@@ -1,0 +1,29 @@
+[
+  {
+    "id": "msg-thread-uuid-001",
+    "patientId": "patient-uuid-001",
+    "initiatingUserId": "user-uuid-001",
+    "subject": "Question about my treatment plan",
+    "category": "Clinical",
+    "status": "PendingStaff",
+    "priority": "Normal",
+    "assignment": {
+      "assignedType": "Provider",
+      "assignedId": "provider-uuid-001"
+    },
+    "readStatus": {
+      "isReadByPatient": true,
+      "isReadByStaff": false
+    },
+    "lastMessage": {
+      "timestamp": "2025-11-21T14:05:00Z",
+      "authorType": "Staff",
+      "snippet": "Hi Jane, absolutely. I've asked our treatment..."
+    },
+    "systemInfo": {
+      "createdAt": "2025-11-21T14:00:00Z",
+      "updatedAt": "2025-11-21T14:05:00Z",
+      "closedAt": null
+    }
+  }
+]

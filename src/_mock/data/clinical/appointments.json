@@ -1,0 +1,84 @@
+[
+  {
+    "id": "appt-uuid-001",
+    "patientId": "patient-uuid-001",
+    "providerId": "provider-uuid-001",
+    "officeId": "office-uuid-001",
+    "status": "Confirmed",
+    "startDateTime": "2025-11-20T18:00:00Z",
+    "endDateTime": "2025-11-20T19:00:00Z",
+    "appointmentType": "Routine Cleaning",
+    "reasonForVisit": "6-Month Checkup & Cleaning",
+    "plannedProcedures": [
+      {
+        "procedureId": "D1110",
+        "description": "Adult Prophylaxis",
+        "tooth": null,
+        "surface": null
+      },
+      {
+        "procedureId": "D0120",
+        "description": "Periodic Oral Evaluation",
+        "tooth": null,
+        "surface": null
+      }
+    ],
+    "confirmation": {
+      "status": "Confirmed",
+      "method": "SMS",
+      "confirmationToken": "c-token-xyz-123",
+      "lastReminderSentAt": "2025-11-19T18:00:00Z"
+    },
+    "cancellation": null,
+    "checkIn": {
+      "checkInTime": null,
+      "method": "Kiosk"
+    },
+    "linkedRecords": {
+      "visitSummaryId": null,
+      "invoiceId": null,
+      "claimId": null
+    },
+    "systemInfo": {
+      "isTelehealth": false,
+      "createdAt": "2025-11-01T09:15:00Z",
+      "createdBy": "user-uuid-staff-001",
+      "updatedAt": "2025-11-19T18:00:00Z"
+    }
+  },
+  {
+    "id": "appt-uuid-002",
+    "patientId": "patient-uuid-002",
+    "providerId": "provider-uuid-001",
+    "officeId": "office-uuid-001",
+    "status": "Cancelled",
+    "startDateTime": "2025-11-22T16:00:00Z",
+    "endDateTime": "2025-11-22T16:30:00Z",
+    "appointmentType": "Consultation",
+    "reasonForVisit": "Follow-up on tooth pain",
+    "plannedProcedures": [],
+    "confirmation": {
+      "status": "Pending",
+      "method": "Email",
+      "confirmationToken": "c-token-abc-789",
+      "lastReminderSentAt": null
+    },
+    "cancellation": {
+      "cancelledAt": "2025-11-21T10:00:00Z",
+      "cancelledBy": "Patient",
+      "reason": "Patient called, had a scheduling conflict."
+    },
+    "checkIn": null,
+    "linkedRecords": {
+      "visitSummaryId": null,
+      "invoiceId": null,
+      "claimId": null
+    },
+    "systemInfo": {
+      "isTelehealth": false,
+      "createdAt": "2025-11-18T14:00:00Z",
+      "createdBy": "user-uuid-001",
+      "updatedAt": "2025-11-21T10:00:00Z"
+    }
+  }
+]

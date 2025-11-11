@@ -1,0 +1,66 @@
+[
+  {
+    "id": "tp-uuid-001",
+    "patientId": "patient-uuid-001",
+    "providerId": "provider-uuid-001",
+    "originatingVisitId": "visit-uuid-001",
+    "planName": "Crown and Filling Plan - Nov 2025",
+    "status": "Accepted",
+    "createdAt": "2025-11-20T11:30:00Z",
+    "presentedAt": "2025-11-20T11:35:00Z",
+    "acceptedAt": "2025-11-21T14:00:00Z",
+    "estimateValidUntil": "2026-02-20T11:30:00Z",
+    
+    "plannedProcedures": [
+      {
+        "id": "tpp-uuid-001",
+        "phase": 1,
+        "priority": "High",
+        "procedureId": "D2740",
+        "description": "Porcelain Crown",
+        "clinicalInfo": {
+          "tooth": "14",
+          "surface": null,
+          "quadrant": "UR"
+        },
+        "status": "Scheduled",
+        "completedAppointmentId": null,
+        "financialEstimate": {
+          "chargeAmount": 1500.00,
+          "estimatedInsurancePaid": 750.00,
+          "estimatedPatientPortion": 750.00,
+          "notes": "50% coverage after $50 deductible. Deductible assumed met."
+        }
+      },
+      {
+        "id": "tpp-uuid-002",
+        "phase": 2,
+        "priority": "Medium",
+        "procedureId": "D2330",
+        "description": "Tooth-Colored Filling (1 Surface)",
+        "clinicalInfo": {
+          "tooth": "8",
+          "surface": "M",
+          "quadrant": "UR"
+        },
+        "status": "Proposed",
+        "completedAppointmentId": null,
+        "financialEstimate": {
+          "chargeAmount": 250.00,
+          "estimatedInsurancePaid": 200.00,
+          "estimatedPatientPortion": 50.00,
+          "notes": "80% coverage after $50 deductible."
+        }
+      }
+    ],
+    
+    "financialSummary": {
+      "totalChargeAmount": 1750.00,
+      "totalEstimatedInsurancePaid": 950.00,
+      "totalEstimatedPatientPortion": 800.00
+    },
+    
+    "providerNotes": "Phase 1 (Crown) is clinically urgent. Phase 2 (Filling) can be scheduled at patient's convenience.",
+    "patientSignatureId": "doc-uuid-006"
+  }
+]

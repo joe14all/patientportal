@@ -1,0 +1,18 @@
+[
+  {
+    "id": "ref-uuid-001",
+    "patientId": "patient-uuid-001",
+    "originalPaymentId": "pay-uuid-002",
+    "refundDate": "2026-01-12",
+    "amount": 150.00,
+    "method": "Check",
+    "reason": "Patient overpaid and requested unapplied credit be refunded.",
+    "transactionDetails": {
+      "checkNumber": "9012"
+    },
+    "systemInfo": {
+      "createdAt": "2026-01-12T14:00:00Z",
+      "createdBy": "user-uuid-staff-001"
+    }
+  }
+]

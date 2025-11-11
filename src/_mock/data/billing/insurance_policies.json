@@ -1,0 +1,102 @@
+[
+  {
+    "id": "ins-uuid-001",
+    "patientId": "patient-uuid-001",
+    "coveragePriority": "Primary",
+    "status": "Active",
+    "carrier": {
+      "name": "Delta Dental",
+      "payerId": "DD-CA-01",
+      "phone": "800-555-1212",
+      "address": {
+        "line": ["PO Box 1234"],
+        "city": "Claims City",
+        "state": "CA",
+        "postalCode": "54321",
+        "country": "US"
+      }
+    },
+    "plan": {
+      "planName": "PPO Plan 2000",
+      "planType": "PPO",
+      "groupNumber": "GRP-789",
+      "policyNumber": "POL-12345"
+    },
+    "subscriber": {
+      "relationshipToPatient": "Self",
+      "subscriberId": "123456789",
+      "firstName": "Jane",
+      "lastName": "Doe",
+      "dateOfBirth": "1990-05-15",
+      "address": null
+    },
+    "coverageDetails": {
+      "effectiveDate": "2024-01-01",
+      "terminationDate": null,
+      "planYearResetDate": "01-01",
+      "deductibles": [
+        {
+          "type": "Individual",
+          "network": "InNetwork",
+          "amount": 50.00,
+          "met": 0.00
+        },
+        {
+          "type": "Family",
+          "network": "InNetwork",
+          "amount": 150.00,
+          "met": 0.00
+        }
+      ],
+      "annualMaximums": [
+        {
+          "type": "Individual",
+          "network": "InNetwork",
+          "amount": 1500.00,
+          "used": 0.00
+        }
+      ],
+      "coverageByFinancialCategory": [
+        {
+          "category": "Preventive",
+          "network": "InNetwork",
+          "coInsurancePercent": 100,
+          "deductibleApplies": false,
+          "coPay": 0
+        },
+        {
+          "category": "Basic",
+          "network": "InNetwork",
+          "coInsurancePercent": 80,
+          "deductibleApplies": true,
+          "coPay": 0
+        },
+        {
+          "category": "Major",
+          "network": "InNetwork",
+          "coInsurancePercent": 50,
+          "deductibleApplies": true,
+          "coPay": 0
+        },
+        {
+          "category": "Orthodontic",
+          "network": "InNetwork",
+          "coInsurancePercent": 50,
+          "deductibleApplies": true,
+          "coPay": 0,
+          "lifetimeMax": 2000.00
+        }
+      ],
+      "notes": "Waiting period for major services. Orthodontic coverage for dependents under 19 only."
+    },
+    "verification": {
+      "lastVerifiedDate": "2025-11-10T09:00:00Z",
+      "verifiedBy": "user-uuid-staff-001",
+      "method": "Portal"
+    },
+    "documentIds": {
+      "front": "doc-uuid-004",
+      "back": "doc-uuid-005"
+    }
+  }
+]

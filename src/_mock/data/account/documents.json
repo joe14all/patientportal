@@ -1,0 +1,71 @@
+[
+  {
+    "id": "doc-uuid-001",
+    "patientId": "patient-uuid-001",
+    "uploadedByUserId": "user-uuid-001",
+    "fileName": "insurance_card_front_2025.jpg",
+    "storage": {
+      "provider": "Mock",
+      "url": "/mock/uploads/patient-001/ins_front_2025.jpg",
+      "fileType": "image/jpeg",
+      "fileSize": 1048576
+    },
+    "category": "Insurance Card",
+    "linkContext": {
+      "type": "InsurancePolicy",
+      "id": "ins-uuid-001",
+      "description": "Front"
+    },
+    "tags": ["Insurance", "2025"],
+    "systemInfo": {
+      "createdAt": "2025-11-01T09:15:00Z",
+      "status": "Active"
+    }
+  },
+  {
+    "id": "doc-uuid-002",
+    "patientId": "patient-uuid-001",
+    "uploadedByUserId": "user-uuid-staff-001",
+    "fileName": "panoramic_xray_2025.dicom",
+    "storage": {
+      "provider": "Mock",
+      "url": "/mock/uploads/patient-001/pano_2025.dicom",
+      "fileType": "application/dicom",
+      "fileSize": 15728640
+    },
+    "category": "X-Ray",
+    "linkContext": {
+      "type": "VisitSummary",
+      "id": "visit-uuid-001",
+      "description": "Panoramic X-Ray"
+    },
+    "tags": ["X-Ray", "Pano", "Diagnostic"],
+    "systemInfo": {
+      "createdAt": "2025-11-20T11:05:00Z",
+      "status": "Active"
+    }
+  },
+  {
+    "id": "doc-uuid-003",
+    "patientId": "patient-uuid-001",
+    "uploadedByUserId": "user-uuid-001",
+    "fileName": "treatment_plan_question.jpg",
+    "storage": {
+      "provider": "Mock",
+      "url": "/mock/uploads/patient-001/msg_attach_1.jpg",
+      "fileType": "image/jpeg",
+      "fileSize": 512000
+    },
+    "category": "Message Attachment",
+    "linkContext": {
+      "type": "MessagePost",
+      "id": "msg-post-uuid-001",
+      "description": null
+    },
+    "tags": ["Message"],
+    "systemInfo": {
+      "createdAt": "2025-11-21T14:00:00Z",
+      "status": "Active"
+    }
+  }
+]

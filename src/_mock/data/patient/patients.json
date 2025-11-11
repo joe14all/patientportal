@@ -1,0 +1,86 @@
+{
+  "id": "patient-uuid-001",
+  "chartNumber": "P-1001",
+  "nationalIdentifiers": [
+    {
+      "type": "SSN_LAST4",
+      "value": "1234",
+      "countryCode": "US"
+    }
+  ],
+  "legalName": {
+    "fullText": "Mrs. Jane Elizabeth Doe",
+    "family": "Doe",
+    "given": ["Jane", "Elizabeth"],
+    "prefix": "Mrs.",
+    "suffix": null
+  },
+  "preferredName": "Jane",
+  "dateOfBirth": "1990-05-15",
+  "demographics": {
+    "genderIdentity": "Woman",
+    "sexAtBirth": "Female",
+    "pronouns": "she/her",
+    "ethnicity": "Not Hispanic or Latino",
+    "race": ["White"],
+    "maritalStatus": "Married"
+  },
+  "contact": {
+    "phones": [
+      {
+        "number": "+15551234567",
+        "type": "Mobile",
+        "isPrimary": true,
+        "allowSms": true
+      }
+    ],
+    "emails": [
+      {
+        "address": "jane.doe@example.com",
+        "isPrimary": true,
+        "isVerified": true
+      }
+    ],
+    "addresses": [
+      {
+        "use": "Home",
+        "isPrimary": true,
+        "line": ["123 Main St"],
+        "city": "Anytown",
+        "state": "CA",
+        "postalCode": "12345",
+        "country": "US"
+      }
+    ]
+  },
+  "emergencyContacts": [
+    {
+      "id": "ec-uuid-001",
+      "name": "Robert Doe",
+      "relationship": "Spouse",
+      "phone": "+15557654321"
+    }
+  ],
+  "guarantor": {
+    "relationshipToPatient": "Self",
+    "patientId": "patient-uuid-001"
+  },
+  "language": {
+    "primaryLanguage": "en",
+    "requiresInterpreter": false,
+    "communicationNeeds": ["Large Print"]
+  },
+  "preferences": {
+    "primaryProviderId": "provider-uuid-001",
+    "primaryOfficeId": "office-uuid-001",
+    "communicationPreference": "Email"
+  },
+  "systemInfo": {
+    "status": "Active",
+    "createdAt": "2024-01-15T09:00:00Z",
+    "updatedAt": "2025-11-10T14:30:00Z",
+    "createdBy": "admin-uuid-001",
+    "lastLogin": "2025-11-09T18:45:00Z",
+    "profileImageUrl": "/images/patients/patient-uuid-001.jpg"
+  }
+}

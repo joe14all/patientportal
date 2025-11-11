@@ -1,0 +1,59 @@
+[
+  {
+    "id": "visit-uuid-001",
+    "appointmentId": "appt-uuid-001",
+    "patientId": "patient-uuid-001",
+    "providerId": "provider-uuid-001",
+    "visitDate": "2025-11-20",
+    "status": "Finalized",
+    "summaryNotes": "Routine cleaning and checkup. No new cavities found. Some minor gum inflammation on the lower posteriors. Recommended continued flossing. See you in 6 months!",
+    
+    "completedProcedures": [
+      {
+        "procedureId": "D1110",
+        "description": "Adult Prophylaxis (Cleaning)",
+        "tooth": null,
+        "surface": null,
+        "quadrant": null,
+        "arch": null
+      },
+      {
+        "procedureId": "D0120",
+        "description": "Periodic Oral Evaluation",
+        "tooth": null,
+        "surface": null,
+        "quadrant": null,
+        "arch": null
+      }
+    ],
+    
+    "clinicalObservations": [
+      {
+        "type": "Finding",
+        "category": "Periodontal",
+        "text": "Minor gingivitis, lower posterior region."
+      },
+      {
+        "type": "Watch",
+        "category": "Restorative",
+        "tooth": "14",
+        "text": "Monitor for potential micro-fracture on tooth #14."
+      }
+    ],
+    
+    "postVisitInstructions": "Avoid sticky or hard foods for the rest of the day. Continue flossing daily, paying special attention to the lower back teeth.",
+    
+    "nextSteps": {
+      "nextVisitRecommendedDate": "2026-05-20",
+      "nextVisitReason": "6-Month Routine Recall",
+      "treatmentPlanId": null
+    },
+    
+    "systemInfo": {
+      "createdAt": "2025-11-20T11:05:00Z",
+      "createdBy": "provider-uuid-001",
+      "finalizedAt": "2025-11-20T11:15:00Z",
+      "finalizedBy": "provider-uuid-001"
+    }
+  }
+]

@@ -1,0 +1,27 @@
+[
+  {
+    "id": "msg-post-uuid-001",
+    "threadId": "msg-thread-uuid-001",
+    "authorType": "Patient",
+    "authorId": "user-uuid-001",
+    "authorName": "Jane Doe",
+    "body": "Hi Dr. Farnsworth, I had a question about the crown listed on my plan. Can we discuss alternatives?",
+    "attachments": [
+      {
+        "documentId": "doc-uuid-007",
+        "fileName": "treatment_plan_question.jpg"
+      }
+    ],
+    "createdAt": "2025-11-21T14:00:00Z"
+  },
+  {
+    "id": "msg-post-uuid-002",
+    "threadId": "msg-thread-uuid-001",
+    "authorType": "Staff",
+    "authorId": "provider-uuid-001",
+    "authorName": "Dr. Alan Farnsworth",
+    "body": "Hi Jane, absolutely. I've asked our treatment coordinator to give you a call this afternoon to discuss the options.",
+    "attachments": [],
+    "createdAt": "2025-11-21T14:05:00Z"
+  }
+]

@@ -1,0 +1,79 @@
+{
+  "id": "provider-uuid-001",
+  "legalName": {
+    "family": "Farnsworth",
+    "given": ["Alan", "Robert"],
+    "prefix": "Dr.",
+    "suffix": "DDS, PhD"
+  },
+  "preferredName": "Dr. Alan",
+  "identifiers": [
+    {
+      "type": "NPI",
+      "value": "1234567890",
+      "country": "US"
+    }
+  ],
+  "credentials": {
+    "licenses": [
+      {
+        "number": "DDS-12345",
+        "authority": "California Dental Board",
+        "region": "CA",
+        "country": "US",
+        "expires": "2026-12-31"
+      }
+    ],
+    "education": [
+      {
+        "degree": "DDS",
+        "school": "UCSF School of Dentistry",
+        "year": 2005
+      }
+    ],
+    "certifications": [
+      {
+        "name": "Board Certified in General Dentistry",
+        "authority": "American Board of General Dentistry",
+        "year": 2006
+      }
+    ]
+  },
+  "specialty": {
+    "primary": "General Dentistry",
+    "subSpecialties": ["Cosmetic Dentistry"],
+    "taxonomyCode": "1223G0001X",
+    "ageGroups": ["Adults", "Seniors"]
+  },
+  "patientFacingInfo": {
+    "bio": "Dr. Alan Farnsworth has been practicing for 15 years... He specializes in cosmetic dentistry and preventative care.",
+    "profileImageUrl": "/images/providers/alan-farnsworth.jpg",
+    "languagesSpoken": ["en", "es"],
+    "philosophy": "My goal is to provide compassionate, high-quality care..."
+  },
+  "availability": {
+    "acceptingNewPatients": true,
+    "telehealthEnabled": true,
+    "officeSchedules": [
+      {
+        "officeId": "office-uuid-001",
+        "weeklyHours": [
+          { "day": "Monday", "start": "08:00", "end": "17:00" },
+          { "day": "Tuesday", "start": "08:00", "end": "12:00" }
+        ],
+        "booksOnline": true
+      },
+      {
+        "officeId": "office-uuid-002",
+        "weeklyHours": [
+          { "day": "Thursday", "start": "09:00", "end": "18:00" }
+        ],
+        "booksOnline": false
+      }
+    ]
+  },
+  "systemInfo": {
+    "status": "Active",
+    "joinedDate": "2010-06-01"
+  }
+}

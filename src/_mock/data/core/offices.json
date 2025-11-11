@@ -1,0 +1,101 @@
+{
+  "id": "office-uuid-001",
+  "name": "Downtown Dental Center",
+  "legalBusinessName": "JSClinic Dental Group, P.C.",
+  "identifiers": [
+    {
+      "type": "NPI_TYPE_2",
+      "value": "1002003004",
+      "country": "US"
+    },
+    {
+      "type": "TAX_ID",
+      "value": "99-1234567",
+      "country": "US"
+    }
+  ],
+  "contact": {
+    "phone": "+15559876543",
+    "fax": "+1G5559876544",
+    "email": "downtown@jsclinic.com",
+    "address": {
+      "use": "Main",
+      "line": ["456 Oak Ave", "Suite 100"],
+      "city": "Anytown",
+      "state": "CA",
+      "postalCode": "12346",
+      "country": "US"
+    }
+  },
+  "operatingHours": {
+    "timezone": "America/Los_Angeles",
+    "weekly": [
+      {
+        "day": "Monday",
+        "start": "08:00",
+        "end": "17:00",
+        "breakStart": "12:00",
+        "breakEnd": "13:00"
+      },
+      {
+        "day": "Tuesday",
+        "start": "08:00",
+        "end": "17:00",
+        "breakStart": "12:00",
+        "breakEnd": "13:00"
+      },
+      {
+        "day": "Wednesday",
+        "start": "09:00",
+        "end": "18:00",
+        "breakStart": "13:00",
+        "breakEnd": "14:00"
+      },
+      {
+        "day": "Thursday",
+        "start": "08:00",
+        "end": "17:00",
+        "breakStart": "12:00",
+        "breakEnd": "13:00"
+      },
+      {
+        "day": "Friday",
+        "start": "08:00",
+        "end": "14:00",
+        "breakStart": null,
+        "breakEnd": null
+      },
+      { "day": "Saturday", "start": null, "end": null },
+      { "day": "Sunday", "start": null, "end": null }
+    ],
+    "specialClosures": [
+      {
+        "date": "2025-11-27",
+        "reason": "Thanksgiving",
+        "start": "00:00",
+        "end": "23:59"
+      },
+      {
+        "date": "2025-12-25",
+        "reason": "Christmas Day",
+        "start": "00:00",
+        "end": "23:59"
+      }
+    ]
+  },
+  "servicesOffered": [
+    "General Dentistry",
+    "Cosmetic Dentistry",
+    "Preventive Care",
+    "Restorative Dentistry"
+  ],
+  "facilityInfo": {
+    "profileImageUrl": "/images/offices/downtown.jpg",
+    "accessibility": ["WheelchairAccessible", "BrailleSignage"],
+    "parking": "On-site garage parking, validation available."
+  },
+  "systemInfo": {
+    "status": "Active",
+    "openedDate": "2010-01-15"
+  }
+}

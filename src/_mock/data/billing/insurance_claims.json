@@ -1,0 +1,33 @@
+[
+  {
+    "id": "claim-uuid-001",
+    "patientId": "patient-uuid-001",
+    "providerId": "provider-uuid-001",
+    "insurancePolicyId": "ins-uuid-001",
+    "appointmentId": "appt-uuid-001",
+    "invoiceId": "inv-uuid-001",
+    "status": "Adjudicated",
+    "submissionType": "Electronic",
+    "submissionDate": "2025-11-21T00:00:00Z",
+    "carrierClaimId": "C-987654321",
+    "totalCharge": 170.00,
+    "totalPaid": 136.00,
+    "patientResponsibility": 34.00,
+    "adjudicationDate": "2025-12-05T00:00:00Z",
+    "eobDocumentId": "doc-uuid-003",
+    "lineItems": [
+      {
+        "procedureId": "D1110",
+        "charge": 120.00,
+        "paid": 96.00,
+        "reasonCode": "CO-1"
+      },
+      {
+        "procedureId": "D0120",
+        "charge": 50.00,
+        "paid": 40.00,
+        "reasonCode": "CO-1"
+      }
+    ]
+  }
+]
