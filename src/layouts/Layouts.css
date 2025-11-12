@@ -3,6 +3,7 @@
   display: flex;
   flex-direction: column;
   min-height: 100vh;
+  width: 100%; /* Ensure it fills the .App container */
 }
 
 .main-header {
@@ -13,15 +14,21 @@
   background-color: var(--bg-surface);
   border-bottom: 1px solid var(--border-color);
   gap: 1rem;
+  width: 100%; /* Ensure header spans full width */
 }
 
 .logo-area {
   font-size: 1.25rem;
+  width: 100%; /* Take full width to center text */
+  text-align: center;
 }
 
 .main-nav {
   display: flex;
   gap: 1rem;
+  flex-wrap: wrap; /* Allow links to wrap on small screens */
+  justify-content: center; /* Center the links */
+  width: 100%;
 }
 
 .main-nav a {
@@ -36,13 +43,15 @@
 
 .user-menu {
   display: flex;
+  width: 100%; /* Take full width */
+  justify-content: center; /* Center buttons on mobile */
 }
 
 .content-area {
   flex-grow: 1;
   width: 100%;
   max-width: 1024px;
-  padding: 1.5rem;
+  padding: 1rem; /* Use 1rem padding for mobile */
   margin: 0 auto;
   box-sizing: border-box; /* Ensures padding is included in width */
 }
@@ -52,16 +61,34 @@
   .main-header {
     flex-direction: row; /* Horizontal on desktop */
     justify-content: space-between;
+    padding: 1rem 2rem; /* Add more horizontal padding on desktop */
   }
+
+  .logo-area {
+    width: auto; /* Let it shrink to content size */
+    text-align: left;
+  }
+
   .main-nav {
     flex-grow: 1;
     margin-left: 2rem;
+    flex-wrap: nowrap; /* Don't wrap on desktop */
+    justify-content: flex-start; /* Align left */
+    width: auto;
+  }
+
+  .user-menu {
+    width: auto; /* Let it shrink to content size */
+  }
+
+  .content-area {
+    padding: 2rem; /* Use larger padding for desktop */
   }
 }
 
 /* Auth Layout (Login Page) */
 .auth-layout-container {
-  padding: 2rem 1rem;
+  padding: 1rem; /* Use 1rem padding for mobile */
   width: 100%;
   display: flex;
   justify-content: center;

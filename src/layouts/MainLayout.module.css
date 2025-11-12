@@ -1,0 +1,38 @@
+.mainLayout {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background-color: var(--bg-body);
+}
+
+.container {
+  display: flex; /* This is the key: Sidebar + Content */
+  flex-grow: 1;
+}
+
+.contentArea {
+  flex-grow: 1;
+  padding: 1rem;
+  width: 100%;
+  /* Handle potential overflow from content */
+  min-width: 0;
+  /* Make the content area scrollable if it overflows */
+  overflow-y: auto;
+  /* Set height for sticky sidebar to work against */
+  height: calc(100vh - 60px); /* Full height minus header */
+}
+
+/* This is the new wrapper for readability */
+.contentWrapper {
+  width: 100%;
+  max-width: 1024px; /* Constrains the content */
+  margin: 0 auto; /* Centers the content */
+}
+
+/* Tablet & Desktop */
+@media (min-width: 768px) {
+  .contentArea {
+    /* More "relaxed" padding on desktop */
+    padding: 2.5rem;
+  }
+}

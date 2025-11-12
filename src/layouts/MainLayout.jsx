@@ -1,36 +1,40 @@
-import React from 'react';
-import { Outlet, Link } from 'react-router-dom';
-import { useAccountData, useTheme } from '../contexts';
-import './Layouts.css'; // We'll add this file for layout-specific styles
+import React, { useState } from 'react';
+import { Outlet } from 'react-router-dom';
+import Header from './components/Header';
+import Sidebar from './components/Sidebar';
+import MobileMenu from './components/MobileMenu';
+import styles from './MainLayout.module.css'; // Import the new CSS Module
 
 const MainLayout = () => {
-  const { logout } = useAccountData();
-  const { theme, toggleTheme } = useTheme();
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  const toggleMobileMenu = () => {
+    setIsMobileMenuOpen(prev => !prev);
+  };
+
+  const closeMobileMenu = () => {
+    setIsMobileMenuOpen(false);
+  };
 
   return (
-    <div className="layout-container">
-      <header className="main-header">
-        <div className="logo-area">
-          <h3>Patient Portal</h3>
-        </div>
-        <nav className="main-nav">
-          <Link to="/">Dashboard</Link>
-          <Link to="/appointments">Appointments</Link>
-          {/* Add more links here: /billing, /messages, etc. */}
-        </nav>
-        <div className="user-menu">
-          <button onClick={toggleTheme} className="secondary" style={{ marginRight: '1rem' }}>
-            {theme === 'light' ? 'Dark' : 'Light'}
-          </button>
-          <button onClick={logout}>
-            Log Out
-          </button>
-        </div>
-      </header>
-      <main className="content-area">
-        {/* All protected pages will render here */}
-        <Outlet />
-      </main>
+    <div className={styles.mainLayout}>
+      <Header 
+        onToggleMenu={toggleMobileMenu} 
+        isMobileMenuOpen={isMobileMenuOpen} 
+      />
+      
+      <div className={styles.container}>
+        <Sidebar /> {/* This is the desktop-only sidebar */}
+        
+        <main className={styles.contentArea}>
+          <Outlet /> {/* All protected pages render here */}
+        </main>
+      </div>
+
+      <MobileMenu 
+        isOpen={isMobileMenuOpen} 
+        onCloseMenu={closeMobileMenu} 
+      />
     </div>
   );
 };
