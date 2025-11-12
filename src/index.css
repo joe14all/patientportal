@@ -282,3 +282,6 @@ body.dark .is-invalid:focus {
   font-size: 0.875rem;
   margin-top: 0.25rem;
 }
+.body-no-scroll {
+  overflow: hidden;
+}

@@ -1,0 +1,119 @@
+.pageWrapper {
+  /* No styles needed, just a container */
+}
+
+.pageDescription {
+  font-size: 1rem;
+  color: var(--text-secondary);
+  margin-top: -0.75rem;
+  margin-bottom: 2rem;
+}
+
+/* --- Layout --- */
+.historyLayout {
+  display: grid;
+  grid-template-columns: 1fr; /* Mobile-first: single column */
+  gap: 1.5rem;
+  /* Add padding-bottom to avoid save bar overlap */
+  padding-bottom: 80px; 
+}
+
+.column {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/* Desktop: 2-column layout */
+@media (min-width: 768px) {
+  .historyLayout {
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+  }
+}
+
+/* --- History List --- */
+.historyList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.historyItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  background-color: var(--bg-body);
+  border: 1px solid var(--border-color);
+  border-radius: 0.5rem;
+}
+
+.historyItem strong {
+  color: var(--text-primary);
+}
+
+.historyItem span {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+}
+
+.notesHelp {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  margin-top: -0.5rem;
+  margin-bottom: 1rem;
+}
+
+/* --- Sticky Save Bar --- */
+.saveBar {
+  position: sticky;
+  bottom: 0;
+  left: 0;
+  right: 0;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.5rem;
+  background-color: var(--bg-surface);
+  border-top: 1px solid var(--border-color);
+  box-shadow: 0 -4px 12px rgba(0,0,0,0.05);
+
+  /* Nudge it to fit inside the layout area on desktop */
+  margin-left: -1.5rem;
+  margin-right: -1.5rem;
+}
+
+body.dark .saveBar {
+  box-shadow: 0 -4px 12px rgba(0,0,0,0.2);
+}
+
+.saveBar p {
+  margin: 0;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+/* On desktop, confine the save bar to the content area */
+@media (min-width: 768px) {
+  .saveBar {
+    width: 100%;
+    max-width: 1024px; /* Matches .contentWrapper */
+    margin: 0 auto;
+    left: 50%;
+    transform: translateX(-50%);
+    bottom: 2.5rem; /* Float it */
+    border-radius: 0.75rem;
+    border: 1px solid var(--border-color);
+  }
+  
+  /* Adjust main layout padding to account for floating bar */
+  .historyLayout {
+    padding-bottom: 100px;
+  }
+}

@@ -1,0 +1,101 @@
+.pageWrapper {
+  /* No styles needed, just a container */
+}
+
+.pageDescription {
+  font-size: 1rem;
+  color: var(--text-secondary);
+  margin-top: -0.75rem;
+  margin-bottom: 2rem;
+}
+
+/* --- Layout --- */
+.billingLayout {
+  display: grid;
+  grid-template-columns: 1fr; /* Mobile-first: single column */
+  gap: 2rem;
+}
+
+.columnSecondary {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+/* Desktop: 2-column layout */
+@media (min-width: 900px) {
+  .billingLayout {
+    /* 60% for main content, 40% for sidebar */
+    grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+    gap: 2.5rem;
+  }
+}
+
+/* --- Section --- */
+.section h2 {
+  font-size: 1.25rem;
+  margin-bottom: 1rem;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 0.5rem;
+}
+
+/* --- Invoice Card --- */
+.invoiceHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.invoiceHeader strong {
+  font-size: 1.1rem;
+  color: var(--text-primary);
+}
+
+.amountDue {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--primary);
+}
+
+.payButton {
+  width: 100%;
+  margin-top: 1rem;
+  /* Make it stand out */
+  padding: 0.8rem;
+  font-size: 1rem;
+}
+
+/* --- Payment List --- */
+/* Remove padding so the list items can span */
+.paymentList {
+  padding: 0;
+}
+
+.paymentItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid var(--border-color);
+}
+.paymentList .paymentItem:last-child {
+  border-bottom: none;
+}
+
+.paymentItem strong {
+  font-size: 1rem;
+  color: var(--text-primary);
+}
+
+.paymentItem span {
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+.paymentMethod {
+  display: block;
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  margin-top: 0.25rem;
+}
