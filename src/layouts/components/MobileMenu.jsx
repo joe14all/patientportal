@@ -1,7 +1,15 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
 import { useAccountData, useTheme } from '../../contexts';
-import { IconDashboard, IconAppointments } from './Icons';
+import { 
+  IconDashboard, 
+  IconAppointments,
+  IconMessages,
+  IconBilling,
+  IconDocuments,
+  IconProfile,
+  IconMedicalHistory
+} from './Icons';
 import styles from './MobileMenu.module.css';
 
 const MobileMenu = ({ isOpen, onCloseMenu }) => {
@@ -20,6 +28,7 @@ const MobileMenu = ({ isOpen, onCloseMenu }) => {
           <li>
             <NavLink 
               to="/" 
+              end
               onClick={handleNavClick}
               className={({ isActive }) => 
                 isActive ? `${styles.navLink} ${styles.active}` : styles.navLink
@@ -39,7 +48,63 @@ const MobileMenu = ({ isOpen, onCloseMenu }) => {
               Appointments
             </NavLink>
           </li>
-          {/* Add more links here */}
+          
+          {/* --- NEW LINKS --- */}
+          <li>
+            <NavLink 
+              to="/messages" 
+              onClick={handleNavClick}
+              className={({ isActive }) => 
+                isActive ? `${styles.navLink} ${styles.active}` : styles.navLink
+              }>
+              <IconMessages />
+              Messages
+            </NavLink>
+          </li>
+          <li>
+            <NavLink 
+              to="/billing" 
+              onClick={handleNavClick}
+              className={({ isActive }) => 
+                isActive ? `${styles.navLink} ${styles.active}` : styles.navLink
+              }>
+              <IconBilling />
+              Billing
+            </NavLink>
+          </li>
+          <li>
+            <NavLink 
+              to="/documents" 
+              onClick={handleNavClick}
+              className={({ isActive }) => 
+                isActive ? `${styles.navLink} ${styles.active}` : styles.navLink
+              }>
+              <IconDocuments />
+              Documents
+            </NavLink>
+          </li>
+          <li>
+            <NavLink 
+              to="/history" 
+              onClick={handleNavClick}
+              className={({ isActive }) => 
+                isActive ? `${styles.navLink} ${styles.active}` : styles.navLink
+              }>
+              <IconMedicalHistory />
+              Medical History
+            </NavLink>
+          </li>
+          <li>
+            <NavLink 
+              to="/profile" 
+              onClick={handleNavClick}
+              className={({ isActive }) => 
+                isActive ? `${styles.navLink} ${styles.active}` : styles.navLink
+              }>
+              <IconProfile />
+              Profile
+            </NavLink>
+          </li>
         </ul>
       </nav>
 

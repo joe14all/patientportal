@@ -10,6 +10,14 @@ import Appointments from '../pages/Appointments.jsx';
 import LoginPage from '../pages/Login.jsx';
 import NotFound from '../pages/NotFound.jsx';
 
+// --- Import all the new pages ---
+import Messages from '../pages/Messages.jsx';
+import Thread from '../pages/Thread.jsx';
+import Billing from '../pages/Billing.jsx';
+import Documents from '../pages/Documents.jsx';
+import Profile from '../pages/Profile.jsx';
+import MedicalHistory from '../pages/MedicalHistory.jsx';
+
 export const AppRouter = () => (
   <BrowserRouter>
     <Routes>
@@ -23,7 +31,15 @@ export const AppRouter = () => (
           {/* The default page inside MainLayout */}
           <Route index element={<Dashboard />} /> 
           <Route path="appointments" element={<Appointments />} />
-          {/* Add more protected routes here (e.g., billing, messages) */}
+          
+          {/* --- Add all the new routes --- */}
+          <Route path="messages" element={<Messages />} />
+          <Route path="messages/:threadId" element={<Thread />} />
+          <Route path="billing" element={<Billing />} />
+          <Route path="documents" element={<Documents />} />
+          <Route path="profile" element={<Profile />} />
+          <Route path="history" element={<MedicalHistory />} />
+          
         </Route>
       </Route>
 
