@@ -3,7 +3,10 @@
   display: grid;
   grid-template-columns: 1fr; /* Mobile-first: single column */
   gap: 1.5rem;
-  padding-bottom: 80px; /* Space for save bar */
+  
+  /* Space for save bar (handled by common component, 
+     but we still need to add padding to the bottom of the page) */
+  padding-bottom: 80px; 
 }
 
 .column {
@@ -20,130 +23,7 @@
   }
 }
 
-/* --- Avatar Card --- */
-.avatarCard {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-}
-
-.avatar {
-  width: 100px;
-  height: 100px;
-  border-radius: 50%;
-  background-color: var(--primary-light);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 1rem;
-}
-
-.avatar svg {
-  width: 48px;
-  height: 48px;
-  color: var(--primary);
-}
-
-.avatarCard h2 {
-  font-size: 1.5rem;
-  color: var(--text-primary);
-  margin: 0;
-}
-
-.avatarCard p {
-  font-size: 1rem;
-  color: var(--text-secondary);
-  margin: 0.25rem 0 0;
-}
-
-/* --- Login History --- */
-.loginHistoryCard {
-  padding-top: 1rem;
-  padding-bottom: 1rem;
-}
-
-.loginHistoryList {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.loginHistoryItem {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0.75rem 0;
-  border-bottom: 1px solid var(--border-color);
-}
-.loginHistoryItem:last-child {
-  border-bottom: none;
-  padding-bottom: 0;
-}
-.loginHistoryItem:first-child {
-  padding-top: 0;
-}
-
-.loginHistoryItem strong {
-  font-size: 0.875rem;
-  color: var(--text-secondary);
-}
-
-.loginHistoryItem span {
-  font-weight: 600;
-  font-size: 0.875rem;
-}
-
-.success {
-  color: var(--success-500);
-}
-
-.failed {
-  color: var(--error-500);
-}
-
-/* --- Sticky Save Bar --- */
-/* This is duplicated from MedicalHistory.module.css for modularity */
-.saveBar {
-  position: sticky;
-  bottom: 0;
-  left: 0;
-  right: 0;
-
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 1rem 1.5rem;
-  background-color: var(--bg-surface);
-  border-top: 1px solid var(--border-color);
-  box-shadow: 0 -4px 12px rgba(0,0,0,0.05);
-
-  margin-left: -1.5rem;
-  margin-right: -1.5rem;
-}
-
-body.dark .saveBar {
-  box-shadow: 0 -4px 12px rgba(0,0,0,0.2);
-}
-
-.saveBar p {
-  margin: 0;
-  font-weight: 500;
-  color: var(--text-primary);
-}
-
-@media (min-width: 768px) {
-  .saveBar {
-    width: 100%;
-    max-width: 1024px; /* Matches .contentWrapper */
-    margin: 0 auto;
-    left: 50%;
-    transform: translateX(-50%);
-    bottom: 2.5rem;
-    border-radius: 0.75rem;
-    border: 1px solid var(--border-color);
-  }
-}
+/* All other styles (Avatar Card, Login History, Save Bar)
+  have been REMOVED from this file and moved into their
+  own respective component .module.css files.
+*/

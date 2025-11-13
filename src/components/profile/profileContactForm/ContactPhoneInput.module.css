@@ -1,0 +1,93 @@
+.phoneWrapper {
+  /* This is a new wrapper for the whole phone block */
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border-color);
+}
+
+.phoneGrid {
+  display: grid;
+  grid-template-columns: 100px 1fr; /* Fixed width for code, flexible for number */
+  gap: 0 0.75rem;
+}
+
+/* --- Checkbox Group --- */
+.checkboxGroup {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  margin-top: 0.75rem;
+  text-align: left;
+}
+
+.checkboxGroup label {
+  margin-bottom: 0;
+  margin-left: 0.75rem;
+  flex: 1;
+  /* Use the helper text style for the checkbox label */
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  font-weight: 400;
+}
+
+.checkboxGroup input[type="checkbox"] {
+  width: auto; /* Don't force 100% width */
+  flex-shrink: 0;
+}
+
+
+/* --- Base/Helper Styles --- */
+
+.select {
+  font-family: inherit;
+  font-size: 1rem;
+  font-weight: 400;
+  width: 100%;
+  padding: 0.75rem;
+  color: var(--text-primary);
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: 0.5rem;
+  box-sizing: border-box;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2220%22%20height%3D%2220%22%20fill%3D%22none%22%20stroke%3D%22%2364748b%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%20stroke-width%3D%222%22%20class%3D%22feather%20feather-chevron-down%22%3E%3Cpath%20d%3D%22m6%209%206%206%206-6%22%2F%3E%3C%2Fsvg%3E');
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+  background-size: 1em;
+  padding-right: 2.5rem;
+}
+
+body.dark .select {
+  background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2220%22%20height%3D%2220%22%20fill%3D%22none%22%20stroke%3D%22%2394a3b8%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%20stroke-width%3D%222%22%20class%3D%22feather%20feather-chevron-down%22%3E%3Cpath%20d%3D%22m6%209%206%206%206-6%22%2F%3E%3C%2Fsvg%3E');
+}
+
+.select:focus,
+input:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px var(--primary-light);
+}
+
+body.dark .select:focus,
+body.dark input:focus {
+  box-shadow: 0 0 0 3px var(--neutral-700);
+}
+
+.errorText {
+  font-size: 0.875rem;
+  color: var(--error);
+  font-weight: 500;
+  margin-top: 0.25rem;
+  margin-bottom: 0;
+}
+
+.isInvalid {
+  border-color: var(--error);
+}
+
+.isInvalid:focus {
+  box-shadow: 0 0 0 3px var(--error-bg);
+}

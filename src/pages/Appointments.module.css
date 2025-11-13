@@ -1,0 +1,161 @@
+.pageHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.pageDescription {
+  font-size: 1rem;
+  color: var(--text-secondary);
+  margin-top: -0.75rem;
+  margin-bottom: 2rem;
+}
+
+/* --- Booking Form --- */
+.bookingCard {
+  margin-bottom: 2.5rem;
+}
+
+.bookingActions {
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+  margin-top: 1.5rem;
+}
+
+/* --- Section --- */
+.section {
+  margin-bottom: 2.5rem;
+}
+
+.section h2 {
+  font-size: 1.25rem;
+  margin-bottom: 1rem;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 0.5rem;
+}
+
+/* --- Appointment List --- */
+.appointmentList {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.appointmentCard {
+  padding: 0; /* Remove default card padding */
+  overflow: hidden; /* Ensure clean corners */
+}
+
+.appointmentCard.past {
+  opacity: 0.8;
+}
+
+.cardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 1.25rem 1.25rem 1rem;
+  background-color: var(--bg-surface-hover);
+  border-bottom: 1px solid var(--border-color);
+}
+
+body.dark .cardHeader {
+  background-color: var(--bg-surface);
+}
+
+.dateTime {
+  display: flex;
+  flex-direction: column;
+}
+
+.date {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.time {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.status {
+  font-size: 0.875rem;
+  font-weight: 600;
+  padding: 0.25rem 0.6rem;
+  border-radius: 99px;
+  text-transform: uppercase;
+}
+
+.confirmed {
+  color: var(--success-700);
+  background-color: var(--success-100);
+}
+.cancelled {
+  color: var(--error-700);
+  background-color: var(--error-100);
+}
+.pending {
+  color: var(--warning-700);
+  background-color: var(--warning-100);
+}
+
+body.dark .confirmed {
+  color: var(--success-200);
+  background-color: var(--success-900);
+}
+body.dark .cancelled {
+  color: var(--error-200);
+  background-color: var(--error-900);
+}
+body.dark .pending {
+  color: var(--warning-200);
+  background-color: var(--warning-900);
+}
+
+.cardBody {
+  padding: 1.25rem;
+}
+
+.cardBody h3 {
+  margin: 0 0 0.5rem;
+  font-size: 1.25rem;
+  color: var(--text-primary);
+}
+
+.cardBody p {
+  margin: 0 0 1.25rem;
+  color: var(--text-secondary);
+  font-size: 1rem;
+}
+
+.details {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+}
+
+.details span {
+  color: var(--text-secondary);
+}
+
+.details strong {
+  color: var(--text-primary);
+  margin-right: 0.5rem;
+}
+
+.cardActions {
+  display: flex;
+  gap: 1rem;
+  padding: 1.25rem;
+  border-top: 1px solid var(--border-color);
+  background-color: var(--bg-surface-hover);
+}
+
+body.dark .cardActions {
+  background-color: var(--bg-surface);
+}

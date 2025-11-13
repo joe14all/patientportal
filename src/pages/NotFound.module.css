@@ -1,0 +1,36 @@
+.notFoundWrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  width: 100%;
+  min-height: 100vh; /* Full viewport height */
+  padding: 2rem;
+  box-sizing: border-box;
+  background-color: var(--bg-body);
+}
+
+.notFoundContent {
+  max-width: 500px;
+}
+
+.errorCode {
+  font-size: 6rem;
+  font-weight: 800;
+  color: var(--primary);
+  margin: 0;
+  line-height: 1;
+}
+
+.title {
+  font-size: 1.75rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0.5rem 0 1rem;
+}
+
+.message {
+  font-size: 1rem;
+  color: var(--text-secondary);
+  margin-bottom: 2rem;
+}

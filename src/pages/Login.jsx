@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useAccountData } from '../contexts';
+import styles from './Login.module.css'; // Import the CSS module
 
 const LoginPage = () => {
   const [email, setEmail] = useState('parent@example.com');
@@ -22,8 +23,11 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="card" style={{ maxWidth: '400px', margin: '0 auto' }}>
-      <h2>Portal Login</h2>
+    // Use the CSS module for styling
+    <div className={`card ${styles.loginCard}`}> 
+      <h2 className={styles.title}>Portal Login</h2>
+      <p className={styles.subtitle}>Welcome back. Please log in to your account.</p>
+      
       <form onSubmit={handleSubmit}>
         <div className="form-group">
           <label htmlFor="email">Email</label>
@@ -43,11 +47,18 @@ const LoginPage = () => {
             onChange={(e) => setPassword(e.target.value)}
           />
         </div>
+        
         {error && <p className="error-text" style={{ marginBottom: '1rem' }}>{error}</p>}
-        <button type="submit" disabled={loading} style={{ width: '100%' }}>
+        
+        <button type="submit" disabled={loading} className={styles.loginButton}>
           {loading ? 'Logging in...' : 'Log In'}
         </button>
       </form>
+
+      <div className={styles.footerLinks}>
+        <Link to="/forgot-password">Forgot password?</Link>
+        <Link to="/signup">Don't have an account? Sign up</Link>
+      </div>
     </div>
   );
 };

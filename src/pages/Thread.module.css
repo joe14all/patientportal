@@ -1,0 +1,130 @@
+/* Make the page a full-height flex column */
+.pageWrapper {
+  display: flex;
+  flex-direction: column;
+  /* * Use the full height of the content area.
+   * We subtract the header (60px) and the content padding (2.5rem * 2) 
+   * This is a bit fragile but works for a full-screen chat.
+  */
+  height: calc(100vh - 60px - 5rem);
+  width: 100%;
+}
+
+/* --- Header --- */
+.threadHeader {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--border-color);
+  flex-shrink: 0; /* Don't shrink the header */
+}
+
+.headerInfo {
+  min-width: 0;
+}
+
+.headerSubject {
+  font-size: 1.25rem;
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.headerStatus {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+/* --- Message List --- */
+.messageList {
+  flex-grow: 1; /* Take up all available space */
+  overflow-y: auto; /* Allow messages to scroll */
+  padding: 1.5rem 0.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.messageBubble {
+  max-width: 80%;
+  padding: 0.75rem 1rem;
+  border-radius: 1rem;
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  width: fit-content;
+}
+
+.bubbleHeader {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-bottom: 0.25rem;
+}
+
+.bubbleHeader strong {
+  color: var(--text-primary);
+}
+
+.messageBody {
+  margin: 0;
+  color: var(--text-primary);
+  /* Allow long words to break and wrap */
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+/* "Mine" (Sent by user) */
+.mine {
+  align-self: flex-end;
+  background-color: var(--primary);
+  border-color: var(--primary);
+  color: white;
+}
+.mine .bubbleHeader {
+  color: rgba(255, 255, 255, 0.8);
+}
+.mine .bubbleHeader strong {
+  color: white;
+}
+.mine .messageBody {
+  color: white;
+}
+
+/* "Theirs" (Received) */
+.theirs {
+  align-self: flex-start;
+  background-color: var(--bg-surface);
+}
+
+/* --- Reply Form --- */
+.replyForm {
+  display: flex;
+  gap: 0.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border-color);
+  flex-shrink: 0; /* Don't shrink the form */
+}
+
+.replyForm input {
+  flex-grow: 1;
+}
+
+/* Make the send button fit */
+.replyForm .icon-button {
+  height: 44px; /* Match input height */
+  width: 44px; /* Match input height */
+  flex-shrink: 0;
+}
+
+/* On mobile, use less vertical space */
+@media (max-width: 767px) {
+  .pageWrapper {
+    height: calc(100vh - 60px - 2rem); /* 1rem padding top/bottom */
+  }
+}

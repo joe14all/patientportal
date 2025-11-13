@@ -87,7 +87,15 @@ export const IconMedicalHistory = (props) => (
   </svg>
 );
 
-{/* --- NEW ICONS FOR DOCUMENTS PAGE --- */}
+export const IconTreatmentPlan = (props) => (
+  <svg {...iconProps} {...props}>
+    <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"></path>
+    <polyline points="14 2 14 8 20 8"></polyline>
+    <polyline points="10 14 12 16 16 12"></polyline>
+  </svg>
+);
+
+{/* --- ICONS FOR DOCUMENTS PAGE --- */}
 
 export const IconUploadCloud = (props) => (
   <svg {...iconProps} {...props}>
@@ -135,5 +143,12 @@ export const IconSend = (props) => (
   <svg {...iconProps} {...props}>
     <line x1="22" y1="2" x2="11" y2="13"></line>
     <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+  </svg>
+);
+
+export const IconArrowLeft = (props) => (
+  <svg {...iconProps} {...props}>
+    <line x1="19" y1="12" x2="5" y2="12"></line>
+    <polyline points="12 19 5 12 12 5"></polyline>
   </svg>
 );

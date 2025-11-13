@@ -7,7 +7,8 @@ import {
   IconBilling,
   IconDocuments,
   IconProfile,
-  IconMedicalHistory
+  IconMedicalHistory,
+  IconTreatmentPlan // 1. Import the new icon
 } from './Icons';
 import styles from './Sidebar.module.css';
 
@@ -32,7 +33,7 @@ const Sidebar = () => {
           </NavLink>
         </li>
         
-        {/* --- NEW LINKS --- */}
+        {/* --- LINKS --- */}
         <li>
           <NavLink to="/messages" className={({ isActive }) => 
             isActive ? `${styles.navLink} ${styles.active}` : styles.navLink
@@ -49,6 +50,17 @@ const Sidebar = () => {
             Billing
           </NavLink>
         </li>
+        
+        {/* 2. Add the new NavLink for Treatment Plans */}
+        <li>
+          <NavLink to="/plans" className={({ isActive }) => 
+            isActive ? `${styles.navLink} ${styles.active}` : styles.navLink
+          }>
+            <IconTreatmentPlan />
+            Treatment Plans
+          </NavLink>
+        </li>
+        
         <li>
           <NavLink to="/documents" className={({ isActive }) => 
             isActive ? `${styles.navLink} ${styles.active}` : styles.navLink

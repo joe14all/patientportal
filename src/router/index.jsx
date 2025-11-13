@@ -17,6 +17,7 @@ import Billing from '../pages/Billing.jsx';
 import Documents from '../pages/Documents.jsx';
 import Profile from '../pages/Profile.jsx';
 import MedicalHistory from '../pages/MedicalHistory.jsx';
+import TreatmentPlans from '../pages/TreatmentPlans.jsx'; // 1. Import TreatmentPlans
 
 export const AppRouter = () => (
   <BrowserRouter>
@@ -36,6 +37,7 @@ export const AppRouter = () => (
           <Route path="messages" element={<Messages />} />
           <Route path="messages/:threadId" element={<Thread />} />
           <Route path="billing" element={<Billing />} />
+          <Route path="plans" element={<TreatmentPlans />} /> {/* 2. Add the route */}
           <Route path="documents" element={<Documents />} />
           <Route path="profile" element={<Profile />} />
           <Route path="history" element={<MedicalHistory />} />

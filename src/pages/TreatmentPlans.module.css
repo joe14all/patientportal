@@ -1,0 +1,208 @@
+.pageWrapper {
+  /* No styles needed, just a container */
+}
+
+.pageDescription {
+  font-size: 1rem;
+  color: var(--text-secondary);
+  margin-top: -0.75rem;
+  margin-bottom: 2rem;
+}
+
+.section {
+  margin-bottom: 2.5rem;
+}
+
+.section h2 {
+  font-size: 1.25rem;
+  margin-bottom: 1rem;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 0.5rem;
+}
+
+.planList {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/* --- Plan Card --- */
+.planCard {
+  padding: 0; /* Remove default card padding */
+  overflow: hidden; /* Ensure clean corners */
+  border: 1px solid var(--border-color);
+}
+
+/* Add colored left border based on status */
+.proposed {
+  border-left: 4px solid var(--warning-500);
+}
+.accepted {
+  border-left: 4px solid var(--success-500);
+}
+.rejected {
+  border-left: 4px solid var(--error-500);
+}
+.other {
+  border-left: 4px solid var(--border-color);
+}
+
+
+/* --- Card Header --- */
+.cardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 1.25rem 1.25rem 1rem;
+  background-color: var(--bg-surface-hover);
+}
+body.dark .cardHeader {
+  background-color: var(--bg-surface);
+}
+
+.headerInfo {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: var(--text-primary);
+}
+.headerInfo h3 {
+  margin: 0;
+  font-size: 1.25rem;
+}
+.headerInfo svg {
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+}
+
+/* Status Tag */
+.status {
+  font-size: 0.875rem;
+  font-weight: 600;
+  padding: 0.25rem 0.6rem;
+  border-radius: 99px;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.proposed .status {
+  color: var(--warning-700);
+  background-color: var(--warning-100);
+}
+.accepted .status {
+  color: var(--success-700);
+  background-color: var(--success-100);
+}
+.rejected .status {
+  color: var(--error-700);
+  background-color: var(--error-100);
+}
+
+body.dark .proposed .status {
+  color: var(--warning-200);
+  background-color: var(--warning-900);
+}
+body.dark .accepted .status {
+  color: var(--success-200);
+  background-color: var(--success-900);
+}
+body.dark .rejected .status {
+  color: var(--error-200);
+  background-color: var(--error-900);
+}
+
+/* --- Procedure List --- */
+.procedureList {
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.procedureItem {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--border-color);
+}
+.procedureList .procedureItem:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+@media (min-width: 640px) {
+  .procedureItem {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+  }
+}
+
+.procInfo strong {
+  display: block;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+.procInfo span {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+}
+
+.procCost {
+  text-align: left;
+}
+.procCost strong {
+  display: block;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+.procCost span {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+}
+
+@media (min-width: 640px) {
+  .procCost {
+    text-align: right;
+  }
+}
+
+/* --- Summary --- */
+.financialSummary {
+  padding: 1.25rem;
+  border-top: 1px solid var(--border-color);
+  background-color: var(--bg-surface-hover);
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+body.dark .financialSummary {
+  background-color: var(--bg-surface);
+}
+
+.financialSummary div {
+  display: flex;
+  justify-content: space-between;
+  font-size: 1rem;
+  color: var(--text-secondary);
+}
+.financialSummary div strong {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+/* --- Actions --- */
+.cardActions {
+  display: flex;
+  gap: 1rem;
+  padding: 1.25rem;
+  border-top: 1px solid var(--border-color);
+  background-color: var(--bg-surface);
+  justify-content: flex-end;
+}

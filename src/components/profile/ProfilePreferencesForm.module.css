@@ -1,0 +1,29 @@
+.formCard {
+  /* No specific styles needed, just uses the global 'card' */
+}
+
+/* --- Checkbox Group --- */
+/* This style overrides the default .form-group behavior 
+   to put the checkbox and label on the same line. 
+   It's a common pattern for checkbox inputs. */
+.checkboxGroup {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  margin-bottom: 0.75rem;
+  text-align: left;
+}
+
+/* We don't want the label to be a block element here */
+.checkboxGroup label {
+  margin-bottom: 0;
+  margin-left: 0.75rem;
+  /* Make the label take up the remaining space */
+  flex: 1;
+}
+
+/* Make the checkbox input smaller */
+.checkboxGroup input[type="checkbox"] {
+  width: auto; /* Don't force 100% width */
+  flex-shrink: 0;
+}

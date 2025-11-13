@@ -1,91 +1,195 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { usePatientData, useAccountData } from '../contexts';
-import { IconProfile } from '../layouts/components/Icons';
 import styles from './Profile.module.css';
 
-const Profile = () => {
-  // Get data and actions from two different contexts
-  const { 
-    patient, 
-    updatePatientDetails, 
-    loading: patientLoading 
-  } = usePatientData();
-  
-  const { 
-    user, 
-    loginHistory, 
-    updateUserPreferences, 
-    updateRecoveryPhone,
-    loading: accountLoading 
-  } = useAccountData();
+// ... (imports for all other subcomponents remain the same)
+import ProfileAvatarCard from '../components/profile/ProfileAvatarCard';
+import ProfileContactForm from '../components/profile/ProfileContactForm';
+import ProfileEmergencyContacts from '../components/profile/ProfileEmergencyContacts';
+import ProfileSecurityForm from '../components/profile/ProfileSecurityForm';
+import ProfilePreferencesForm from '../components/profile/ProfilePreferencesForm';
+import ProfileDemographicsForm from '../components/profile/ProfileDemographicsForm';
+import ProfileLoginHistory from '../components/profile/ProfileLoginHistory';
+import ProfileSystemInfo from '../components/profile/ProfileSystemInfo';
+import StickySaveBar from '../components/common/StickySaveBar';
 
+// --- THIS IS THE FIX ---
+// We need GENDER_IDENTITY_OPTIONS for the `useEffect` logic
+import { RACE_OPTIONS, GENDER_IDENTITY_OPTIONS } from '../constants';
+
+// ... (Helper functions like splitPhoneNumber, getPrimaryOrFirst remain the same)
+const splitPhoneNumber = (fullNumber) => {
+  if (!fullNumber) return { code: '+1', number: '' };
+  if (fullNumber.startsWith('+1')) return { code: '+1', number: fullNumber.substring(2) };
+  if (fullNumber.startsWith('+20')) return { code: '+20', number: fullNumber.substring(3) };
+  return { code: '+1', number: fullNumber.replace('+1', '') };
+};
+const getPrimaryOrFirst = (arr, defaultItem) => {
+  if (!arr || arr.length === 0) return defaultItem;
+  return arr.find(i => i.isPrimary) || arr[0];
+};
+
+
+const Profile = () => {
+  // --- Data and Actions ---
+  const { patient, updatePatientDetails, loading: patientLoading } = usePatientData();
+  const { user, updateUserPreferences, updateRecoveryPhone, loading: accountLoading } = useAccountData();
+
+  // --- Component State ---
   const [formData, setFormData] = useState(null);
   const [isDirty, setIsDirty] = useState(false);
+  const [originalEmail, setOriginalEmail] = useState(null);
 
-  // When data loads from contexts, combine it into one form state
+  // --- Effects ---
   useEffect(() => {
     if (patient && user) {
+      const primaryEmail = getPrimaryOrFirst(patient.contact.emails, {});
+      const primaryPhone = getPrimaryOrFirst(patient.contact.phones, {});
+      const primaryAddress = getPrimaryOrFirst(patient.contact.addresses, {});
+      const { code: phoneCountryCode, number: phoneNumber } = splitPhoneNumber(primaryPhone.number);
+
+      // --- Demographics Logic ---
+      const demographics = patient.demographics || {};
+      const gender = demographics.genderIdentity || '';
+      
+      // Find the "Other" gender value (This was the line that caused the error)
+      const genderOther = !GENDER_IDENTITY_OPTIONS.includes(gender) ? gender : '';
+      
+      // Find the "Other" race value
+      const raceOther = (demographics.race || []).find(
+        r => !RACE_OPTIONS.includes(r) && r !== "Prefer not to say"
+      ) || '';
+
       setFormData({
-        // Patient data
+        // ... (Contact fields)
         preferredName: patient.preferredName,
-        email: patient.contact.emails.find(e => e.isPrimary)?.address || '',
-        phone: patient.contact.phones.find(p => p.isPrimary)?.number || '',
-        addressLine1: patient.contact.addresses.find(a => a.isPrimary)?.line[0] || '',
-        city: patient.contact.addresses.find(a => a.isPrimary)?.city || '',
-        state: patient.contact.addresses.find(a => a.isPrimary)?.state || '',
-        postalCode: patient.contact.addresses.find(a => a.isPrimary)?.postalCode || '',
+        email: primaryEmail.address || '',
+        emailIsVerified: primaryEmail.isVerified || false,
+        phoneCountryCode: phoneCountryCode,
+        phoneNumber: phoneNumber,
+        phoneType: primaryPhone.type || 'Mobile',
+        allowSms: primaryPhone.allowSms || false,
+        addressUse: primaryAddress.use || 'Home',
+        addressLine1: primaryAddress.line ? primaryAddress.line[0] : '',
+        addressLine2: primaryAddress.line ? primaryAddress.line[1] : '',
+        city: primaryAddress.city || '',
+        state: primaryAddress.state || '',
+        postalCode: primaryAddress.postalCode || '',
+        country: primaryAddress.country || 'US',
         
-        // Account data
+        // --- Demographics State ---
+        demographics: {
+          genderIdentity: GENDER_IDENTITY_OPTIONS.includes(gender) ? gender : 'Other',
+          genderIdentityOther: genderOther,
+          pronouns: demographics.pronouns || '',
+          maritalStatus: demographics.maritalStatus || '',
+          sexAtBirth: demographics.sexAtBirth || '',
+          ethnicity: demographics.ethnicity || '',
+          race: demographics.race || [],
+          raceOther: raceOther, 
+        },
+        
+        // ... (Account fields)
         recoveryPhone: user.contact.recoveryPhone,
         language: user.preferences.language,
         notifications: user.preferences.notifications,
       });
+      
+      setOriginalEmail(primaryEmail.address || '');
       setIsDirty(false);
     }
-  }, [patient, user]);
+  }, [patient, user]); // This dependency array is correct
 
-  // Generic change handler for top-level fields
+  // --- Event Handlers ---
+
+  const handleRaceChange = useCallback((selectedRaces, otherRace) => {
+    const newRaceArray = [...selectedRaces];
+    if (otherRace) {
+      newRaceArray.push(otherRace);
+    }
+    
+    setFormData(prev => ({
+      ...prev,
+      demographics: { 
+        ...prev.demographics, 
+        race: newRaceArray,
+        raceOther: otherRace
+      }
+    }));
+    setIsDirty(true);
+  }, []);
+
+
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     
-    // Handle nested notification checkboxes
     if (name.startsWith('notify_')) {
-      const key = name.split('_')[1]; // e.g., "appointmentReminders"
+      const key = name.split('_')[1];
+      setFormData(prev => ({ ...prev, notifications: { ...prev.notifications, [key]: checked }}));
+    
+    } else if (name.startsWith('demographics.')) {
+      const key = name.split('.')[1];
       setFormData(prev => ({
         ...prev,
-        notifications: {
-          ...prev.notifications,
-          [key]: checked,
-        }
+        demographics: { ...prev.demographics, [key]: value }
       }));
+
+    } else if (name === 'email') {
+      const newEmail = value;
+      setFormData(prev => ({
+        ...prev,
+        email: newEmail,
+        emailIsVerified: newEmail.toLowerCase() === originalEmail.toLowerCase() 
+          ? patient.contact.emails.find(e => e.isPrimary).isVerified 
+          : false,
+      }));
+
     } else {
-      setFormData(prev => ({
-        ...prev,
-        [name]: type === 'checkbox' ? checked : value
-      }));
+      setFormData(prev => ({ ...prev, [name]: type === 'checkbox' ? checked : value }));
     }
     setIsDirty(true);
   };
 
-  // Handle form submission
   const handleSave = async () => {
+    if (!formData) return;
     try {
+      // --- Prepare Demographics Payload ---
+      const demoData = formData.demographics;
+      const finalGender = demoData.genderIdentity === 'Other' 
+        ? demoData.genderIdentityOther 
+        : demoData.genderIdentity;
+
       // 1. Update Patient Details
       await updatePatientDetails({
         preferredName: formData.preferredName,
         contact: {
-          ...patient.contact, // Preserve existing data
-          emails: [{ address: formData.email, isPrimary: true, isVerified: false }],
-          phones: [{ number: formData.phone, type: "Mobile", isPrimary: true, allowSms: true }],
+          ...patient.contact,
+          emails: [{ address: formData.email, isPrimary: true, isVerified: formData.emailIsVerified }],
+          phones: [{ 
+            number: `${formData.phoneCountryCode}${formData.phoneNumber}`,
+            type: formData.phoneType,
+            isPrimary: true, 
+            allowSms: formData.allowSms
+          }],
           addresses: [{
-            use: "Home",
+            use: formData.addressUse,
             isPrimary: true,
-            line: [formData.addressLine1],
+            line: [formData.addressLine1, formData.addressLine2].filter(Boolean),
             city: formData.city,
             state: formData.state,
             postalCode: formData.postalCode,
-            country: "US"
+            country: formData.country
           }]
+        },
+        
+        demographics: {
+          ...patient.demographics,
+          genderIdentity: finalGender,
+          pronouns: demoData.pronouns,
+          maritalStatus: demoData.maritalStatus,
+          sexAtBirth: demoData.sexAtBirth,
+          ethnicity: demoData.ethnicity,
+          race: demoData.race,
         }
       });
 
@@ -98,22 +202,22 @@ const Profile = () => {
       // 3. Update Account Recovery Phone
       await updateRecoveryPhone(formData.recoveryPhone);
 
-      setIsDirty(false); // Reset dirty state on success
+      setOriginalEmail(formData.email);
+      setIsDirty(false);
     } catch (err) {
       console.error("Failed to save profile", err);
-      // Error is handled in the respective contexts
     }
   };
 
+  const handleVerifyEmail = () => {
+    alert(`A verification link has been sent to ${formData.email}.`);
+  };
+
+  // --- Render Logic ---
   const loading = patientLoading || accountLoading;
   
-  if (loading && !formData) {
-    return <p>Loading profile...</p>;
-  }
-  
-  if (!formData) {
-    return <p>Could not load profile data.</p>;
-  }
+  if (loading && !formData) return <p>Loading profile...</p>;
+  if (!formData) return <p>Could not load profile data.</p>;
 
   return (
     <div className={styles.pageWrapper}>
@@ -122,161 +226,40 @@ const Profile = () => {
       <div className={styles.profileLayout}>
         {/* --- Column 1: Profile & Contact --- */}
         <div className={styles.column}>
-          <div className={`card ${styles.avatarCard}`}>
-            <div className={styles.avatar}>
-              <IconProfile />
-            </div>
-            <h2>{patient.legalName.fullText}</h2>
-            <p>DOB: {patient.dateOfBirth}</p>
-          </div>
-
-          <form className="card">
-            <h2>Personal Information</h2>
-            <div className="form-group">
-              <label htmlFor="preferredName">Preferred Name</label>
-              <input 
-                type="text" 
-                id="preferredName"
-                name="preferredName"
-                value={formData.preferredName}
-                onChange={handleChange}
-              />
-            </div>
-            
-            <h2>Contact Information</h2>
-            <div className="form-group">
-              <label htmlFor="email">Email Address</label>
-              <input 
-                type="email" 
-                id="email"
-                name="email"
-                value={formData.email}
-                onChange={handleChange}
-              />
-            </div>
-            <div className="form-group">
-              <label htmlFor="phone">Mobile Phone</label>
-              <input 
-                type="tel" 
-                id="phone"
-                name="phone"
-                value={formData.phone}
-                onChange={handleChange}
-              />
-            </div>
-            <div className="form-group">
-              <label htmlFor="addressLine1">Address</label>
-              <input 
-                type="text" 
-                id="addressLine1"
-                name="addressLine1"
-                value={formData.addressLine1}
-                onChange={handleChange}
-              />
-            </div>
-            {/* Add City/State/Zip... */}
-          </form>
+          <ProfileAvatarCard />
+          <ProfileContactForm 
+            formData={formData} // Pass the *full* formData
+            handleChange={handleChange}
+            handleVerifyEmail={handleVerifyEmail}
+          />
+          <ProfileEmergencyContacts />
         </div>
         
         {/* --- Column 2: Account & Security --- */}
         <div className={styles.column}>
-          <form className="card">
-            <h2>Account Security</h2>
-            <div className="form-group">
-              <label htmlFor="email">Login Email</label>
-              <input 
-                type="email" 
-                id="loginEmail"
-                name="loginEmail"
-                value={user.email}
-                disabled 
-              />
-            </div>
-            <div className="form-group">
-              <label htmlFor="recoveryPhone">Recovery Phone</label>
-              <input 
-                type="tel" 
-                id="recoveryPhone"
-                name="recoveryPhone"
-                value={formData.recoveryPhone}
-                onChange={handleChange}
-              />
-            </div>
-          </form>
-
-          <form className="card">
-            <h2>Preferences</h2>
-            <div className="form-group">
-              <label htmlFor="language">Language</label>
-              <select 
-                id="language"
-                name="language"
-                value={formData.language}
-                onChange={handleChange}
-              >
-                <option value="en">English</option>
-                <option value="es">Español</option>
-              </select>
-            </div>
-            
-            <h3>Notifications</h3>
-            <div className="form-group">
-              <input 
-                type="checkbox" 
-                id="notify_appointmentReminders"
-                name="notify_appointmentReminders"
-                checked={formData.notifications.appointmentReminders}
-                onChange={handleChange}
-              />
-              <label htmlFor="notify_appointmentReminders">Appointment Reminders</label>
-            </div>
-            <div className="form-group">
-              <input 
-                type="checkbox" 
-                id="notify_newMessageAlerts"
-                name="notify_newMessageAlerts"
-                checked={formData.notifications.newMessageAlerts}
-                onChange={handleChange}
-              />
-              <label htmlFor="notify_newMessageAlerts">New Message Alerts</label>
-            </div>
-            <div className="form-group">
-              <input 
-                type="checkbox" 
-                id="notify_billingAlerts"
-                name="notify_billingAlerts"
-                checked={formData.notifications.billingAlerts}
-                onChange={handleChange}
-              />
-              <label htmlFor="notify_billingAlerts">Billing Alerts</label>
-            </div>
-          </form>
-
-          <section className={`card ${styles.loginHistoryCard}`}>
-            <h2>Login History</h2>
-            <ul className={styles.loginHistoryList}>
-              {loginHistory.slice(0, 3).map(item => (
-                <li className={styles.loginHistoryItem} key={item.id}>
-                  <strong>{new Date(item.timestamp).toLocaleString()}</strong>
-                  <span className={item.status === 'Success' ? styles.success : styles.failed}>
-                    {item.status}
-                  </span>
-                </li>
-              ))}
-            </ul>
-          </section>
+          <ProfileSecurityForm 
+            formData={formData} 
+            handleChange={handleChange} 
+          />
+          <ProfilePreferencesForm 
+            formData={formData} 
+            handleChange={handleChange} 
+          />
+          <ProfileDemographicsForm
+            formData={formData.demographics} // Pass the demographics sub-object
+            handleChange={handleChange}
+            handleRaceChange={handleRaceChange} 
+          />
+          <ProfileLoginHistory />
+          <ProfileSystemInfo />
         </div>
       </div>
 
-      {/* --- Sticky Save Bar --- */}
-      {isDirty && (
-        <div className={styles.saveBar}>
-          <p>You have unsaved changes.</p>
-          <button onClick={handleSave} disabled={loading}>
-            {loading ? 'Saving...' : 'Save Changes'}
-          </button>
-        </div>
-      )}
+      <StickySaveBar 
+        isDirty={isDirty}
+        loading={loading}
+        onSave={handleSave}
+      />
     </div>
   );
 };

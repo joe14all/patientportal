@@ -1,0 +1,87 @@
+.contactsCard {
+  /* No special styles needed, just uses the global 'card' */
+}
+
+.contactList {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.contactItem {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  background-color: var(--bg-body);
+  border: 1px solid var(--border-color);
+  border-radius: 0.5rem;
+}
+
+.contactAvatar {
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: var(--primary-light);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.contactAvatar svg {
+  width: 20px;
+  height: 20px;
+  color: var(--primary);
+}
+
+.contactInfo {
+  flex-grow: 1;
+}
+
+.contactInfo strong {
+  display: block;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.contactInfo span {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+}
+
+.contactActions {
+  display: flex;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+
+.addButton {
+  margin-top: 1rem;
+  /* Use secondary style for a "less" primary action */
+  background-color: var(--bg-surface);
+  color: var(--primary);
+  border-color: var(--primary);
+}
+.addButton:hover {
+  background-color: var(--primary-light);
+}
+
+/* --- Edit Form --- */
+.editForm {
+  padding-top: 1rem;
+  border-top: 1px solid var(--border-color);
+  margin-top: 1rem;
+}
+
+.editForm h3 {
+  font-size: 1.1rem;
+  color: var(--text-primary);
+}
+
+.formActions {
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+  margin-top: 1.5rem;
+}
