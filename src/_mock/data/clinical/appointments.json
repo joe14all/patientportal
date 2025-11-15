@@ -4,9 +4,9 @@
     "patientId": "patient-uuid-001",
     "providerId": "provider-uuid-001",
     "officeId": "office-uuid-001",
-    "status": "Confirmed",
-    "startDateTime": "2025-11-20T18:00:00Z",
-    "endDateTime": "2025-11-20T19:00:00Z",
+    "status": "Completed",
+    "startDateTime": "2025-11-10T18:00:00Z",
+    "endDateTime": "2025-11-10T19:00:00Z",
     "appointmentType": "Routine Cleaning",
     "reasonForVisit": "6-Month Checkup & Cleaning",
     "plannedProcedures": [
@@ -27,23 +27,23 @@
       "status": "Confirmed",
       "method": "SMS",
       "confirmationToken": "c-token-xyz-123",
-      "lastReminderSentAt": "2025-11-19T18:00:00Z"
+      "lastReminderSentAt": "2025-11-09T18:00:00Z"
     },
     "cancellation": null,
     "checkIn": {
-      "checkInTime": null,
+      "checkInTime": "2025-11-10T17:55:00Z",
       "method": "Kiosk"
     },
     "linkedRecords": {
-      "visitSummaryId": null,
-      "invoiceId": null,
-      "claimId": null
+      "visitSummaryId": "visit-uuid-001",
+      "invoiceId": "inv-uuid-001",
+      "claimId": "claim-uuid-001"
     },
     "systemInfo": {
       "isTelehealth": false,
       "createdAt": "2025-11-01T09:15:00Z",
       "createdBy": "user-uuid-staff-001",
-      "updatedAt": "2025-11-19T18:00:00Z"
+      "updatedAt": "2025-11-10T19:00:00Z"
     }
   },
   {
@@ -52,8 +52,8 @@
     "providerId": "provider-uuid-001",
     "officeId": "office-uuid-001",
     "status": "Cancelled",
-    "startDateTime": "2025-11-22T16:00:00Z",
-    "endDateTime": "2025-11-22T16:30:00Z",
+    "startDateTime": "2025-11-12T16:00:00Z",
+    "endDateTime": "2025-11-12T16:30:00Z",
     "appointmentType": "Consultation",
     "reasonForVisit": "Follow-up on tooth pain",
     "plannedProcedures": [],
@@ -64,7 +64,7 @@
       "lastReminderSentAt": null
     },
     "cancellation": {
-      "cancelledAt": "2025-11-21T10:00:00Z",
+      "cancelledAt": "2025-11-11T10:00:00Z",
       "cancelledBy": "Patient",
       "reason": "Patient called, had a scheduling conflict."
     },
@@ -76,9 +76,48 @@
     },
     "systemInfo": {
       "isTelehealth": false,
-      "createdAt": "2025-11-18T14:00:00Z",
+      "createdAt": "2025-11-10T14:00:00Z",
       "createdBy": "user-uuid-001",
-      "updatedAt": "2025-11-21T10:00:00Z"
+      "updatedAt": "2025-11-11T10:00:00Z"
+    }
+  },
+  {
+    "id": "appt-uuid-003",
+    "patientId": "patient-uuid-001",
+    "providerId": "provider-uuid-001",
+    "officeId": "office-uuid-001",
+    "status": "Confirmed",
+    "startDateTime": "2025-11-28T14:00:00Z",
+    "endDateTime": "2025-11-28T15:30:00Z",
+    "appointmentType": "Crown Placement",
+    "reasonForVisit": "Crown Placement (from Treatment Plan)",
+    "plannedProcedures": [
+      {
+        "procedureId": "D2740",
+        "description": "Porcelain Crown",
+        "tooth": "14",
+        "surface": null
+      }
+    ],
+    "confirmation": {
+      "status": "Confirmed",
+      "method": "Online Portal",
+      "confirmationToken": "c-token-xyz-456",
+      "lastReminderSentAt": null
+    },
+    "cancellation": null,
+    "checkIn": null,
+    "linkedRecords": {
+      "visitSummaryId": null,
+      "invoiceId": null,
+      "claimId": null,
+      "treatmentPlanProcedureId": "tpp-uuid-001"
+    },
+    "systemInfo": {
+      "isTelehealth": false,
+      "createdAt": "2025-11-10T19:05:00Z",
+      "createdBy": "user-uuid-001",
+      "updatedAt": "2025-11-10T19:05:00Z"
     }
   }
 ]

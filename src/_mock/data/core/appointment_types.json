@@ -1,0 +1,72 @@
+[
+  {
+    "id": "appt-type-001",
+    "name": "Adult Routine Cleaning",
+    "patientFacingName": "Routine Cleaning & Checkup",
+    "description": "A standard 6-month cleaning, polishing, and exam.",
+    "duration": 60,
+    "patientFacing": true,
+    "bookingRules": {
+      "providerIds": ["provider-uuid-001"],
+      "operatoryIds": ["chair-2"],
+      "procedureIds": ["D1110", "D0120"]
+    },
+    "defaultCost": 170.00
+  },
+  {
+    "id": "appt-type-002",
+    "name": "New Patient Consultation",
+    "patientFacingName": "New Patient Exam & X-Rays",
+    "description": "A comprehensive exam for new patients, including full x-rays.",
+    "duration": 45,
+    "patientFacing": true,
+    "bookingRules": {
+      "providerIds": ["provider-uuid-001"],
+      "operatoryIds": ["chair-1", "chair-2"],
+      "procedureIds": []
+    },
+    "defaultCost": 120.00
+  },
+  {
+    "id": "appt-type-003",
+    "name": "Crown Placement",
+    "patientFacingName": "Crown Placement (from Treatment Plan)",
+    "description": "Appointment to prepare and/or place a dental crown.",
+    "duration": 90,
+    "patientFacing": false,
+    "bookingRules": {
+      "providerIds": ["provider-uuid-001"],
+      "operatoryIds": ["chair-1"],
+      "procedureIds": ["D2740"]
+    },
+    "defaultCost": 1500.00
+  },
+  {
+    "id": "appt-type-004",
+    "name": "Emergency / Pain Visit",
+    "patientFacingName": "Emergency / Tooth Pain",
+    "description": "A focused exam to address a specific problem or pain point.",
+    "duration": 30,
+    "patientFacing": true,
+    "bookingRules": {
+      "providerIds": ["provider-uuid-001"],
+      "operatoryIds": ["chair-1"],
+      "procedureIds": []
+    },
+    "defaultCost": 95.00
+  },
+  {
+    "id": "appt-type-005",
+    "name": "Restorative - Filling",
+    "patientFacingName": "Filling (from Treatment Plan)",
+    "description": "Appointment to place a tooth-colored filling.",
+    "duration": 60,
+    "patientFacing": false,
+    "bookingRules": {
+      "providerIds": ["provider-uuid-001"],
+      "operatoryIds": ["chair-1"],
+      "procedureIds": ["D2330", "D2331", "D2332"]
+    },
+    "defaultCost": 250.00
+  }
+]

@@ -12,6 +12,7 @@ export const ClinicalProvider = ({ children }) => {
   const [appointments, setAppointments] = useState(mockApi.clinical.appointments);
   const [visitSummaries, setVisitSummaries] = useState(mockApi.clinical.visitSummaries);
   const [treatmentPlans, setTreatmentPlans] = useState(mockApi.clinical.treatmentPlans);
+  const [availableSlots, setAvailableSlots] = useState(mockApi.clinical.availableSlots);
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -65,6 +66,21 @@ export const ClinicalProvider = ({ children }) => {
         }
       };
       setAppointments(prev => [...prev, newAppointment]);
+      
+      // --- ADD LOGIC TO REMOVE THE BOOKED SLOT ---
+      // This is a basic implementation. A real app would be more robust.
+      // We find the date key first, e.g., "2025-11-18"
+      const dateKey = newAppointmentData.startDateTime.split('T')[0];
+      setAvailableSlots(prevSlots => {
+        const updatedSlotsForDate = (prevSlots[dateKey] || []).filter(
+          slot => slot.startTime !== newAppointmentData.startDateTime || 
+                  slot.providerId !== newAppointmentData.providerId
+        );
+        return {
+          ...prevSlots,
+          [dateKey]: updatedSlotsForDate
+        };
+      });
     });
   }, []);
 
@@ -89,20 +105,28 @@ export const ClinicalProvider = ({ children }) => {
           return appt;
         })
       );
+      
+      // --- ADD LOGIC TO ADD SLOT BACK (if desired) ---
+      // Note: This is complex as you need to know the original slot.
+      // For now, we will *not* add the slot back to keep it simple.
     });
   }, []);
 
   /**
    * (UPDATE) Reschedules an existing appointment.
+   * --- UPDATED TO REMOVE NEW SLOT ---
    */
   const rescheduleAppointment = useCallback(async (appointmentId, newStart, newEnd) => {
     await simulateApi(() => {
+      let providerId = null;
       setAppointments(prev =>
         prev.map(appt => {
           if (appt.id === appointmentId) {
             // Check if appointment can be rescheduled (not already 'Cancelled' or 'Completed')
             if (appt.status === "Cancelled") throw new Error("Cannot reschedule a cancelled appointment.");
             
+            providerId = appt.providerId; // Get providerId for slot removal
+
             return {
               ...appt,
               startDateTime: newStart,
@@ -117,6 +141,21 @@ export const ClinicalProvider = ({ children }) => {
           return appt;
         })
       );
+
+      // --- ADDED: Remove the NEWLY booked slot from availability ---
+      if (providerId) {
+        const dateKey = newStart.split('T')[0];
+        setAvailableSlots(prevSlots => {
+          const updatedSlotsForDate = (prevSlots[dateKey] || []).filter(
+            slot => slot.startTime !== newStart || 
+                    slot.providerId !== providerId
+          );
+          return {
+            ...prevSlots,
+            [dateKey]: updatedSlotsForDate
+          };
+        });
+      }
     });
   }, []);
 
@@ -177,6 +216,7 @@ export const ClinicalProvider = ({ children }) => {
     appointments,
     visitSummaries,
     treatmentPlans,
+    availableSlots, // <-- ADDED
     loading,
     error,
     
@@ -191,6 +231,7 @@ export const ClinicalProvider = ({ children }) => {
     appointments, 
     visitSummaries, 
     treatmentPlans, 
+    availableSlots, // <-- ADDED
     loading, 
     error,
     bookAppointment,

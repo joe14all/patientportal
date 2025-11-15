@@ -15,6 +15,9 @@ export const CoreProvider = ({ children }) => {
   const [providers, setProviders] = useState(mockApi.core.providers);
   const [offices, setOffices] = useState(mockApi.core.offices);
   const [procedures, setProcedures] = useState(mockApi.core.procedures);
+  // --- ADD NEW STATE ---
+  const [appointmentTypes, setAppointmentTypes] = useState(mockApi.core.appointmentTypes);
+  const [operatories, setOperatories] = useState(mockApi.core.operatories);
 
   // This context has no "actions", so loading/error state
   // is less critical unless we were simulating an initial fetch.
@@ -62,6 +65,22 @@ export const CoreProvider = ({ children }) => {
     return null;
   }, [offices]);
 
+  // --- ADD NEW GETTERS ---
+
+  /**
+   * (READ) Gets a single appointment type from the list by its ID.
+   */
+  const getAppointmentTypeById = useCallback((typeId) => {
+    return appointmentTypes.find(t => t.id === typeId);
+  }, [appointmentTypes]);
+
+  /**
+   * (READ) Gets all patient-facing appointment types.
+   */
+  const getPatientFacingAppointmentTypes = useMemo(() => {
+    return appointmentTypes.filter(t => t.patientFacing === true);
+  }, [appointmentTypes]);
+
 
   // --- Value ---
   // Memoize the context value to prevent unnecessary re-renders
@@ -70,6 +89,8 @@ export const CoreProvider = ({ children }) => {
     providers,     // The main provider object
     offices,       // The main office object
     procedures,    // The full array of all procedures
+    appointmentTypes, // <-- ADDED
+    operatories,      // <-- ADDED
     loading,
     error,
     
@@ -78,17 +99,23 @@ export const CoreProvider = ({ children }) => {
     getProcedureByCode,
     getProviderById,
     getOfficeById,
+    getAppointmentTypeById, // <-- ADDED
+    getPatientFacingAppointmentTypes, // <-- ADDED
     
   }), [
     providers, 
     offices, 
     procedures, 
+    appointmentTypes, // <-- ADDED
+    operatories,      // <-- ADDED
     loading, 
     error,
     getProcedureById,
     getProcedureByCode,
     getProviderById,
-    getOfficeById
+    getOfficeById,
+    getAppointmentTypeById, // <-- ADDED
+    getPatientFacingAppointmentTypes // <-- ADDED (it's a memoized value, not function)
   ]);
 
   // --- Render ---

@@ -31,7 +31,8 @@
         "number": "+15551234567",
         "type": "Mobile",
         "isPrimary": true,
-        "allowSms": true
+        "allowSms": true,
+        "isVerified": true 
       }
     ],
     "emails": [

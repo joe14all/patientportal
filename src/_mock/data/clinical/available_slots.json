@@ -1,0 +1,70 @@
+{
+  "2025-11-17": [
+    {
+      "startTime": "2025-11-17T17:00:00Z",
+      "endTime": "2025-11-17T18:00:00Z",
+      "providerId": "provider-uuid-001",
+      "officeId": "office-uuid-001",
+      "operatoryId": "chair-2",
+      "availableForAppointmentTypeIds": ["appt-type-001", "appt-type-002"]
+    },
+    {
+      "startTime": "2025-11-17T17:00:00Z",
+      "endTime": "2025-11-17T18:30:00Z",
+      "providerId": "provider-uuid-001",
+      "officeId": "office-uuid-001",
+      "operatoryId": "chair-1",
+      "availableForAppointmentTypeIds": ["appt-type-002", "appt-type-003", "appt-type-004"]
+    },
+    {
+      "startTime": "2025-11-17T18:30:00Z",
+      "endTime": "2025-11-17T19:00:00Z",
+      "providerId": "provider-uuid-001",
+      "officeId": "office-uuid-001",
+      "operatoryId": "chair-1",
+      "availableForAppointmentTypeIds": ["appt-type-004"]
+    },
+    {
+      "startTime": "2025-11-17T18:00:00Z",
+      "endTime": "2025-11-17T19:00:00Z",
+      "providerId": "provider-uuid-001",
+      "officeId": "office-uuid-001",
+      "operatoryId": "chair-2",
+      "availableForAppointmentTypeIds": ["appt-type-001"]
+    }
+  ],
+  "2025-11-18": [
+    {
+      "startTime": "2025-11-18T16:00:00Z",
+      "endTime": "2025-11-18T17:00:00Z",
+      "providerId": "provider-uuid-001",
+      "officeId": "office-uuid-001",
+      "operatoryId": "chair-2",
+      "availableForAppointmentTypeIds": ["appt-type-001"]
+    },
+    {
+      "startTime": "2025-11-18T16:00:00Z",
+      "endTime": "2025-11-18T16:30:00Z",
+      "providerId": "provider-uuid-001",
+      "officeId": "office-uuid-001",
+      "operatoryId": "chair-1",
+      "availableForAppointmentTypeIds": ["appt-type-002", "appt-type-004"]
+    },
+    {
+      "startTime": "2025-11-18T17:30:00Z",
+      "endTime": "2025-11-18T19:00:00Z",
+      "providerId": "provider-uuid-001",
+      "officeId": "office-uuid-001",
+      "operatoryId": "chair-1",
+      "availableForAppointmentTypeIds": ["appt-type-003"]
+    },
+    {
+      "startTime": "2025-11-18T17:00:00Z",
+      "endTime": "2025-11-18T18:00:00Z",
+      "providerId": "provider-uuid-001",
+      "officeId": "office-uuid-001",
+      "operatoryId": "chair-2",
+      "availableForAppointmentTypeIds": ["appt-type-001"]
+    }
+  ]
+}

@@ -1,0 +1,149 @@
+.calendarContainer {
+  margin-top: 1rem;
+}
+
+/* --- Calendar Header --- */
+.calendarHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 0.5rem;
+}
+
+.calendarHeader h3 {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.calendarHeader button {
+  background: transparent;
+  border: none;
+  font-size: 1.5rem;
+  color: var(--text-secondary);
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+}
+.calendarHeader button:hover {
+  background-color: var(--bg-surface-hover);
+  color: var(--text-primary);
+}
+
+/* --- Calendar Grid --- */
+.calendarGrid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+  margin-top: 1rem;
+}
+
+.dayName {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-align: center;
+  padding: 0.5rem 0;
+}
+
+.dayCell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 40px;
+  width: 100%;
+  font-size: 0.9rem;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  background-color: var(--bg-surface);
+  color: var(--text-secondary);
+  opacity: 0.6;
+}
+
+.dayCell:disabled {
+  cursor: not-allowed;
+}
+
+.dayCell.available {
+  font-weight: 600;
+  color: var(--primary);
+  background-color: var(--primary-light);
+  opacity: 1;
+  border-color: var(--primary-light);
+}
+
+.dayCell.available:hover {
+  border-color: var(--primary);
+}
+
+.dayCell.selected {
+  background-color: var(--primary);
+  color: var(--text-inverted);
+  border-color: var(--primary);
+}
+
+.dayCell.disabled {
+  color: var(--text-secondary);
+  opacity: 0.4;
+  text-decoration: line-through;
+}
+
+/* --- Slot Picker --- */
+.slotContainer {
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--border-color);
+}
+
+.slotHeader {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 1rem 0;
+}
+
+.slotGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  gap: 0.75rem;
+}
+
+.slotButton {
+  /* Use secondary button style as a base */
+  background-color: var(--bg-surface-hover);
+  color: var(--primary);
+  border: 1px solid var(--border-color);
+  padding: 0.75rem;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.slotButton:hover {
+  background-color: var(--primary-light);
+  border-color: var(--primary);
+}
+
+.slotButton.selected {
+  /* Use primary button style for selected */
+  background-color: var(--primary);
+  color: var(--text-inverted);
+  border-color: var(--primary);
+}
+
+.noSlots {
+  text-align: center;
+  padding: 2rem 1rem;
+  background-color: var(--bg-body);
+  border-radius: 0.5rem;
+  margin-top: 1rem;
+}
+
+.noSlots p {
+  margin: 0;
+  color: var(--text-secondary);
+}
+.noSlots p:first-of-type {
+  font-weight: 500;
+  color: var(--text-primary);
+  margin-bottom: 0.25rem;
+}

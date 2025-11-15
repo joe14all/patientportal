@@ -7,13 +7,31 @@ const ContactPhoneInput = ({
   phoneNumber,
   phoneType,
   allowSms,
+  phoneIsVerified, // NEW: Prop to get verification status
   onChange, 
   onBlur, 
+  handleVerifyPhone, // NEW: Prop to call verification function
   phoneNumberError 
 }) => {
   
   const getInputClass = () => {
     return phoneNumberError ? styles.isInvalid : '';
+  };
+
+  // --- NEW: Render the verification status badge ---
+  const renderPhoneStatus = () => {
+    if (phoneIsVerified) {
+      return (
+        <span className={`${styles.statusBadge} ${styles.verified}`}>
+          Verified
+        </span>
+      );
+    }
+    return (
+      <span className={`${styles.statusBadge} ${styles.unverified}`}>
+        Unverified
+      </span>
+    );
   };
 
   return (
@@ -70,8 +88,26 @@ const ContactPhoneInput = ({
       {/* Show validation error for the number */}
       {phoneNumberError && <p className={styles.errorText}>{phoneNumberError}</p>}
 
+      {/* --- NEW: Verification Button & Status --- */}
+      {!phoneIsVerified ? (
+        <div className={styles.verifyWrapper}>
+          <p className={styles.helpText}>Your phone is unverified.</p>
+          <button 
+            type="button" 
+            className={styles.verifyButton}
+            onClick={handleVerifyPhone}
+          >
+            Verify Now
+          </button>
+        </div>
+      ) : (
+        <div className={styles.verifyWrapper}>
+          <p className={styles.helpText}>Primary number for reminders.</p>
+          {renderPhoneStatus()}
+        </div>
+      )}
+
       {/* --- Allow SMS Checkbox --- */}
-      {/* We only show this if the type is "Mobile" */}
       {phoneType === 'Mobile' && (
         <div className={styles.checkboxGroup}>
           <input
@@ -80,8 +116,14 @@ const ContactPhoneInput = ({
             name="allowSms"
             checked={allowSms}
             onChange={onChange}
+            disabled={!phoneIsVerified}
           />
-          <label htmlFor="allowSms">Allow SMS for appointment reminders</label>
+          <label 
+            htmlFor="allowSms"
+            className={!phoneIsVerified ? styles.disabledLabel : ''} 
+          >
+            Allow SMS for appointment reminders
+          </label>
         </div>
       )}
     </div>

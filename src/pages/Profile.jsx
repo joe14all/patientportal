@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { usePatientData, useAccountData } from '../contexts';
 import styles from './Profile.module.css';
 
-// ... (imports for all other subcomponents remain the same)
+// (All component imports remain the same)
 import ProfileAvatarCard from '../components/profile/ProfileAvatarCard';
 import ProfileContactForm from '../components/profile/ProfileContactForm';
 import ProfileEmergencyContacts from '../components/profile/ProfileEmergencyContacts';
@@ -12,12 +12,9 @@ import ProfileDemographicsForm from '../components/profile/ProfileDemographicsFo
 import ProfileLoginHistory from '../components/profile/ProfileLoginHistory';
 import ProfileSystemInfo from '../components/profile/ProfileSystemInfo';
 import StickySaveBar from '../components/common/StickySaveBar';
-
-// --- THIS IS THE FIX ---
-// We need GENDER_IDENTITY_OPTIONS for the `useEffect` logic
 import { RACE_OPTIONS, GENDER_IDENTITY_OPTIONS } from '../constants';
 
-// ... (Helper functions like splitPhoneNumber, getPrimaryOrFirst remain the same)
+// (Helper functions remain the same)
 const splitPhoneNumber = (fullNumber) => {
   if (!fullNumber) return { code: '+1', number: '' };
   if (fullNumber.startsWith('+1')) return { code: '+1', number: fullNumber.substring(2) };
@@ -39,36 +36,43 @@ const Profile = () => {
   const [formData, setFormData] = useState(null);
   const [isDirty, setIsDirty] = useState(false);
   const [originalEmail, setOriginalEmail] = useState(null);
+  
+  // --- THIS IS NEW ---
+  const [originalPhone, setOriginalPhone] = useState(null);
 
   // --- Effects ---
   useEffect(() => {
     if (patient && user) {
+      // (Get primary items)
       const primaryEmail = getPrimaryOrFirst(patient.contact.emails, {});
       const primaryPhone = getPrimaryOrFirst(patient.contact.phones, {});
       const primaryAddress = getPrimaryOrFirst(patient.contact.addresses, {});
       const { code: phoneCountryCode, number: phoneNumber } = splitPhoneNumber(primaryPhone.number);
 
-      // --- Demographics Logic ---
+      // (Demographics logic)
       const demographics = patient.demographics || {};
       const gender = demographics.genderIdentity || '';
-      
-      // Find the "Other" gender value (This was the line that caused the error)
       const genderOther = !GENDER_IDENTITY_OPTIONS.includes(gender) ? gender : '';
-      
-      // Find the "Other" race value
       const raceOther = (demographics.race || []).find(
         r => !RACE_OPTIONS.includes(r) && r !== "Prefer not to say"
       ) || '';
 
       setFormData({
-        // ... (Contact fields)
+        // ... (Personal info)
         preferredName: patient.preferredName,
+        
+        // ... (Email info)
         email: primaryEmail.address || '',
         emailIsVerified: primaryEmail.isVerified || false,
+        
+        // --- THIS IS UPDATED ---
         phoneCountryCode: phoneCountryCode,
         phoneNumber: phoneNumber,
         phoneType: primaryPhone.type || 'Mobile',
         allowSms: primaryPhone.allowSms || false,
+        phoneIsVerified: primaryPhone.isVerified || false, // Add this line
+
+        // ... (Address info)
         addressUse: primaryAddress.use || 'Home',
         addressLine1: primaryAddress.line ? primaryAddress.line[0] : '',
         addressLine2: primaryAddress.line ? primaryAddress.line[1] : '',
@@ -77,7 +81,7 @@ const Profile = () => {
         postalCode: primaryAddress.postalCode || '',
         country: primaryAddress.country || 'US',
         
-        // --- Demographics State ---
+        // ... (Demographics info)
         demographics: {
           genderIdentity: GENDER_IDENTITY_OPTIONS.includes(gender) ? gender : 'Other',
           genderIdentityOther: genderOther,
@@ -89,87 +93,112 @@ const Profile = () => {
           raceOther: raceOther, 
         },
         
-        // ... (Account fields)
+        // ... (Account info)
         recoveryPhone: user.contact.recoveryPhone,
         language: user.preferences.language,
         notifications: user.preferences.notifications,
       });
       
+      // --- THIS IS UPDATED ---
       setOriginalEmail(primaryEmail.address || '');
+      setOriginalPhone(primaryPhone.number || ''); // Store original full phone
       setIsDirty(false);
     }
-  }, [patient, user]); // This dependency array is correct
+  }, [patient, user]);
 
   // --- Event Handlers ---
 
   const handleRaceChange = useCallback((selectedRaces, otherRace) => {
     const newRaceArray = [...selectedRaces];
-    if (otherRace) {
-      newRaceArray.push(otherRace);
-    }
-    
+    if (otherRace) newRaceArray.push(otherRace);
     setFormData(prev => ({
       ...prev,
-      demographics: { 
-        ...prev.demographics, 
-        race: newRaceArray,
-        raceOther: otherRace
-      }
+      demographics: { ...prev.demographics, race: newRaceArray, raceOther: otherRace }
     }));
     setIsDirty(true);
   }, []);
 
 
+  // --- THIS IS UPDATED ---
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     
-    if (name.startsWith('notify_')) {
-      const key = name.split('_')[1];
-      setFormData(prev => ({ ...prev, notifications: { ...prev.notifications, [key]: checked }}));
-    
-    } else if (name.startsWith('demographics.')) {
-      const key = name.split('.')[1];
-      setFormData(prev => ({
-        ...prev,
-        demographics: { ...prev.demographics, [key]: value }
-      }));
+    setFormData(prev => {
+      let newFormData = { ...prev };
 
-    } else if (name === 'email') {
-      const newEmail = value;
-      setFormData(prev => ({
-        ...prev,
-        email: newEmail,
-        emailIsVerified: newEmail.toLowerCase() === originalEmail.toLowerCase() 
+      // Handle nested notification checkboxes
+      if (name.startsWith('notify_')) {
+        const key = name.split('_')[1];
+        newFormData.notifications = { ...prev.notifications, [key]: checked };
+      
+      // Handle nested demographic fields
+      } else if (name.startsWith('demographics.')) {
+        const key = name.split('.')[1];
+        newFormData.demographics = { ...prev.demographics, [key]: value };
+
+      // Special logic for email change
+      } else if (name === 'email') {
+        const newEmail = value;
+        newFormData.email = newEmail;
+        newFormData.emailIsVerified = newEmail.toLowerCase() === originalEmail.toLowerCase() 
           ? patient.contact.emails.find(e => e.isPrimary).isVerified 
-          : false,
-      }));
+          : false;
 
-    } else {
-      setFormData(prev => ({ ...prev, [name]: type === 'checkbox' ? checked : value }));
-    }
+      // --- NEW: Special logic for phone change ---
+      } else if (name === 'phoneNumber' || name === 'phoneCountryCode') {
+        const newPhonePart = value;
+        const otherPhonePart = name === 'phoneNumber' 
+          ? prev.phoneCountryCode 
+          : prev.phoneNumber;
+        
+        const newFullPhone = name === 'phoneNumber'
+          ? `${otherPhonePart}${newPhonePart}`
+          : `${newPhonePart}${otherPhonePart}`;
+        
+        newFormData[name] = value;
+        newFormData.phoneIsVerified = newFullPhone === originalPhone 
+          ? (patient.contact.phones.find(p => p.isPrimary)?.isVerified || false)
+          : false;
+
+      // Handle standard fields
+      } else {
+        newFormData[name] = type === 'checkbox' ? checked : value;
+      }
+      
+      return newFormData;
+    });
+
     setIsDirty(true);
   };
 
   const handleSave = async () => {
     if (!formData) return;
     try {
-      // --- Prepare Demographics Payload ---
+      // (Prepare demographics payload)
       const demoData = formData.demographics;
       const finalGender = demoData.genderIdentity === 'Other' 
         ? demoData.genderIdentityOther 
         : demoData.genderIdentity;
+      
+      // --- THIS IS UPDATED ---
+      const newFullPhone = `${formData.phoneCountryCode}${formData.phoneNumber}`;
 
       // 1. Update Patient Details
       await updatePatientDetails({
         preferredName: formData.preferredName,
         contact: {
           ...patient.contact,
-          emails: [{ address: formData.email, isPrimary: true, isVerified: formData.emailIsVerified }],
+          emails: [{ 
+            address: formData.email, 
+            isPrimary: true, 
+            isVerified: formData.emailIsVerified 
+          }],
           phones: [{ 
-            number: `${formData.phoneCountryCode}${formData.phoneNumber}`,
+            number: newFullPhone, // Save combined number
             type: formData.phoneType,
             isPrimary: true, 
-            allowSms: formData.allowSms
+            allowSms: formData.allowSms,
+            isVerified: formData.phoneIsVerified // Save new flag
           }],
           addresses: [{
             use: formData.addressUse,
@@ -202,7 +231,9 @@ const Profile = () => {
       // 3. Update Account Recovery Phone
       await updateRecoveryPhone(formData.recoveryPhone);
 
+      // --- THIS IS UPDATED ---
       setOriginalEmail(formData.email);
+      setOriginalPhone(newFullPhone); // Set new original phone
       setIsDirty(false);
     } catch (err) {
       console.error("Failed to save profile", err);
@@ -211,6 +242,12 @@ const Profile = () => {
 
   const handleVerifyEmail = () => {
     alert(`A verification link has been sent to ${formData.email}.`);
+  };
+
+  // --- THIS IS NEW ---
+  const handleVerifyPhone = () => {
+    // In a real app, this would trigger an API call to send an SMS code.
+    alert(`A verification code will be sent to ${formData.phoneCountryCode}${formData.phoneNumber}.`);
   };
 
   // --- Render Logic ---
@@ -228,14 +265,16 @@ const Profile = () => {
         <div className={styles.column}>
           <ProfileAvatarCard />
           <ProfileContactForm 
-            formData={formData} // Pass the *full* formData
+            formData={formData} 
             handleChange={handleChange}
             handleVerifyEmail={handleVerifyEmail}
+            handleVerifyPhone={handleVerifyPhone} 
+            phoneIsVerified={formData.phoneIsVerified} 
           />
           <ProfileEmergencyContacts />
         </div>
         
-        {/* --- Column 2: Account & Security --- */}
+        {/* (Column 2 remains the same) */}
         <div className={styles.column}>
           <ProfileSecurityForm 
             formData={formData} 
@@ -246,7 +285,7 @@ const Profile = () => {
             handleChange={handleChange} 
           />
           <ProfileDemographicsForm
-            formData={formData.demographics} // Pass the demographics sub-object
+            formData={formData.demographics}
             handleChange={handleChange}
             handleRaceChange={handleRaceChange} 
           />

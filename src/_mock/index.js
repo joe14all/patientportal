@@ -17,6 +17,7 @@ import patientAlerts from "./data/patient/patient_alerts.json";
 import appointments from "./data/clinical/appointments.json";
 import visitSummaries from "./data/clinical/visit_summaries.json";
 import treatmentPlans from "./data/clinical/treatment_plans.json";
+import availableSlots from "./data/clinical/available_slots.json";
 
 // --- Billing ---
 import insurancePolicies from "./data/billing/insurance_policies.json";
@@ -29,6 +30,8 @@ import billingRefunds from "./data/billing/billing_refunds.json";
 import providers from "./data/core/providers.json";
 import offices from "./data/core/offices.json";
 import procedures from "./data/core/procedures.json";
+import appointmentTypes from "./data/core/appointment_types.json";
+import operatories from "./data/core/operatories.json";
 
 // --- API ---
 // This mock API object is what your React components will import.
@@ -51,6 +54,7 @@ export const mockApi = {
     appointments,
     visitSummaries,
     treatmentPlans,
+    availableSlots, // 4. EXPORT NEW
   },
   // Financial data
   billing: {
@@ -71,5 +75,7 @@ export const mockApi = {
     providers,
     offices,
     procedures,
+    appointmentTypes,
+    operatories,
   },
 };

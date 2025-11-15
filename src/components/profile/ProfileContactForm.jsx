@@ -8,7 +8,13 @@ import ContactAddressForm from './profileContactForm/ContactAddressForm';
  * This component now holds the validation logic and orchestrates
  * the sub-components.
  */
-const ProfileContactForm = ({ formData, handleChange, handleVerifyEmail }) => {
+const ProfileContactForm = ({ 
+  formData, 
+  handleChange, 
+  handleVerifyEmail, 
+  handleVerifyPhone,
+  phoneIsVerified 
+}) => {
   const [errors, setErrors] = useState({});
 
   // Helper to get the correct class name for an input
@@ -142,13 +148,14 @@ const ProfileContactForm = ({ formData, handleChange, handleVerifyEmail }) => {
 
         {/* --- Phone (Rendered by Child) --- */}
         <ContactPhoneInput
-          // Pass down all the state and handlers
           countryCode={formData.phoneCountryCode}
           phoneNumber={formData.phoneNumber}
           phoneType={formData.phoneType}
           allowSms={formData.allowSms}
+          phoneIsVerified={phoneIsVerified} 
           onChange={handleChange}
           onBlur={handleBlur}
+          handleVerifyPhone={handleVerifyPhone} 
           phoneNumberError={errors.phoneNumber}
         />
 

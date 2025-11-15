@@ -6,10 +6,10 @@
     "originatingVisitId": "visit-uuid-001",
     "planName": "Crown and Filling Plan - Nov 2025",
     "status": "Accepted",
-    "createdAt": "2025-11-20T11:30:00Z",
-    "presentedAt": "2025-11-20T11:35:00Z",
-    "acceptedAt": "2025-11-21T14:00:00Z",
-    "estimateValidUntil": "2026-02-20T11:30:00Z",
+    "createdAt": "2025-11-10T11:30:00Z",
+    "presentedAt": "2025-11-10T11:35:00Z",
+    "acceptedAt": "2025-11-10T14:00:00Z",
+    "estimateValidUntil": "2026-02-10T11:30:00Z",
     
     "plannedProcedures": [
       {
@@ -24,7 +24,7 @@
           "quadrant": "UR"
         },
         "status": "Scheduled",
-        "completedAppointmentId": null,
+        "linkedAppointmentId": "appt-uuid-003",
         "financialEstimate": {
           "chargeAmount": 1500.00,
           "estimatedInsurancePaid": 750.00,
@@ -44,7 +44,7 @@
           "quadrant": "UR"
         },
         "status": "Proposed",
-        "completedAppointmentId": null,
+        "linkedAppointmentId": null,
         "financialEstimate": {
           "chargeAmount": 250.00,
           "estimatedInsurancePaid": 200.00,

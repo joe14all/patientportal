@@ -1,0 +1,14 @@
+[
+  {
+    "id": "chair-1",
+    "officeId": "office-uuid-001",
+    "name": "Operatory 1",
+    "capabilities": ["general", "surgical", "restorative"]
+  },
+  {
+    "id": "chair-2",
+    "officeId": "office-uuid-001",
+    "name": "Hygiene 1",
+    "capabilities": ["hygiene", "xray", "general"]
+  }
+]

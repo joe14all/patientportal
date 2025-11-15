@@ -1,0 +1,126 @@
+/* Styles moved from Appointments.module.css and enhanced */
+.bookingCard {
+  margin-bottom: 2.5rem;
+  /* Add max-width for better layout on desktop */
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.bookingHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.bookingHeader h2 {
+  margin: 0;
+  font-size: 1.25rem;
+}
+
+.bookingActions {
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+  margin-top: 1.5rem;
+}
+
+.fieldset {
+  border: 1px solid var(--border-color);
+  background-color: var(--bg-body);
+  border-radius: 0.5rem;
+  padding: 1.5rem;
+  margin: 0 0 1.5rem 0;
+}
+
+.fieldset legend {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  padding: 0 0.5rem;
+  margin-left: -0.5rem;
+}
+
+/* --- Step 1 Buttons --- */
+
+.typeButton,
+.planButton {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  text-align: left;
+  padding: 1rem;
+  margin-bottom: 0.75rem;
+  
+  /* Use secondary button styles */
+  background-color: var(--bg-surface);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+}
+
+.typeButton:last-child,
+.planButton:last-child {
+  margin-bottom: 0;
+}
+
+.typeButton:hover,
+.planButton:hover {
+  background-color: var(--primary-light);
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.typeButton strong,
+.planButton strong {
+  font-size: 1rem;
+  font-weight: 600;
+  color: inherit;
+  margin: 0;
+}
+
+.typeButton span,
+.planButton span {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+}
+
+.planButton {
+  border-color: var(--primary);
+  background-color: var(--primary-light);
+  color: var(--primary-700);
+}
+
+body.dark .planButton {
+  color: var(--primary-100);
+}
+
+/* --- Step 3 Confirmation --- */
+.confirmDetails {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 1rem;
+}
+
+.confirmDetails p {
+  font-size: 1rem;
+  color: var(--text-secondary);
+  margin-bottom: 0.5rem;
+}
+
+.confirmDetails strong {
+  font-size: 1.25rem;
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.confirmDetails span {
+  font-size: 1.1rem;
+  color: var(--text-primary);
+  margin-top: 0.25rem;
+}
