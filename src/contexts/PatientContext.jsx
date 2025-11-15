@@ -106,6 +106,27 @@ export const PatientProvider = ({ children }) => {
   }, []);
 
   /**
+   * (UPDATE) Updates an existing item in a medical history section.
+   */
+  const updateMedicalHistoryItem = useCallback(async (historyId, itemType, updatedItem) => {
+    await simulateApi(() => {
+      setMedicalHistory(prevHistories =>
+        prevHistories.map(history => {
+          if (history.id === historyId) {
+            const newHistory = { ...history };
+            const newItems = newHistory[itemType].items.map(item =>
+              item.id === updatedItem.id ? { ...item, ...updatedItem } : item
+            );
+            newHistory[itemType].items = newItems; //
+            return newHistory;
+          }
+          return history;
+        })
+      );
+    });
+  }, []);
+
+  /**
    * (DELETE) Removes an item from a medical history section.
    */
   const removeMedicalHistoryItem = useCallback(async (historyId, itemType, itemId) => {
@@ -187,6 +208,7 @@ export const PatientProvider = ({ children }) => {
     updatePatientDetails,
     updateMedicalHistory,
     addMedicalHistoryItem,
+    updateMedicalHistoryItem, // <-- ADDED
     removeMedicalHistoryItem,
     signConsent,
     acknowledgeAlert,
@@ -201,6 +223,7 @@ export const PatientProvider = ({ children }) => {
     updatePatientDetails,
     updateMedicalHistory,
     addMedicalHistoryItem,
+    updateMedicalHistoryItem, // <-- ADDED
     removeMedicalHistoryItem,
     signConsent,
     acknowledgeAlert

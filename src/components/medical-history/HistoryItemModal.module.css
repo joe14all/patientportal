@@ -1,0 +1,15 @@
+.formWrapper {
+  /* No special styles needed, it uses global .form-group */
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0 1.5rem;
+}
+
+@media (min-width: 768px) {
+  .grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}

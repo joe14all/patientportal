@@ -1,0 +1,38 @@
+.historyItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  background-color: var(--bg-body);
+  border: 1px solid var(--border-color);
+  border-radius: 0.5rem;
+}
+
+.itemInfo {
+  flex-grow: 1;
+  min-width: 0;
+  word-wrap: break-word;
+}
+
+.itemInfo strong {
+  color: var(--text-primary);
+}
+
+.itemInfo span {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  margin-left: 0.25rem;
+}
+
+.itemType {
+  font-style: italic;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+.itemActions {
+  display: flex;
+  gap: 0.25rem;
+  flex-shrink: 0;
+  margin-left: 0.5rem;
+}

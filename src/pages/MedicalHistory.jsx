@@ -1,27 +1,28 @@
-/* eslint-disable no-unused-vars */
+
 import React, { useState, useEffect } from 'react';
 import { usePatientData } from '../contexts';
+// import { DENTAL_QUESTIONS } from '../../constants/medicalHistoryOptions'; 
 import styles from './MedicalHistory.module.css';
 
-// Helper component for list items
-const HistoryItem = ({ item, onRemove }) => (
-  <li className={styles.historyItem}>
-    <div>
-      <strong>{item.agent || item.name || item.type || 'Unknown'}</strong>
-      {item.reaction && <span> - {item.reaction}</span>}
-      {item.dosage && <span> - {item.dosage}</span>}
-      {item.reason && <span> ({item.reason})</span>}
-      {item.year && <span> - {item.year}</span>}
-    </div>
-    {/* 'onRemove' would be implemented in a full "edit" mode */}
-    {/* <button onClick={onRemove} className="icon-button danger">&times;</button> */}
-  </li>
-);
+// --- Import the new subcomponents ---
+import AllergySection from '../components/medical-history/AllergySection';
+import MedicationSection from '../components/medical-history/MedicationSection';
+import ConditionSection from '../components/medical-history/ConditionSection';
+import SurgerySection from '../components/medical-history/SurgerySection';
+import SocialHistorySection from '../components/medical-history/SocialHistorySection';
+import PhysicianCard from '../components/medical-history/PhysicianCard';
+import DentalQuestionsForm from '../components/medical-history/DentalQuestionsForm';
+
+// --- Import the common save bar ---
+import StickySaveBar from '../components/common/StickySaveBar';
 
 const MedicalHistory = () => {
   const { 
     medicalHistory, 
-    updateMedicalHistory, 
+    updateMedicalHistory,
+    addMedicalHistoryItem,
+    updateMedicalHistoryItem,
+    removeMedicalHistoryItem,
     loading, 
     error 
   } = usePatientData();
@@ -39,20 +40,21 @@ const MedicalHistory = () => {
     }
   }, [currentHistory]);
 
-  // Handle changes to nested form fields
-  // e.g., handleFieldChange('allergies', 'noKnownDrugAllergies', true)
-  const handleFieldChange = (section, field, value) => {
+  /**
+   * --- NEW HANDLER ---
+   * A generic handler for all sub-components to update their
+   * part of the form state.
+   * e.g., handleDataChange('allergies', newAllergyObject)
+   */
+  const handleDataChange = (sectionKey, sectionData) => {
     setFormData(prevData => ({
       ...prevData,
-      [section]: {
-        ...prevData[section],
-        [field]: value
-      }
+      [sectionKey]: sectionData
     }));
     setIsDirty(true);
   };
 
-  // Handle simple text area change
+  // Handle simple text area change (for General Notes)
   const handleNotesChange = (e) => {
     setFormData(prevData => ({
       ...prevData,
@@ -65,6 +67,7 @@ const MedicalHistory = () => {
     if (!formData) return;
     
     try {
+      // Pass the *entire* formData object to be saved
       await updateMedicalHistory(formData.id, formData);
       setIsDirty(false);
     } catch (err) {
@@ -84,6 +87,16 @@ const MedicalHistory = () => {
     return <p>No medical history found.</p>;
   }
 
+  // --- Pass down all necessary props to children ---
+  const sectionProps = {
+    historyId: currentHistory.id,
+    loading: loading,
+    onChange: handleDataChange, // Pass the new generic handler
+    addMedicalHistoryItem,
+    updateMedicalHistoryItem,
+    removeMedicalHistoryItem,
+  };
+
   return (
     <div className={styles.pageWrapper}>
       <h1>Medical History</h1>
@@ -96,83 +109,53 @@ const MedicalHistory = () => {
 
         {/* --- Column 1 --- */}
         <div className={styles.column}>
-          {/* Allergies */}
-          <section className="card">
-            <h2>Allergies</h2>
-            <div className="form-group">
-              <input 
-                type="checkbox" 
-                id="noDrugAllergies"
-                checked={formData.allergies.noKnownDrugAllergies}
-                onChange={(e) => handleFieldChange('allergies', 'noKnownDrugAllergies', e.target.checked)}
-              />
-              <label htmlFor="noDrugAllergies">No Known Drug Allergies</label>
-            </div>
-            {!formData.allergies.noKnownDrugAllergies && (
-              <ul className={styles.historyList}>
-                {formData.allergies.items.filter(i => i.type === 'Drug').map(item => (
-                  <HistoryItem key={item.id} item={item} />
-                ))}
-              </ul>
-            )}
-            {/* Add inputs for other allergy types... */}
-          </section>
+          
+          {/* --- NEW: Dental Questions --- */}
+          <DentalQuestionsForm
+            data={formData.specificDentalQuestions}
+            onChange={(newData) => handleDataChange('specificDentalQuestions', newData)}
+          />
 
-          {/* Medications */}
-          <section className="card">
-            <h2>Medications</h2>
-            <div className="form-group">
-              <input 
-                type="checkbox" 
-                id="noMeds"
-                checked={formData.medications.noCurrentMedications}
-                onChange={(e) => handleFieldChange('medications', 'noCurrentMedications', e.target.checked)}
-              />
-              <label htmlFor="noMeds">No Current Medications</label>
-            </div>
-            {!formData.medications.noCurrentMedications && (
-              <ul className={styles.historyList}>
-                {formData.medications.items.map(item => (
-                  <HistoryItem key={item.id} item={item} />
-                ))}
-              </ul>
-            )}
-          </section>
+          {/* --- NEW: Allergies Component --- */}
+          <AllergySection
+            data={formData.allergies}
+            {...sectionProps}
+          />
 
-          {/* Surgeries */}
-          <section className="card">
-            <h2>Surgeries & Hospitalizations</h2>
-            <ul className={styles.historyList}>
-              {formData.surgeries.items.map(item => (
-                <HistoryItem key={item.id} item={item} />
-              ))}
-            </ul>
-          </section>
+          {/* --- NEW: Medications Component --- */}
+          <MedicationSection
+            data={formData.medications}
+            {...sectionProps}
+          />
+          
+          {/* --- NEW: Surgeries Component --- */}
+          <SurgerySection
+            data={formData.surgeries}
+            {...sectionProps}
+          />
         </div>
 
         {/* --- Column 2 --- */}
         <div className={styles.column}>
-          {/* Conditions */}
-          <section className="card">
-            <h2>Medical Conditions</h2>
-            <ul className={styles.historyList}>
-              {formData.conditions.items.map(item => (
-                <HistoryItem key={item.id} item={item} />
-              ))}
-            </ul>
-          </section>
+          {/* --- NEW: Conditions Component --- */}
+          <ConditionSection
+            data={formData.conditions}
+            {...sectionProps}
+          />
 
-          {/* Social History */}
-          <section className="card">
-            <h2>Social History</h2>
-            <ul className={styles.historyList}>
-              {formData.socialHistory.map(item => (
-                <HistoryItem key={item.type} item={item} />
-              ))}
-            </ul>
-          </section>
+          {/* --- NEW: Social History Component --- */}
+          <SocialHistorySection
+            data={formData.socialHistory}
+            onChange={(newData) => handleDataChange('socialHistory', newData)}
+          />
+          
+          {/* --- NEW: Primary Care Physician --- */}
+          <PhysicianCard
+            data={formData.primaryCarePhysician}
+            onChange={(newData) => handleDataChange('primaryCarePhysician', newData)}
+          />
 
-          {/* General Notes */}
+          {/* --- General Notes (Stays in this file) --- */}
           <section className="card">
             <h2>General Notes</h2>
             <p className={styles.notesHelp}>
@@ -188,14 +171,11 @@ const MedicalHistory = () => {
       </div>
 
       {/* --- Sticky Save Bar --- */}
-      {isDirty && (
-        <div className={styles.saveBar}>
-          <p>You have unsaved changes.</p>
-          <button onClick={handleSave} disabled={loading}>
-            {loading ? 'Saving...' : 'Save Changes'}
-          </button>
-        </div>
-      )}
+      <StickySaveBar
+        isDirty={isDirty}
+        loading={loading}
+        onSave={handleSave}
+      />
     </div>
   );
 };
