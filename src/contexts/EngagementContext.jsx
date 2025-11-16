@@ -15,6 +15,8 @@ export const EngagementProvider = ({ children }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
+
+
   // --- Helper for simulated API calls ---
   const simulateApi = (callback, delay = 500) => {
     return new Promise((resolve, reject) => {

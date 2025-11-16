@@ -16,13 +16,13 @@
       "isReadByStaff": false
     },
     "lastMessage": {
-      "timestamp": "2025-11-21T14:05:00Z",
+      "timestamp": "2025-11-15T14:05:00Z",
       "authorType": "Staff",
       "snippet": "Hi Jane, absolutely. I've asked our treatment..."
     },
     "systemInfo": {
-      "createdAt": "2025-11-21T14:00:00Z",
-      "updatedAt": "2025-11-21T14:05:00Z",
+      "createdAt": "2025-11-15T14:00:00Z",
+      "updatedAt": "2025-11-15T14:05:00Z",
       "closedAt": null
     }
   }

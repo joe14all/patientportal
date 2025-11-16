@@ -1,0 +1,57 @@
+/* * This is the "hidden input" pattern.
+
+We hide the default file input completely.
+*/
+.hiddenInput {
+opacity: 0;
+position: absolute;
+width: 0.1px;
+height: 0.1px;
+z-index: -1;
+overflow: hidden;
+pointer-events: none;
+}
+
+/*
+
+This styles our visible button to look like a subtle,
+
+mobile-friendly icon button that fits with your other forms.
+*/
+.uploadButton {
+display: inline-flex;
+align-items: center;
+justify-content: center;
+
+/* Sizing for an icon button /
+padding: 0.6rem;
+height: 44px; / Match height of text inputs for alignment */
+width: 44px;
+
+/* Style /
+background-color: transparent;
+border: 1px solid transparent; / No border by default /
+color: var(--text-secondary); / Subtle icon color */
+border-radius: 0.5rem;
+cursor: pointer;
+transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+/* Hover/focus styles */
+.uploadButton:hover:not(:disabled) {
+background-color: var(--bg-surface-hover);
+color: var(--text-primary);
+}
+
+.uploadButton:focus,
+.uploadButton:focus-visible {
+outline: 4px auto var(--primary);
+outline-offset: 2px;
+}
+
+/* Disabled state */
+.uploadButton:disabled {
+opacity: 0.5;
+cursor: not-allowed;
+background-color: transparent;
+}

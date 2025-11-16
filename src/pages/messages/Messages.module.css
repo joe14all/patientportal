@@ -1,0 +1,142 @@
+/* --- Page Layout --- */
+.pageWrapper {
+/* This just ensures the page has a consistent max-width */
+width: 100%;
+max-width: 1024px;
+margin: 0 auto;
+}
+
+.pageHeader {
+display: flex;
+justify-content: space-between;
+align-items: center;
+margin-bottom: 2rem;
+}
+
+.composeButton {
+/* Use the primary button style (already global) */
+flex-shrink: 0; /* Prevents button from shrinking on mobile */
+}
+
+/* --- Thread List --- */
+.threadList {
+display: flex;
+flex-direction: column;
+gap: 1rem;
+}
+
+
+.threadItem {
+display: grid;
+/* Columns: [Read Dot] [Info] [Meta Date/Status] */
+grid-template-columns: auto 1fr auto;
+align-items: center;
+gap: 1rem;
+padding: 1.25rem;
+cursor: pointer;
+transition: background-color 0.2s ease, border-color 0.2s ease;
+border: 1px solid var(--border-color);
+}
+
+.threadItem:hover {
+background-color: var(--bg-surface-hover);
+border-color: var(--primary);
+}
+
+/* --- Column 1: Read Indicator --- */
+.readIndicator {
+width: 10px;
+height: 10px;
+border-radius: 50%;
+background-color: transparent;
+flex-shrink: 0;
+}
+
+.readIndicator.unread {
+background-color: var(--primary);
+}
+
+/* --- Column 2: Thread Info (Subject/Snippet) --- */
+.threadInfo {
+flex-grow: 1;
+min-width: 0; /* CRITICAL: Allows text to truncate */
+}
+
+.threadSubject {
+display: block;
+font-weight: 600;
+color: var(--text-primary);
+white-space: nowrap;
+overflow: hidden;
+text-overflow: ellipsis;
+}
+
+.threadSnippet {
+display: block;
+font-size: 0.875rem;
+color: var(--text-secondary);
+white-space: nowrap;
+overflow: hidden;
+text-overflow: ellipsis;
+margin-top: 0.25rem;
+}
+
+/* --- Column 3: Meta Info (Date/Status) --- */
+.threadMeta {
+flex-shrink: 0;
+text-align: right;
+}
+
+.threadDate {
+display: block;
+font-size: 0.875rem;
+font-weight: 500;
+color: var(--text-secondary);
+white-space: nowrap; /* Keep date from wrapping */
+}
+
+.threadStatus {
+display: block;
+font-size: 0.75rem;
+color: var(--text-secondary);
+font-weight: 500;
+margin-top: 0.25rem;
+text-transform: capitalize; /* e.g., "PendingStaff" -> "Pendingstaff" */
+}
+
+/* --- Mobile Breakpoint --- */
+
+@media (max-width: 480px) {
+.threadItem {
+grid-template-columns: auto 1fr;
+grid-template-rows: auto auto;
+gap: 0.5rem 1rem;
+align-items: flex-start;
+padding: 1rem;
+}
+
+.readIndicator {
+margin-top: 6px; /* Align dot with first line of text */
+}
+
+.threadInfo {
+/* Takes up the top-right grid cell */
+grid-column: 2 / 3;
+grid-row: 1 / 2;
+}
+
+.threadMeta {
+/* Takes up the bottom-right grid cell /
+grid-column: 2 / 3;
+grid-row: 2 / 3;
+text-align: left; / Align left when stacked */
+display: flex;
+gap: 0.75rem;
+align-items: center;
+margin-top: 0.25rem;
+}
+
+.threadStatus {
+margin-top: 0;
+}
+}

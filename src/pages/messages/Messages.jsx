@@ -1,48 +1,32 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useEngagementData } from '../contexts';
-import { IconSend, IconMessages } from '../layouts/components/Icons';
+import { useEngagementData } from '../../contexts';
+// --- 1. Import the new component ---
+import NewMessageForm from '../../components/messages/NewMessageForm';
+// --- 2. (IconSend and IconMessages are no longer needed here) ---
 import styles from './Messages.module.css';
 
 const Messages = () => {
   const { 
     messageThreads, 
-    createNewThread, 
+    // --- 3. (createNewThread is no longer needed here) ---
     loading, 
     error 
   } = useEngagementData();
   
   const navigate = useNavigate();
 
-  // State for the "New Message" form
+  // --- 4. State is simplified to just manage visibility ---
   const [isComposing, setIsComposing] = useState(false);
-  const [newSubject, setNewSubject] = useState('');
-  const [newBody, setNewBody] = useState('');
+  // (newSubject and newBody state is removed)
 
   const handleThreadClick = (threadId) => {
     // Navigate to the specific thread page
     navigate(`/messages/${threadId}`);
   };
 
-  const handleComposeSubmit = async (e) => {
-    e.preventDefault();
-    if (!newSubject || !newBody) {
-      alert("Please fill out both a subject and a message body.");
-      return;
-    }
-    
-    try {
-      // "Clinical" is a good default category
-      await createNewThread(newSubject, 'Clinical', newBody);
-      // Reset form and hide it
-      setIsComposing(false);
-      setNewSubject('');
-      setNewBody('');
-    } catch (err) {
-      console.error("Failed to create thread", err);
-      // Error is handled in context
-    }
-  };
+  // --- 5. (handleComposeSubmit is removed) ---
+  // The NewMessageForm component now handles its own submission.
 
   // Helper to format date
   const formatLastDate = (dateString) => {
@@ -68,51 +52,12 @@ const Messages = () => {
 
       {error && <p className="error-text">Error: {error}</p>}
 
-      {/* --- New Message Form --- */}
+      {/* --- 6. Render the new component --- */}
       {isComposing && (
-        <div className={`card ${styles.composeCard}`}>
-          <form onSubmit={handleComposeSubmit}>
-            <h2>New Message</h2>
-            <div className="form-group">
-              <label htmlFor="subject">Subject</label>
-              <input 
-                type="text" 
-                id="subject"
-                value={newSubject}
-                onChange={(e) => setNewSubject(e.target.value)}
-                placeholder="Question about my treatment plan..."
-              />
-            </div>
-            <div className="form-group">
-              <label htmlFor="body">Message</label>
-              <textarea 
-                id="body"
-                value={newBody}
-                onChange={(e) => setNewBody(e.target.value)}
-                rows="5"
-                placeholder="Hi Dr. Farnsworth, I had a question..."
-              ></textarea>
-            </div>
-            <div className={styles.composeActions}>
-              <button 
-                type="button" 
-                className="secondary" 
-                onClick={() => setIsComposing(false)}
-              >
-                Cancel
-              </button>
-              <button 
-                type="submit" 
-                disabled={loading}
-              >
-                {loading ? 'Sending...' : 'Send Message'}
-              </button>
-            </div>
-          </form>
-        </div>
+        <NewMessageForm onClose={() => setIsComposing(false)} />
       )}
 
-      {/* --- Thread List --- */}
+      {/* --- Thread List (remains the same) --- */}
       {loading && messageThreads.length === 0 && <p>Loading messages...</p>}
       
       <div className={styles.threadList}>

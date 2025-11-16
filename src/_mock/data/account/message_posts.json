@@ -12,7 +12,7 @@
         "fileName": "treatment_plan_question.jpg"
       }
     ],
-    "createdAt": "2025-11-21T14:00:00Z"
+    "createdAt": "2025-11-15T14:00:00Z"
   },
   {
     "id": "msg-post-uuid-002",
@@ -22,6 +22,6 @@
     "authorName": "Dr. Alan Farnsworth",
     "body": "Hi Jane, absolutely. I've asked our treatment coordinator to give you a call this afternoon to discuss the options.",
     "attachments": [],
-    "createdAt": "2025-11-21T14:05:00Z"
+    "createdAt": "2025-11-15T14:05:00Z"
   }
 ]

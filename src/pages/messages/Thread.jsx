@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useEngagementData, useAccountData } from '../contexts';
-import { IconArrowLeft, IconSend } from '../layouts/components/Icons'; // [cite: src/layouts/components/Icons.jsx]
+import { useEngagementData, useAccountData } from '../../contexts';
+import { IconArrowLeft, IconSend } from '../../layouts/components/Icons'; 
 import styles from './Thread.module.css';
 
 const Thread = () => {
@@ -18,10 +18,12 @@ const Thread = () => {
   
   const { user } = useAccountData();
   const [newMessage, setNewMessage] = useState('');
+
   const messagesEndRef = useRef(null); // Ref for auto-scrolling
 
   // --- Find the current thread and its posts ---
   const { thread, posts } = useMemo(() => {
+
     const currentThread = messageThreads.find(t => t.id === threadId);
     const threadPosts = messagePosts
       .filter(p => p.threadId === threadId)

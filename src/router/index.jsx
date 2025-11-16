@@ -11,14 +11,15 @@ import LoginPage from '../pages/Login.jsx';
 import NotFound from '../pages/NotFound.jsx';
 
 // --- Import all the new pages ---
-import Messages from '../pages/Messages.jsx';
-import Thread from '../pages/Thread.jsx';
+// --- 1. UPDATE THESE FILE PATHS ---
+import Messages from '../pages/messages/Messages.jsx';
+import Thread from '../pages/messages/Thread.jsx';
 import Billing from '../pages/Billing.jsx';
 import Documents from '../pages/Documents.jsx';
 import Profile from '../pages/Profile.jsx';
 import MedicalHistory from '../pages/MedicalHistory.jsx';
 import TreatmentPlans from '../pages/TreatmentPlans.jsx';
-import VisitSummary from '../pages/VisitSummary.jsx'; // 1. Import the new page
+import VisitSummary from '../pages/VisitSummary.jsx';
 
 export const AppRouter = () => (
   <BrowserRouter>
@@ -34,7 +35,7 @@ export const AppRouter = () => (
           <Route index element={<Dashboard />} /> 
           <Route path="appointments" element={<Appointments />} />
           
-          {/* --- Add all the new routes --- */}
+          {/* --- 2. The routes themselves are correct, just the imports were broken --- */}
           <Route path="messages" element={<Messages />} />
           <Route path="messages/:threadId" element={<Thread />} />
           <Route path="billing" element={<Billing />} />
@@ -43,7 +44,6 @@ export const AppRouter = () => (
           <Route path="profile" element={<Profile />} />
           <Route path="history" element={<MedicalHistory />} />
           
-          {/* 2. Add the new route for visit summaries */}
           <Route path="visits/:visitSummaryId" element={<VisitSummary />} />
           
         </Route>
