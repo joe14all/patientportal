@@ -1,5 +1,12 @@
-.contactsCard {
-  /* No special styles needed, just uses the global 'card' */
+/* .contactsCard {
+} */
+
+/* --- ADDED: Help Text Style --- */
+.helpText {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  margin-top: -0.5rem;
+  margin-bottom: 1.5rem;
 }
 
 .contactList {
@@ -16,6 +23,9 @@
   background-color: var(--bg-body);
   border: 1px solid var(--border-color);
   border-radius: 0.5rem;
+  
+  /* --- MODIFIED: Allow wrapping --- */
+  flex-wrap: wrap;
 }
 
 .contactAvatar {
@@ -36,25 +46,55 @@
 }
 
 .contactInfo {
+  /* --- MODIFIED: Grow to fill space next to avatar --- */
   flex-grow: 1;
+  flex-basis: 0;
+  min-width: 150px; /* Give it some base width */
 }
 
 .contactInfo strong {
   display: block;
   font-weight: 600;
   color: var(--text-primary);
+  /* --- FIX: Allow long names to wrap --- */
+  word-break: break-word;
 }
 
 .contactInfo span {
   font-size: 0.875rem;
   color: var(--text-secondary);
+  /* --- FIX: Allow long relationship/phone text to wrap --- */
+  word-break: break-word;
 }
 
 .contactActions {
   display: flex;
   gap: 0.5rem;
   flex-shrink: 0;
+  
+  /* --- MODIFIED: Take full width and align right on new line --- */
+  flex-basis: 100%;
+  justify-content: flex-end;
+  margin-top: 1rem;
 }
+
+/* --- MODIFIED: On desktop, revert to a single row --- */
+@media (min-width: 768px) {
+  .contactItem {
+    flex-wrap: nowrap; /* Don't wrap on desktop */
+  }
+
+  .contactInfo {
+    min-width: 0; /* Reset min-width */
+  }
+
+  .contactActions {
+    flex-basis: auto; /* Revert to auto width */
+    justify-content: flex-start; /* Revert alignment */
+    margin-top: 0; /* Remove top margin */
+  }
+}
+
 
 .addButton {
   margin-top: 1rem;

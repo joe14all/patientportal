@@ -39,6 +39,8 @@ body.dark .avatarCard {
   font-size: 1.5rem;
   color: var(--text-primary);
   margin: 0;
+    word-break: break-word; /* --- ADDED: Allows long names to wrap --- */
+
 }
 
 .avatarCard p {

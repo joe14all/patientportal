@@ -71,7 +71,7 @@ const ContactPhoneInput = ({
           </select>
         </div>
         <div className="form-group">
-          <label htmlFor="phoneNumber">Local Phone Number</label>
+          <label htmlFor="phoneNumber">Phone Number</label>
           <input
             type="tel"
             id="phoneNumber"

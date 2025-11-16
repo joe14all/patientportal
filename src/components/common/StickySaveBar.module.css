@@ -15,15 +15,22 @@
   background-color: var(--bg-surface);
   border-top: 1px solid var(--border-color);
   box-shadow: 0 -4px 12px rgba(0,0,0,0.05);
+  flex-direction: column;
+  align-items: stretch; /* Make children full-width */
+  gap: 0.75rem; /* Add gap between text and button group */
+  
+  padding: 1rem 1.5rem;
+  background-color: var(--bg-surface);
+  border-top: 1px solid var(--border-color);
+  box-shadow: 0 -4px 12px rgba(0,0,0,0.05);
 
   /* Nudge it to fit inside the layout area on mobile.
     This assumes the parent container has 1.5rem padding.
     If layout padding changes, this might need adjustment.
   */
-  margin-left: -1.5rem;
-  margin-right: -1.5rem;
+  margin-left: -1rem;
+  margin-right: -1rem;
 }
-
 body.dark .saveBar {
   box-shadow: 0 -4px 12px rgba(0,0,0,0.2);
 }
@@ -33,6 +40,7 @@ body.dark .saveBar {
   font-weight: 500;
   color: var(--text-primary);
   font-size: 0.9rem;
+  text-align: center; /* MODIFIED: Center text on mobile */
 }
 
 /* --- NEW: Button Group --- */
@@ -45,6 +53,7 @@ body.dark .saveBar {
 .buttonGroup button {
   padding: 0.6em 1em;
   font-size: 0.9rem;
+  flex-grow: 1; /* MODIFIED: Make buttons 50/50 width */
   flex-shrink: 0; /* Prevent buttons from shrinking weirdly */
 }
 
@@ -52,6 +61,11 @@ body.dark .saveBar {
 /* This targets screens where the main content area is constrained */
 @media (min-width: 768px) {
   .saveBar {
+    /* MODIFIED: Restore horizontal layout */
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+
     width: 100%;
     /* Constrain to the max-width of .contentWrapper in MainLayout */
     max-width: 1024px; 
@@ -77,10 +91,12 @@ body.dark .saveBar {
   
   .saveBar p {
      font-size: 1rem;
+     text-align: left; /* MODIFIED: Restore left-align */
   }
   
   .buttonGroup button {
     font-size: 1rem;
     padding: 0.6em 1.2em;
+    flex-grow: 0; /* MODIFIED: Restore auto-width */
   }
 }

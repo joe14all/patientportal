@@ -31,6 +31,9 @@
 .loginHistoryItem strong {
   font-size: 0.875rem;
   color: var(--text-secondary);
+   min-width: 0; /* Allow the element to shrink */
+  word-break: break-word; /* Allow the text itself to wrap */
+  padding-right: 0.5rem; /* Add spacing between date and status */
 }
 
 .loginHistoryItem span {

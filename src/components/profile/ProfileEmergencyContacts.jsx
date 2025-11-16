@@ -80,6 +80,9 @@ const ProfileEmergencyContacts = () => {
   return (
     <section className={`card ${styles.contactsCard}`}>
       <h2>Emergency Contacts</h2>
+      <p className={styles.helpText}>
+        Please list who we should contact in an emergency.
+      </p>
 
       {/* --- This is the list of existing contacts --- */}
       {!isEditing && (
