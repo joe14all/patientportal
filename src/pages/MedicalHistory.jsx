@@ -1,7 +1,7 @@
-
+/* eslint-disable no-unused-vars */
 import React, { useState, useEffect } from 'react';
 import { usePatientData } from '../contexts';
-// import { DENTAL_QUESTIONS } from '../../constants/medicalHistoryOptions'; 
+// import { DENTAL_QUESTIONS } from '../../constants/medicalHistoryOptions';
 import styles from './MedicalHistory.module.css';
 
 // --- Import the new subcomponents ---
@@ -31,14 +31,18 @@ const MedicalHistory = () => {
   const currentHistory = medicalHistory?.[0];
 
   const [formData, setFormData] = useState(null);
+  const [originalFormData, setOriginalFormData] = useState(null); // --- NEW
   const [isDirty, setIsDirty] = useState(false);
 
   // When data loads from context, populate the form state
   useEffect(() => {
-    if (currentHistory) {
+    // Only set state if it hasn't been set before
+    if (currentHistory && !originalFormData) {
       setFormData(currentHistory);
+      setOriginalFormData(currentHistory); // --- NEW
+      setIsDirty(false);
     }
-  }, [currentHistory]);
+  }, [currentHistory, originalFormData]); // Add originalFormData as a dependency
 
   /**
    * --- NEW HANDLER ---
@@ -69,11 +73,19 @@ const MedicalHistory = () => {
     try {
       // Pass the *entire* formData object to be saved
       await updateMedicalHistory(formData.id, formData);
+      setOriginalFormData(formData); // --- NEW: Update original state on save
       setIsDirty(false);
     } catch (err) {
       console.error("Failed to save medical history", err);
     }
   };
+
+  // --- NEW: Handle Revert ---
+  const handleRevert = () => {
+    setFormData(originalFormData);
+    setIsDirty(false);
+  };
+
 
   if (loading && !formData) {
     return <p>Loading medical history...</p>;
@@ -170,11 +182,12 @@ const MedicalHistory = () => {
         </div>
       </div>
 
-      {/* --- Sticky Save Bar --- */}
+      {/* --- UPDATED: Pass the onRevert prop --- */}
       <StickySaveBar
         isDirty={isDirty}
         loading={loading}
         onSave={handleSave}
+        onRevert={handleRevert}
       />
     </div>
   );

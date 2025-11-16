@@ -34,15 +34,14 @@ const Profile = () => {
 
   // --- Component State ---
   const [formData, setFormData] = useState(null);
+  const [originalFormData, setOriginalFormData] = useState(null); // --- NEW: To store original state
   const [isDirty, setIsDirty] = useState(false);
-  const [originalEmail, setOriginalEmail] = useState(null);
   
-  // --- THIS IS NEW ---
-  const [originalPhone, setOriginalPhone] = useState(null);
+  // (originalEmail and originalPhone are no longer needed here)
 
   // --- Effects ---
   useEffect(() => {
-    if (patient && user) {
+    if (patient && user && !originalFormData) { // Only set original data once on load
       // (Get primary items)
       const primaryEmail = getPrimaryOrFirst(patient.contact.emails, {});
       const primaryPhone = getPrimaryOrFirst(patient.contact.phones, {});
@@ -57,7 +56,7 @@ const Profile = () => {
         r => !RACE_OPTIONS.includes(r) && r !== "Prefer not to say"
       ) || '';
 
-      setFormData({
+      const initialData = {
         // ... (Personal info)
         preferredName: patient.preferredName,
         
@@ -97,14 +96,13 @@ const Profile = () => {
         recoveryPhone: user.contact.recoveryPhone,
         language: user.preferences.language,
         notifications: user.preferences.notifications,
-      });
-      
-      // --- THIS IS UPDATED ---
-      setOriginalEmail(primaryEmail.address || '');
-      setOriginalPhone(primaryPhone.number || ''); // Store original full phone
+      };
+
+      setFormData(initialData);
+      setOriginalFormData(initialData); // --- NEW: Set the original data
       setIsDirty(false);
     }
-  }, [patient, user]);
+  }, [patient, user, originalFormData]); // Add originalFormData as a dependency
 
   // --- Event Handlers ---
 
@@ -125,6 +123,8 @@ const Profile = () => {
     
     setFormData(prev => {
       let newFormData = { ...prev };
+      const originalPhone = `${originalFormData.phoneCountryCode}${originalFormData.phoneNumber}`;
+      const originalEmail = originalFormData.email;
 
       // Handle nested notification checkboxes
       if (name.startsWith('notify_')) {
@@ -141,7 +141,7 @@ const Profile = () => {
         const newEmail = value;
         newFormData.email = newEmail;
         newFormData.emailIsVerified = newEmail.toLowerCase() === originalEmail.toLowerCase() 
-          ? patient.contact.emails.find(e => e.isPrimary).isVerified 
+          ? originalFormData.emailIsVerified
           : false;
 
       // --- NEW: Special logic for phone change ---
@@ -157,7 +157,7 @@ const Profile = () => {
         
         newFormData[name] = value;
         newFormData.phoneIsVerified = newFullPhone === originalPhone 
-          ? (patient.contact.phones.find(p => p.isPrimary)?.isVerified || false)
+          ? originalFormData.phoneIsVerified
           : false;
 
       // Handle standard fields
@@ -232,12 +232,17 @@ const Profile = () => {
       await updateRecoveryPhone(formData.recoveryPhone);
 
       // --- THIS IS UPDATED ---
-      setOriginalEmail(formData.email);
-      setOriginalPhone(newFullPhone); // Set new original phone
+      setOriginalFormData(formData); // Set the new "original" state to the saved data
       setIsDirty(false);
     } catch (err) {
       console.error("Failed to save profile", err);
     }
+  };
+  
+  // --- NEW: Handle Revert ---
+  const handleRevert = () => {
+    setFormData(originalFormData);
+    setIsDirty(false);
   };
 
   const handleVerifyEmail = () => {
@@ -294,10 +299,12 @@ const Profile = () => {
         </div>
       </div>
 
+      {/* --- UPDATED: Pass the onRevert prop --- */}
       <StickySaveBar 
         isDirty={isDirty}
         loading={loading}
         onSave={handleSave}
+        onRevert={handleRevert} 
       />
     </div>
   );

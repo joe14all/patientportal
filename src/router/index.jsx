@@ -17,7 +17,8 @@ import Billing from '../pages/Billing.jsx';
 import Documents from '../pages/Documents.jsx';
 import Profile from '../pages/Profile.jsx';
 import MedicalHistory from '../pages/MedicalHistory.jsx';
-import TreatmentPlans from '../pages/TreatmentPlans.jsx'; // 1. Import TreatmentPlans
+import TreatmentPlans from '../pages/TreatmentPlans.jsx';
+import VisitSummary from '../pages/VisitSummary.jsx'; // 1. Import the new page
 
 export const AppRouter = () => (
   <BrowserRouter>
@@ -37,10 +38,13 @@ export const AppRouter = () => (
           <Route path="messages" element={<Messages />} />
           <Route path="messages/:threadId" element={<Thread />} />
           <Route path="billing" element={<Billing />} />
-          <Route path="plans" element={<TreatmentPlans />} /> {/* 2. Add the route */}
+          <Route path="plans" element={<TreatmentPlans />} /> 
           <Route path="documents" element={<Documents />} />
           <Route path="profile" element={<Profile />} />
           <Route path="history" element={<MedicalHistory />} />
+          
+          {/* 2. Add the new route for visit summaries */}
+          <Route path="visits/:visitSummaryId" element={<VisitSummary />} />
           
         </Route>
       </Route>

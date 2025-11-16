@@ -6,7 +6,8 @@
 /* Tablet & Desktop */
 @media (min-width: 768px) {
   .sidebar {
-    display: block; /* Show on desktop */
+    display: flex; /* 1. Change to flex */
+    flex-direction: column; /* 2. Make it a column */
     width: 250px;
     background-color: var(--bg-surface);
     border-right: 1px solid var(--border-color);
@@ -53,4 +54,45 @@
 
 .navLink.active svg {
   color: var(--primary); /* Make icon primary color too */
+}
+
+/* --- 3. NEW STYLES for footer buttons --- */
+
+.sidebarFooter {
+  margin-top: auto; /* This pushes the footer to the bottom */
+  padding-top: 1rem;
+  border-top: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.menuButton {
+  /* Reset button styles to look like menu items */
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+  text-align: left;
+  padding: 0.75rem 1rem;
+  font-size: 0.9rem;
+  font-weight: 500;
+  border-radius: 0.5rem;
+  cursor: pointer;
+}
+
+.menuButton:hover {
+  background-color: var(--bg-surface-hover);
+  color: var(--text-primary);
+}
+
+.logoutButton {
+  color: var(--error-500);
+}
+.logoutButton:hover {
+  background-color: var(--error-bg);
+  color: var(--error-500);
 }

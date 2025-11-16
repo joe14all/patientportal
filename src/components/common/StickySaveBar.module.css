@@ -35,9 +35,17 @@ body.dark .saveBar {
   font-size: 0.9rem;
 }
 
-.saveBar button {
+/* --- NEW: Button Group --- */
+.buttonGroup {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.buttonGroup button {
   padding: 0.6em 1em;
   font-size: 0.9rem;
+  flex-shrink: 0; /* Prevent buttons from shrinking weirdly */
 }
 
 /* --- Desktop: Floating bar --- */
@@ -71,7 +79,7 @@ body.dark .saveBar {
      font-size: 1rem;
   }
   
-  .saveBar button {
+  .buttonGroup button {
     font-size: 1rem;
     padding: 0.6em 1.2em;
   }

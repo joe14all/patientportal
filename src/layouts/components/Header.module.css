@@ -1,4 +1,4 @@
- .header {
+.header {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -14,7 +14,12 @@
 .logo {
   font-size: 1.1rem;
   font-weight: 600;
+}
+
+/* Make logo a clean link */
+.logo a {
   color: var(--text-primary);
+  text-decoration: none;
 }
 
 .hamburgerBtn {
@@ -32,15 +37,74 @@
   background-color: var(--bg-surface-hover);
 }
 
-/* This menu is for desktop */
-.desktopMenu {
+/* This is the new wrapper for the desktop menu */
+.desktopMenuWrapper {
   display: none; /* Hide on mobile by default */
+  position: relative;
 }
+
+.avatarButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: var(--primary);
+  color: var(--text-inverted);
+  font-weight: 600;
+  font-size: 1rem;
+  text-decoration: none;
+  border: 2px solid var(--border-color);
+  transition: all 0.2s ease;
+}
+.avatarButton:hover {
+  border-color: var(--primary);
+  opacity: 0.9;
+}
+.avatarButton svg {
+  width: 20px;
+  height: 20px;
+}
+
+/* --- UPDATED Dropdown Menu Styles --- */
+.userMenuDropdown {
+  display: none; /* Hide by default */
+  position: absolute;
+  top: calc(100% + 12px); /* Position below the avatar with a gap */
+  right: 0;
+  width: 240px;
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: 0.75rem;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  padding: 0.75rem 1rem; /* Simple padding */
+  z-index: 11; /* Above the header */
+  pointer-events: none; /* Make it a non-interactive tooltip */
+}
+
+/* Show the dropdown when hovering the wrapper */
+.desktopMenuWrapper:hover .userMenuDropdown {
+  display: block;
+}
+
+.userMenuDropdown strong {
+  display: block;
+  font-size: 0.9rem;
+  color: var(--text-primary);
+}
+.userMenuDropdown .dropdownEmail {
+  display: block;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+/* --- REMOVED .menuItem and .logoutButton styles --- */
+
 
 /* Tablet & Desktop */
 @media (min-width: 768px) {
   .header {
-    /* On desktop, the header is just a thin bar on top */
     padding: 0 2rem;
   }
   
@@ -48,9 +112,7 @@
     display: none; /* Hide hamburger on desktop */
   }
 
-  .desktopMenu {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
+  .desktopMenuWrapper {
+    display: block; /* Show the new menu wrapper */
   }
 }

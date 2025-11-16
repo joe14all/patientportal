@@ -87,30 +87,32 @@ body.dark .cardHeader {
   white-space: nowrap;
 }
 
+/* --- FIX: Using defined variables from index.css --- */
 .proposed .status {
-  color: var(--warning-700);
+  color: var(--neutral-700); /* Use a defined dark color */
   background-color: var(--warning-100);
 }
 .accepted .status {
-  color: var(--success-700);
+  color: var(--neutral-700); /* Use a defined dark color */
   background-color: var(--success-100);
 }
 .rejected .status {
-  color: var(--error-700);
+  color: var(--neutral-700); /* Use a defined dark color */
   background-color: var(--error-100);
 }
 
+/* --- FIX: Using defined dark theme variables from index.css --- */
 body.dark .proposed .status {
-  color: var(--warning-200);
-  background-color: var(--warning-900);
+  color: var(--warning-500); /* Use the defined warning color */
+  background-color: var(--warning-bg);
 }
 body.dark .accepted .status {
-  color: var(--success-200);
-  background-color: var(--success-900);
+  color: var(--success-500); /* Use the defined success color */
+  background-color: var(--success-bg);
 }
 body.dark .rejected .status {
-  color: var(--error-200);
-  background-color: var(--error-900);
+  color: var(--error-500); /* Use the defined error color */
+  background-color: var(--error-bg);
 }
 
 /* --- Procedure List --- */

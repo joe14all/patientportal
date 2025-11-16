@@ -1,3 +1,31 @@
+/* 1. NEW: Header for user info */
+.menuHeader {
+  flex-shrink: 0;
+  padding: 1.5rem 2rem;
+  border-bottom: 1px solid var(--border-color);
+  background-color: var(--bg-surface);
+}
+body.dark .menuHeader {
+  background-color: var(--bg-body);
+}
+.menuHeader strong {
+  display: block;
+  color: var(--text-primary);
+  font-size: 1.1rem;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.menuHeader span {
+  display: block;
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 .overlay {
   position: fixed;
   top: 60px; /* Below header */
@@ -80,6 +108,24 @@
   z-index: 1;
 }
 
+/* 2. UPDATED: Footer button styles */
 .footer button {
   width: 100%;
+  /* Add flex properties for icons */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  font-size: 1rem;
+  padding: 0.75rem 1rem;
+}
+
+/* 3. NEW: Logout button specific styles */
+.logoutButton {
+  background-color: var(--bg-surface);
+  color: var(--error-500);
+  border: 1px solid var(--error-500);
+}
+.logoutButton:hover {
+  background-color: var(--error-bg);
 }
