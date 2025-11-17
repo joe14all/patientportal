@@ -8,6 +8,7 @@ import ProfileContactForm from '../components/profile/ProfileContactForm';
 import ProfileEmergencyContacts from '../components/profile/ProfileEmergencyContacts';
 import ProfileSecurityForm from '../components/profile/ProfileSecurityForm';
 import ProfilePreferencesForm from '../components/profile/ProfilePreferencesForm';
+import ProfileSyncing from '../components/profile/ProfileSyncing'; 
 import ProfileDemographicsForm from '../components/profile/ProfileDemographicsForm';
 import ProfileLoginHistory from '../components/profile/ProfileLoginHistory';
 import ProfileSystemInfo from '../components/profile/ProfileSystemInfo';
@@ -34,7 +35,7 @@ const Profile = () => {
 
   // --- Component State ---
   const [formData, setFormData] = useState(null);
-  const [originalFormData, setOriginalFormData] = useState(null); // --- NEW: To store original state
+  const [originalFormData, setOriginalFormData] = useState(null); 
   const [isDirty, setIsDirty] = useState(false);
   
   // (originalEmail and originalPhone are no longer needed here)
@@ -263,7 +264,7 @@ const Profile = () => {
   if (loading && !formData) return <p>Loading profile...</p>;
   if (!formData) return <p>Could not load profile data.</p>;
 
-  return (
+   return (
     <div className={styles.pageWrapper}>
       <h1>Profile & Settings</h1>
       
@@ -281,7 +282,7 @@ const Profile = () => {
           <ProfileEmergencyContacts />
         </div>
         
-        {/* (Column 2 remains the same) */}
+        {/* --- Column 2: Security, Preferences, Sync, etc. --- */}
         <div className={styles.column}>
           <ProfileSecurityForm 
             formData={formData} 
@@ -291,6 +292,9 @@ const Profile = () => {
             formData={formData} 
             handleChange={handleChange} 
           />
+          {/* --- 2. ADD THE NEW COMPONENT HERE --- */}
+          <ProfileSyncing />
+          
           <ProfileDemographicsForm
             formData={formData.demographics}
             handleChange={handleChange}
@@ -301,7 +305,6 @@ const Profile = () => {
         </div>
       </div>
 
-      {/* --- UPDATED: Pass the onRevert prop --- */}
       <StickySaveBar 
         isDirty={isDirty}
         loading={loading}

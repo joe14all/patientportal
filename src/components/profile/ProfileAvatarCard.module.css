@@ -1,21 +1,15 @@
 /* --- Avatar Card --- */
 .avatarCard {
-  /* Added styles that were previously on global .card */
-  background-color: var(--bg-surface);
-  border: 1px solid var(--border-color);
-  border-radius: 0.75rem; /* 12px */
-  padding: 1.5rem; /* 24px */
-  box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
-  
-  /* Existing styles */
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
 }
 
-body.dark .avatarCard {
-  box-shadow: none;
+/* --- Wrapper for avatar + edit button --- */
+.avatarContainer {
+  position: relative;
+  margin-bottom: 1rem;
 }
 
 .avatar {
@@ -26,7 +20,39 @@ body.dark .avatarCard {
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 1rem;
+  color: var(--primary);
+  font-weight: 600;
+  font-size: 2.5rem;
+  line-height: 1;
+  overflow: hidden;
+  border: 3px solid var(--border-color);
+}
+
+/* --- Edit button overlay --- */
+.editButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background-color: var(--bg-surface);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.editButton:hover {
+  background-color: var(--primary);
+  color: var(--text-inverted);
+}
+.editButton svg {
+  width: 16px;
+  height: 16px;
 }
 
 .avatar svg {
@@ -35,16 +61,61 @@ body.dark .avatarCard {
   color: var(--primary);
 }
 
+.avatarImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
 .avatarCard h2 {
   font-size: 1.5rem;
   color: var(--text-primary);
   margin: 0;
-    word-break: break-word; /* --- ADDED: Allows long names to wrap --- */
-
+  word-break: break-word;
 }
 
 .avatarCard p {
   font-size: 1rem;
   color: var(--text-secondary);
   margin: 0.25rem 0 0;
+}
+
+/* --- NEW: Button Group Styles --- */
+.buttonGroup {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 1rem;
+  width: 100%;
+}
+
+/* --- UPDATED: from .removeButton to .actionButton --- */
+.actionButton {
+  /* This replaces .removeButton */
+  padding: 0.3rem 0.8rem;
+  font-size: 0.8rem;
+  font-weight: 500;
+  border-radius: 0.5rem;
+  
+  /* NEW: Make them share the space */
+  flex: 1 1 0; 
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem; /* Space between icon and text */
+}
+
+.actionButton svg {
+  width: 14px;
+  height: 14px;
+  /* margin-right: 0.5rem; (Replaced by gap) */
+}
+
+/* --- Hidden file input --- */
+.hiddenInput {
+  width: 0.1px;
+  height: 0.1px;
+  opacity: 0;
+  overflow: hidden;
+  position: absolute;
+  z-index: -1;
 }

@@ -193,6 +193,23 @@ export const PatientProvider = ({ children }) => {
     });
   }, []);
 
+  /**
+   * (UPDATE) Updates just the patient's profile image URL.
+   */
+  const updateProfilePicture = useCallback(async (newImageUrl) => {
+    // We use a shorter delay for a snappy UI update
+    await simulateApi(() => {
+      setPatient(prevPatient => ({
+        ...prevPatient,
+        systemInfo: {
+          ...prevPatient.systemInfo,
+          profileImageUrl: newImageUrl, // Set the new URL (or null)
+          updatedAt: new Date().toISOString()
+        }
+      }));
+    }, 200); // 200ms delay
+  }, []);
+
   // --- Value ---
   // Memoize the context value to prevent unnecessary re-renders
   const value = useMemo(() => ({
@@ -206,9 +223,10 @@ export const PatientProvider = ({ children }) => {
     
     // Functions (CREATE, UPDATE, DELETE)
     updatePatientDetails,
+    updateProfilePicture, 
     updateMedicalHistory,
     addMedicalHistoryItem,
-    updateMedicalHistoryItem, // <-- ADDED
+    updateMedicalHistoryItem,
     removeMedicalHistoryItem,
     signConsent,
     acknowledgeAlert,
@@ -221,9 +239,10 @@ export const PatientProvider = ({ children }) => {
     loading, 
     error,
     updatePatientDetails,
+    updateProfilePicture, 
     updateMedicalHistory,
     addMedicalHistoryItem,
-    updateMedicalHistoryItem, // <-- ADDED
+    updateMedicalHistoryItem, 
     removeMedicalHistoryItem,
     signConsent,
     acknowledgeAlert

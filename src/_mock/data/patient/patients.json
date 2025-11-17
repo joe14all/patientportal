@@ -82,6 +82,6 @@
     "updatedAt": "2025-11-10T14:30:00Z",
     "createdBy": "admin-uuid-001",
     "lastLogin": "2025-11-09T18:45:00Z",
-    "profileImageUrl": "/images/patients/patient-uuid-001.jpg"
+    "profileImageUrl": "/src/assets/Test/Profile.png"
   }
 }

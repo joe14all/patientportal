@@ -9,7 +9,8 @@ import styles from './DocumentUploadCard.module.css';
  */
 const DocumentUploadCard = ({ onUpload, loading }) => {
   const [fileToUpload, setFileToUpload] = useState(null);
-  const [uploadCategory, setUploadCategory] = useState(DOCUMENT_CATEGORIES[0]);
+  // --- CHANGE 1: Start with no category selected ---
+  const [uploadCategory, setUploadCategory] = useState(''); 
   const [error, setError] = useState(null);
 
   const handleFileChange = (e) => {
@@ -17,7 +18,6 @@ const DocumentUploadCard = ({ onUpload, loading }) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
 
-      // --- Client-side validation ---
       if (file.size > 10 * 1024 * 1024) { // 10MB limit
         setError('File is too large (max 10MB).');
         setFileToUpload(null);
@@ -28,20 +28,29 @@ const DocumentUploadCard = ({ onUpload, loading }) => {
   };
 
   const handleSubmit = async () => {
+    // --- CHANGE 2: Add category validation ---
     if (!fileToUpload) {
       setError('Please select a file first.');
       return;
     }
+    if (!uploadCategory) {
+      setError('Please select a category first.');
+      return;
+    }
+    // ----------------------------------------
 
     setError(null);
     try {
-      // Pass the file and category up to the parent page
       await onUpload(fileToUpload, uploadCategory);
       setFileToUpload(null); // Clear selection on success
+      setUploadCategory(''); // Reset category on success
     } catch (err) {
       setError(err.message || 'Upload failed. Please try again.');
     }
   };
+  
+  // --- CHANGE 3: Determine if upload button should be disabled ---
+  const canUpload = fileToUpload && uploadCategory && !loading;
 
   return (
     <div className={`card ${styles.uploadCard}`}>
@@ -58,7 +67,8 @@ const DocumentUploadCard = ({ onUpload, loading }) => {
             type="file"
             className={styles.uploadInput}
             onChange={handleFileChange}
-            accept="image/*, application/pdf" // Add file type restriction
+            accept="image/*, application/pdf"
+            disabled={loading} // Only disable if loading
           />
         </div>
 
@@ -72,8 +82,11 @@ const DocumentUploadCard = ({ onUpload, loading }) => {
             className={styles.uploadSelect}
             value={uploadCategory}
             onChange={(e) => setUploadCategory(e.target.value)}
-            disabled={!fileToUpload || loading}
+            // --- CHANGE 4: Only disable while loading ---
+            disabled={loading} 
           >
+            {/* --- CHANGE 5: Add a placeholder option --- */}
+            <option value="" disabled>Choose a category...</option>
             {DOCUMENT_CATEGORIES.map(cat => (
               <option key={cat} value={cat}>{cat}</option>
             ))}
@@ -85,10 +98,11 @@ const DocumentUploadCard = ({ onUpload, loading }) => {
       {error && <p className={styles.errorText}>{error}</p>}
 
       {/* --- Upload Button --- */}
+      {/* --- CHANGE 6: Show button if file is selected, but use `canUpload` for disabled state --- */}
       {fileToUpload && (
         <button
           onClick={handleSubmit}
-          disabled={loading}
+          disabled={!canUpload} // Use combined state
           className={styles.uploadButton}
         >
           {loading ? 'Uploading...' : 'Upload File'}

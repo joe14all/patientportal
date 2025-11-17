@@ -1,70 +1,77 @@
 [
   {
-    "id": "doc-uuid-001",
+    "id": "doc-uuid-test-001",
     "patientId": "patient-uuid-001",
     "uploadedByUserId": "user-uuid-001",
-    "fileName": "insurance_card_front_2025.jpg",
+    "fileName": "Test.pdf",
     "storage": {
       "provider": "Mock",
-      "url": "/mock/uploads/patient-001/ins_front_2025.jpg",
-      "fileType": "image/jpeg",
-      "fileSize": 1048576
+      "url": "/src/assets/Test/Test.pdf",
+      "fileType": "application/pdf",
+      "fileSize": 178234
     },
-    "category": "Insurance Card",
-    "linkContext": {
-      "type": "InsurancePolicy",
-      "id": "ins-uuid-001",
-      "description": "Front"
-    },
-    "tags": ["Insurance", "2025"],
+    "category": "Test Documents",
+    "linkContext": null,
+    "tags": ["Test", "PDF"],
     "systemInfo": {
-      "createdAt": "2025-11-01T09:15:00Z",
+      "createdAt": "2025-11-17T14:30:00Z",
       "status": "Active"
     }
   },
   {
-    "id": "doc-uuid-002",
+    "id": "doc-uuid-test-002",
     "patientId": "patient-uuid-001",
-    "uploadedByUserId": "user-uuid-staff-001",
-    "fileName": "panoramic_xray_2025.dicom",
+    "uploadedByUserId": "user-uuid-001",
+    "fileName": "Test.jpg",
     "storage": {
       "provider": "Mock",
-      "url": "/mock/uploads/patient-001/pano_2025.dicom",
-      "fileType": "application/dicom",
-      "fileSize": 15728640
+      "url": "/src/assets/Test/Test.jpg",
+      "fileType": "image/jpeg",
+      "fileSize": 89456
     },
-    "category": "X-Ray",
-    "linkContext": {
-      "type": "VisitSummary",
-      "id": "visit-uuid-001",
-      "description": "Panoramic X-Ray"
-    },
-    "tags": ["X-Ray", "Pano", "Diagnostic"],
+    "category": "Test Documents",
+    "linkContext": null,
+    "tags": ["Test", "JPG"],
     "systemInfo": {
-      "createdAt": "2025-11-20T11:05:00Z",
+      "createdAt": "2025-11-17T14:31:00Z",
       "status": "Active"
     }
   },
   {
-    "id": "doc-uuid-003",
+    "id": "doc-uuid-test-003",
     "patientId": "patient-uuid-001",
     "uploadedByUserId": "user-uuid-001",
-    "fileName": "treatment_plan_question.jpg",
+    "fileName": "Test.png",
     "storage": {
       "provider": "Mock",
-      "url": "/mock/uploads/patient-001/msg_attach_1.jpg",
-      "fileType": "image/jpeg",
-      "fileSize": 512000
+      "url": "/src/assets/Test/Test.png",
+      "fileType": "image/png",
+      "fileSize": 210987
     },
-    "category": "Message Attachment",
-    "linkContext": {
-      "type": "MessagePost",
-      "id": "msg-post-uuid-001",
-      "description": null
-    },
-    "tags": ["Message"],
+    "category": "Test Documents",
+    "linkContext": null,
+    "tags": ["Test", "PNG"],
     "systemInfo": {
-      "createdAt": "2025-11-21T14:00:00Z",
+      "createdAt": "2025-11-17T14:32:00Z",
+      "status": "Active"
+    }
+  },
+  {
+    "id": "doc-uuid-test-004",
+    "patientId": "patient-uuid-001",
+    "uploadedByUserId": "user-uuid-001",
+    "fileName": "Profile.png",
+    "storage": {
+      "provider": "Mock",
+      "url": "/src/assets/Test/Profile.png",
+      "fileType": "image/png",
+      "fileSize": 304567
+    },
+    "category": "Test Documents",
+    "linkContext": null,
+    "tags": ["Test", "PNG"],
+    "systemInfo": {
+      "createdAt": "2025-11-17T14:33:00Z",
       "status": "Active"
     }
   }

@@ -201,10 +201,37 @@ export const IconPaperclip = (props) => (
   </svg>
 );
 
-
 export const IconEye = (props) => (
   <svg {...iconProps} {...props}>
     <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
     <circle cx="12" cy="12" r="3"></circle>
   </svg>
 );
+
+export const IconCamera = (props) => (
+  <svg {...iconProps} {...props}>
+    <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+    <circle cx="12" cy="13" r="4"></circle>
+  </svg>
+);
+
+{/* --- NEW/REPLACED ICONS --- */}
+
+export const IconGoogleCalendar = (props) => (
+  <svg {...iconProps} {...props} viewBox="0 0 24 24">
+    <path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zM5 8V6h14v2H5z"></path>
+    <path d="M10 14h2v2h-2zM14 14h2v2h-2zM10 17h2v2h-2zM14 17h2v2h-2z" fill="currentColor"></path>
+  </svg>
+);
+
+export const IconAppleCalendar = (props) => (
+  <svg {...iconProps} {...props} viewBox="0 0 24 24">
+    <path d="M19 4H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z"></path>
+    <line x1="16" y1="2" x2="16" y2="6"></line>
+    <line x1="8" y1="2" x2="8" y2="6"></line>
+    <line x1="3"y1="10" x2="21" y2="10"></line>
+    <circle cx="12" cy="16" r="1.5" fill="currentColor"></circle>
+  </svg>
+);
+
+{/* --- IconOutlookCalendar is removed --- */}

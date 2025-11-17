@@ -50,7 +50,8 @@ export const EngagementProvider = ({ children }) => {
   };
 
   // --- Message Functions ---
-
+  // ... (sendMessage and createNewThread functions remain unchanged) ...
+  
   /**
    * (CREATE) Sends a new message (reply) in an existing thread.
    */
@@ -121,8 +122,6 @@ export const EngagementProvider = ({ children }) => {
         initiatingUserId: author.id, // <-- Use determined author ID
         subject: subject,
         category: category,
-        // If patient starts, it's pending staff. If system starts, it's "Closed" or "PendingPatient"
-        // Let's use "PendingPatient" for notifications
         status: isPatientInitiated ? "PendingStaff" : "PendingPatient", 
         priority: "Normal",
         assignment: {
@@ -130,9 +129,7 @@ export const EngagementProvider = ({ children }) => {
           assignedId: "provider-uuid-001", // Default provider
         },
         readStatus: {
-          // If patient starts, they've read it. If system starts, they haven't.
           isReadByPatient: isPatientInitiated,
-          // If patient starts, staff hasn't read it. If system starts, staff has "read" it.
           isReadByStaff: !isPatientInitiated,
         },
         lastMessage: {
@@ -163,7 +160,6 @@ export const EngagementProvider = ({ children }) => {
     });
   }, [patientAuthor, systemAuthor]); // <-- Add dependencies
 
-
   /**
    * (UPDATE) Marks a thread as read by the patient.
    */
@@ -185,13 +181,14 @@ export const EngagementProvider = ({ children }) => {
    * (CREATE) Uploads a new document.
    */
   const uploadDocument = useCallback(async (file, category, linkContext = null) => {
-    // `file` would be a File object. We'll mock it.
-    // `linkContext` could be { type: "MessagePost", id: "msg-post-uuid-xxx" }
+    // `file` is a File object.
     
-    // --- THIS IS THE KEY ---
-    // The `simulateApi` function resolves with the return value of its callback.
-    // The callback creates `newDoc` and returns it.
-    // So, `newDoc` will be returned by `await simulateApi(...)`.
+    // --- THIS IS THE FIX ---
+    // Create a temporary local URL for the file.
+    // This allows the <embed> or <img> tag to preview it immediately.
+    // In a real app, this URL would be replaced by an S3 or blob storage URL
+    // after the upload completes. For our mock, this is perfect.
+    const fileUrl = URL.createObjectURL(file);
     
     const newDoc = await simulateApi(() => {
       const newDoc = {
@@ -201,7 +198,8 @@ export const EngagementProvider = ({ children }) => {
         fileName: file.name || "new-file.pdf",
         storage: {
           provider: "Mock",
-          url: `/mock/uploads/patient-001/${file.name || "new-file.pdf"}`,
+          // --- USE THE NEW URL ---
+          url: fileUrl, 
           fileType: file.type || "application/pdf",
           fileSize: file.size || 123456,
         },
@@ -218,7 +216,7 @@ export const EngagementProvider = ({ children }) => {
       return newDoc; // Return the new doc so it can be attached to a message
     });
     
-    return newDoc; // --- This line is correct.
+    return newDoc;
     
   }, []);
 
@@ -227,6 +225,13 @@ export const EngagementProvider = ({ children }) => {
    */
   const archiveDocument = useCallback(async (documentId) => {
     await simulateApi(() => {
+      // --- NEW: Revoke Object URL to prevent memory leaks ---
+      const docToArchive = documents.find(doc => doc.id === documentId);
+      if (docToArchive && docToArchive.storage.url.startsWith('blob:')) {
+        URL.revokeObjectURL(docToArchive.storage.url);
+      }
+      // ----------------------------------------------------
+
       setDocuments(prev =>
         prev.map(doc =>
           doc.id === documentId
@@ -235,7 +240,7 @@ export const EngagementProvider = ({ children }) => {
         )
       );
     });
-  }, []);
+  }, [documents]); // <-- Add documents dependency
 
 
   // --- Value ---

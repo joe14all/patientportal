@@ -45,22 +45,6 @@ body.dark .docItem:hover {
   min-width: 0;
 }
 
-/* --- 1. REMOVE ALL CLICKABLE STYLES --- */
-/*
-.docInfo.clickable {
-  cursor: pointer;
-}
-.docInfo.clickable .docName {
-  color: var(--primary); 
-  font-weight: 600;
-}
-.docItem:hover .docInfo.clickable .docName {
-  text-decoration: underline;
-}
-*/
-/* --- End removal --- */
-
-
 .docName {
   display: block;
   font-weight: 500;
@@ -81,8 +65,6 @@ body.dark .docItem:hover {
 .docActions {
   display: flex;
   gap: 0.5rem;
-  /* --- 2. REMOVE OPACITY/HOVER STYLES --- */
-  /* --- All actions will now be visible by default --- */
 }
 
 /* --- Responsive layout for mobile --- */
@@ -114,9 +96,9 @@ body.dark .docItem:hover {
     /* Bottom-right */
     grid-row: 2 / 3;
     grid-column: 2 / 3;
-    justify-content: flex-start; /* Align actions to the left */
     
-    /* --- 3. REMOVE OPACITY OVERRIDE --- */
+    /* --- THIS IS THE ONLY CHANGE --- */
+    justify-content: flex-end; /* Was flex-start, this looks tidier */
   }
   
   .docName {

@@ -285,3 +285,54 @@ body.dark .is-invalid:focus {
 .body-no-scroll {
   overflow: hidden;
 }
+
+/* 6. GLOBAL ICON BUTTON STYLES */
+/* This is a utility class for buttons that ONLY contain an icon.
+  We style both <a> and <button> tags to make them look identical.
+*/
+.icon-button,
+a.icon-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  
+  /* Reset browser defaults */
+  background: transparent;
+  border: 1px solid transparent;
+  padding: 0; /* Remove default button padding */
+  
+  /* Set a standard, square size */
+  width: 40px;
+  height: 40px;
+  border-radius: 0.5rem; /* 8px, matches other form elements */
+  
+  /* Icon color */
+  color: var(--text-secondary);
+  text-decoration: none; /* For the <a> tag */
+  cursor: pointer;
+}
+
+/* Standard hover effect */
+.icon-button:hover:not(:disabled),
+a.icon-button:hover {
+  background-color: var(--bg-surface-hover);
+  color: var(--text-primary);
+  text-decoration: none; /* For the <a> tag */
+}
+
+/* Danger variant for delete/remove */
+.icon-button.danger {
+  color: var(--error-500);
+}
+.icon-button.danger:hover:not(:disabled) {
+  background-color: var(--error-bg);
+  color: var(--error-500);
+}
+
+/* Disabled state */
+.icon-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background-color: transparent;
+  color: var(--text-secondary);
+}

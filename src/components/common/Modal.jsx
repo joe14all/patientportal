@@ -1,12 +1,12 @@
-import React, { useEffect, useState } from 'react'; // 1. Add useState
+import React, { useEffect, useState } from 'react';
 import { IconClose } from '../../layouts/components/Icons';
 import styles from './Modal.module.css';
 
 /**
  * A reusable, mobile-first modal component for alerts and confirmations.
  *
- * ... (all prop comments remain the same) ...
- * @param {boolean} [props.isLoading] - Disables all buttons and close actions (global loading).
+ * ... (all other props) ...
+ * @param {string} [props.modalClassName] - An optional extra class for the modal card.
  */
 const Modal = ({
   isOpen,
@@ -18,19 +18,20 @@ const Modal = ({
   secondaryActionText,
   onSecondaryAction,
   primaryActionVariant = 'primary',
-  isLoading = false, // This is the GLOBAL loading state
+  isLoading = false,
+  modalClassName = '', // <-- ADD THIS PROP
 }) => {
-  // --- 2. ADD INTERNAL LOADING STATE ---
+  // --- Internal loading state ---
   const [isProcessing, setIsProcessing] = useState(false);
 
-  // --- 3. RESET INTERNAL STATE WHEN MODAL IS CLOSED/OPENED ---
+  // --- Reset internal state when modal is closed/opened ---
   useEffect(() => {
     if (isOpen) {
       setIsProcessing(false); // Reset on open
     }
   }, [isOpen]);
 
-  // --- 4. UPDATE ESCAPE KEY HANDLER ---
+  // --- Escape key handler ---
   useEffect(() => {
     const handleEsc = (event) => {
       if (event.key === 'Escape') {
@@ -52,7 +53,7 @@ const Modal = ({
     return null;
   }
 
-  // --- 5. UPDATE CLICK HANDLERS ---
+  // --- Click Handlers ---
   const handlePrimaryClick = async () => {
     setIsProcessing(true); // <-- Set internal state *immediately*
     if (onPrimaryAction) {
@@ -70,11 +71,9 @@ const Modal = ({
       // If no action, just close
       onClose();
     }
-    // We only want to setIsProcessing(false) if an error occurs
   };
 
   const handleSecondaryClick = () => {
-    // Secondary action (like "Cancel") should not be async
     if (onSecondaryAction) {
       onSecondaryAction();
     }
@@ -86,10 +85,9 @@ const Modal = ({
     onClose();
   };
 
-  // --- 6. COMBINE LOADING STATES FOR 'disabled' ---
+  // --- Combined loading states ---
   const isDisabled = isLoading || isProcessing;
   
-  // Determine button text based on loading state
   let buttonText = primaryActionText;
   if (isProcessing) {
     buttonText = "Processing...";
@@ -107,7 +105,8 @@ const Modal = ({
       aria-labelledby="modal-title"
     >
       <div 
-        className={`card ${styles.modalCard}`} 
+        // --- THIS IS THE CHANGE ---
+        className={`card ${styles.modalCard} ${modalClassName}`} // <-- APPLY THE PROP
         onClick={(e) => e.stopPropagation()} // Prevent overlay click when clicking card
       >
         {/* --- Modal Header --- */}
@@ -150,7 +149,6 @@ const Modal = ({
                 onClick={handlePrimaryClick}
                 disabled={isDisabled} // <-- Use combined state
               >
-                {/* --- 7. UPDATE TEXT --- */}
                 {buttonText} 
               </button>
             )}

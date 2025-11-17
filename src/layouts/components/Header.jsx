@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { usePatientData } from '../../contexts'; // 1. Remove Account and Theme hooks
-import { IconHamburger, IconClose, IconUser } from './Icons';
+import { usePatientData } from '../../contexts';
+import { IconHamburger, IconClose, IconUser } from './Icons'; // IconUser is no longer used here, but we can leave the import
 import styles from './Header.module.css';
 
 // Helper function to get initials from a name
@@ -15,10 +15,10 @@ const getInitials = (name) => {
 };
 
 const Header = ({ onToggleMenu, isMobileMenuOpen }) => {
-  const { patient } = usePatientData(); // 2. Keep patient data for initials
+  const { patient } = usePatientData();
 
-  // Get initials from preferredName, fallback to an icon
   const initials = getInitials(patient?.preferredName);
+  const profileImage = patient?.systemInfo?.profileImageUrl;
 
   return (
     <header className={styles.header}>
@@ -33,17 +33,26 @@ const Header = ({ onToggleMenu, isMobileMenuOpen }) => {
         {isMobileMenuOpen ? <IconClose /> : <IconHamburger />}
       </button>
 
-      {/* --- 3. SIMPLIFIED Desktop User Menu --- */}
+      {/* --- Desktop User Menu --- */}
       <div className={styles.desktopMenuWrapper}>
-        {/* The avatar is now a direct link to the profile */}
         <Link to="/profile" className={styles.avatarButton}>
-          {initials ? initials : <IconUser />}
+          {/* --- THIS IS THE UPDATED LOGIC --- */}
+          {profileImage ? (
+            <img 
+              src={profileImage} 
+              alt="Profile" 
+              className={styles.avatarImage} 
+            />
+          ) : (
+            // Default to initials, even if it's an empty string
+            initials
+          )}
         </Link>
 
         {/* This informational menu appears on hover */}
         <div className={styles.userMenuDropdown}>
           <strong>{patient?.preferredName || 'Patient'}</strong>
-          <span className={styles.dropdownEmail}>{patient?.contact.emails[0].address}</span>
+          <span className={styles.dropdownEmail}>{patient?.contact.emails?.[0]?.address}</span>
         </div>
       </div>
     </header>

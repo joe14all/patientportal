@@ -12,35 +12,55 @@ import {
   IconProfile,
   IconMedicalHistory,
   IconTreatmentPlan,
-  IconLogout 
+  IconLogout,
+  IconUser // --- ADD IconUser ---
 } from './Icons';
 import styles from './MobileMenu.module.css';
 
+// --- NEW: Add the same helper function ---
+const getInitials = (name) => {
+  if (!name) return '';
+  const parts = name.split(' ');
+  if (parts.length > 1) {
+    return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+  }
+  return (name[0] || '').toUpperCase();
+};
+
 const MobileMenu = ({ isOpen, onCloseMenu }) => {
   const { logout } = useAccountData();
-
   const { patient } = usePatientData(); 
-
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
 
-  // We wrap the NavLink onClick to close the menu
+  // --- NEW: Get avatar data ---
+  const initials = getInitials(patient?.preferredName);
+  const profileImage = patient?.systemInfo?.profileImageUrl;
+
   const handleNavClick = () => {
     onCloseMenu();
   };
 
   return (
-    // Wrap in React.Fragment
     <>
       <div className={`${styles.overlay} ${isOpen ? styles.open : ''}`}>
         
-        {/* Add new user info header */}
+        {/* --- THIS IS THE UPDATED HEADER --- */}
         <div className={styles.menuHeader}>
-          <strong>{patient?.preferredName || 'Patient'}</strong>
-          {/* Added optional chaining for safety */}
-          <span>{patient?.contact?.emails?.[0]?.address || 'No email on file'}</span>
+          <div className={styles.avatar}>
+            {profileImage ? (
+              <img src={profileImage} alt="Profile" className={styles.avatarImage} />
+            ) : (
+              initials ? initials : <IconUser />
+            )}
+          </div>
+          <div className={styles.userInfo}>
+            <strong>{patient?.preferredName || 'Patient'}</strong>
+            <span>{patient?.contact?.emails?.[0]?.address || 'No email on file'}</span>
+          </div>
         </div>
 
         <nav>
+          {/* ... (rest of the NavLink list) ... */}
           <ul className={styles.navList}>
             <li>
               <NavLink 
@@ -140,6 +160,7 @@ const MobileMenu = ({ isOpen, onCloseMenu }) => {
 
 
         <div className={styles.footer}>
+          {/* ... (logout button) ... */}
           <button 
             onClick={() => setIsLogoutModalOpen(true)} 
             className={styles.logoutButton}
@@ -150,7 +171,7 @@ const MobileMenu = ({ isOpen, onCloseMenu }) => {
         </div>
       </div>
 
-      {/* Add the logout confirmation modal */}
+      {/* ... (logout modal) ... */}
       <Modal
         isOpen={isLogoutModalOpen}
         onClose={() => setIsLogoutModalOpen(false)}
