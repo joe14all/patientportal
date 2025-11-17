@@ -96,6 +96,7 @@ const Profile = () => {
         recoveryPhone: user.contact.recoveryPhone,
         language: user.preferences.language,
         notifications: user.preferences.notifications,
+        theme: user.preferences.theme || '',
       };
 
       setFormData(initialData);
@@ -225,7 +226,8 @@ const Profile = () => {
       // 2. Update Account Preferences
       await updateUserPreferences({
         language: formData.language,
-        notifications: formData.notifications
+        notifications: formData.notifications,
+        theme: formData.theme === '' ? null : formData.theme
       });
 
       // 3. Update Account Recovery Phone

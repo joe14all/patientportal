@@ -23,12 +23,12 @@ export const ThemeProvider = ({ children }) => {
   // Effect 1: Sync theme from user's saved preference
   // This runs when the user loads or logs in
   useEffect(() => {
-    // Check for the user's preference from the mock data
     const userTheme = user?.preferences?.theme;
+    
     if (userTheme) {
       setTheme(userTheme);
     } else if (!accountLoading) {
-      // If no user is logged in, fall back to system theme
+      // If no user is logged in (or has no pref), fall back to system theme
       setTheme(getSystemTheme());
     }
   }, [user, accountLoading]); // Re-run if user logs in/out
@@ -48,7 +48,9 @@ export const ThemeProvider = ({ children }) => {
     // If the user is logged in, save this preference to their account
     // This calls the function from AccountContext!
     if (user) {
-      updateUserPreferences({ theme: newTheme }); //
+      // If newTheme is 'system default', we save null
+      const themeToSave = newTheme === '' ? null : newTheme;
+      updateUserPreferences({ theme: themeToSave }); 
     }
   }, [theme, user, updateUserPreferences]);
 

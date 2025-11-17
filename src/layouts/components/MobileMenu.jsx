@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { NavLink } from 'react-router-dom';
-import { useAccountData, usePatientData, useTheme } from '../../contexts';
-import Modal from '../../components/common/Modal'; // 1. Import Modal
+
+import { useAccountData, usePatientData } from '../../contexts';
+import Modal from '../../components/common/Modal';
 import { 
   IconDashboard, 
   IconAppointments,
@@ -11,18 +12,15 @@ import {
   IconProfile,
   IconMedicalHistory,
   IconTreatmentPlan,
-  IconSun,        // 2. Import new icons
-  IconMoon,
   IconLogout 
 } from './Icons';
 import styles from './MobileMenu.module.css';
 
 const MobileMenu = ({ isOpen, onCloseMenu }) => {
   const { logout } = useAccountData();
-  const { theme, toggleTheme } = useTheme();
-  const { patient } = usePatientData(); // 3. Get patient data
 
-  // 4. Add state for modal
+  const { patient } = usePatientData(); 
+
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
 
   // We wrap the NavLink onClick to close the menu
@@ -31,14 +29,15 @@ const MobileMenu = ({ isOpen, onCloseMenu }) => {
   };
 
   return (
-    // 5. Wrap in React.Fragment
+    // Wrap in React.Fragment
     <>
       <div className={`${styles.overlay} ${isOpen ? styles.open : ''}`}>
         
-        {/* 6. Add new user info header */}
+        {/* Add new user info header */}
         <div className={styles.menuHeader}>
           <strong>{patient?.preferredName || 'Patient'}</strong>
-          <span>{patient?.contact.emails[0].address}</span>
+          {/* Added optional chaining for safety */}
+          <span>{patient?.contact?.emails?.[0]?.address || 'No email on file'}</span>
         </div>
 
         <nav>
@@ -139,14 +138,10 @@ const MobileMenu = ({ isOpen, onCloseMenu }) => {
           </ul>
         </nav>
 
-        {/* 7. Updated Footer for theme toggle and logout */}
+
         <div className={styles.footer}>
-          <button onClick={toggleTheme} className="secondary">
-            {theme === 'light' ? <IconMoon /> : <IconSun />}
-            {theme === 'light' ? 'Dark' : 'Light'} Mode
-          </button>
           <button 
-            onClick={() => setIsLogoutModalOpen(true)} // 8. Open modal
+            onClick={() => setIsLogoutModalOpen(true)} 
             className={styles.logoutButton}
           >
             <IconLogout />
@@ -155,7 +150,7 @@ const MobileMenu = ({ isOpen, onCloseMenu }) => {
         </div>
       </div>
 
-      {/* 9. Add the logout confirmation modal */}
+      {/* Add the logout confirmation modal */}
       <Modal
         isOpen={isLogoutModalOpen}
         onClose={() => setIsLogoutModalOpen(false)}

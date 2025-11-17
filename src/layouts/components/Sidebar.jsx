@@ -1,7 +1,7 @@
-import React, { useState } from 'react'; // 1. Import useState
+import React, { useState } from 'react';
 import { NavLink } from 'react-router-dom';
-import { useAccountData, useTheme } from '../../contexts'; 
-import Modal from '../../components/common/Modal'; // 2. Import the Modal component
+import { useAccountData } from '../../contexts'; 
+import Modal from '../../components/common/Modal'; 
 import { 
   IconDashboard, 
   IconAppointments,
@@ -11,21 +11,17 @@ import {
   IconProfile,
   IconMedicalHistory,
   IconTreatmentPlan,
-  IconSun,        
-  IconMoon,
+
   IconLogout 
 } from './Icons';
 import styles from './Sidebar.module.css';
 
 const Sidebar = () => {
   const { logout } = useAccountData(); 
-  const { theme, toggleTheme } = useTheme();
 
-  // 3. Add state to control the modal
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
 
   return (
-    // 4. Wrap the component in a React Fragment
     <>
       <nav className={styles.sidebar}>
         <ul className={styles.navList}>
@@ -96,18 +92,11 @@ const Sidebar = () => {
           </li>
         </ul>
 
-        {/* --- Footer section for buttons --- */}
+    
         <div className={styles.sidebarFooter}>
           <button 
-            className={styles.menuButton} 
-            onClick={toggleTheme}
-          >
-            {theme === 'light' ? <IconMoon /> : <IconSun />}
-            {theme === 'light' ? 'Dark' : 'Light'} Mode
-          </button>
-          <button 
             className={`${styles.menuButton} ${styles.logoutButton}`}
-            onClick={() => setIsLogoutModalOpen(true)} // 5. Update onClick to open modal
+            onClick={() => setIsLogoutModalOpen(true)} 
           >
             <IconLogout />
             Log Out

@@ -34,7 +34,7 @@
   "preferences": {
     "language": "en",
     "timezone": "America/Los_Angeles",
-    "theme": "dark",
+    "theme": "light",
     "notifications": {
       "appointmentReminders": true,
       "newMessageAlerts": true,

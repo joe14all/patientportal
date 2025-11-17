@@ -20,6 +20,21 @@ const ProfilePreferencesForm = ({ formData, handleChange }) => {
         </select>
       </div>
 
+      {/* --- NEW: Theme Selection --- */}
+      <div className="form-group">
+        <label htmlFor="theme">App Theme</label>
+        <select
+          id="theme"
+          name="theme"
+          value={formData.theme || ''} // Use || '' to default to "System"
+          onChange={handleChange}
+        >
+          <option value="auto">System Default</option>
+          <option value="light">Light</option>
+          <option value="dark">Dark</option>
+        </select>
+      </div>
+
       {/* --- Notification Checkboxes --- */}
       <h3>Notifications</h3>
       <div className={styles.checkboxGroup}>
