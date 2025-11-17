@@ -1,0 +1,137 @@
+.invoiceCard {
+  padding: 0; /* Remove default card padding */
+  overflow: hidden; /* Keep rounded corners */
+}
+
+/* --- Header --- */
+.invoiceHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.25rem 1.5rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+.invoiceHeader:hover {
+  background-color: var(--bg-surface-hover);
+}
+
+.headerInfo {
+  display: flex;
+  flex-direction: column;
+}
+.headerInfo strong {
+  font-size: 1.1rem;
+  color: var(--text-primary);
+}
+.headerInfo span {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+}
+
+.headerAmount {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.amountDue {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--primary);
+}
+
+.expandIcon {
+  font-size: 1.5rem;
+  font-weight: 300;
+  color: var(--text-secondary);
+  line-height: 1;
+}
+
+/* --- Details (Expanded) --- */
+.invoiceDetails {
+  padding: 1rem 1.5rem 1.5rem;
+  background-color: var(--bg-body);
+  border-top: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.detailSection h4 {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin: 0 0 0.75rem 0;
+}
+
+.lineItemList,
+.summaryList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.lineItem,
+.summaryList li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.9rem;
+}
+.lineItem span:first-child,
+.summaryList li span:first-child {
+  color: var(--text-secondary);
+}
+.lineItem span:last-child,
+.summaryList li span:last-child {
+  color: var(--text-primary);
+  font-weight: 500;
+}
+.summaryList li strong {
+  color: var(--text-primary);
+}
+
+.summaryTotal {
+  padding-top: 0.75rem;
+  margin-top: 0.25rem;
+  border-top: 1px dashed var(--border-color);
+}
+.summaryTotal span,
+.summaryTotal strong {
+  font-size: 1rem;
+  font-weight: 700;
+}
+.summaryTotal strong {
+  color: var(--primary);
+}
+
+.notes {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin: 0;
+  font-style: italic;
+  max-width: none;
+}
+
+
+/* --- Footer --- */
+.invoiceFooter {
+  padding: 1rem 1.5rem;
+  border-top: 1px solid var(--border-color);
+  background-color: var(--bg-surface-hover);
+}
+body.dark .invoiceFooter {
+  background-color: var(--bg-surface);
+}
+
+.payButton {
+  width: 100%;
+  padding: 0.8rem;
+  font-size: 1rem;
+}

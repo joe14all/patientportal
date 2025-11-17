@@ -25,6 +25,7 @@ import insuranceClaims from "./data/billing/insurance_claims.json";
 import billingInvoices from "./data/billing/billing_invoices.json";
 import billingPayments from "./data/billing/billing_payments.json";
 import billingRefunds from "./data/billing/billing_refunds.json";
+import paymentMethods from "./data/billing/payment_methods.json";
 
 // --- Core (Practice Definitions) ---
 import providers from "./data/core/providers.json";
@@ -63,6 +64,7 @@ export const mockApi = {
     billingInvoices,
     billingPayments,
     billingRefunds,
+    paymentMethods,
   },
   // Secure messaging & files
   engagement: {

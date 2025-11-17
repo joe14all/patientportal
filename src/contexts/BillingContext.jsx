@@ -19,6 +19,8 @@ export const BillingProvider = ({ children }) => {
   const [invoices, setInvoices] = useState(mockApi.billing.billingInvoices);
   const [payments, setPayments] = useState(mockApi.billing.billingPayments);
   const [refunds, setRefunds] = useState(mockApi.billing.billingRefunds);
+  // --- ADD NEW PAYMENT METHODS STATE ---
+  const [paymentMethods, setPaymentMethods] = useState(mockApi.billing.paymentMethods);
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -43,62 +45,137 @@ export const BillingProvider = ({ children }) => {
     });
   };
 
+  // --- Payment Method Functions (NEW) ---
+
+  /**
+   * (CREATE) Adds a new payment method to the user's account.
+   */
+  const addPaymentMethod = useCallback(async (newCardData) => {
+    await simulateApi(() => {
+      const newPaymentMethod = {
+        ...newCardData, // This would be the tokenized card data in a real app
+        id: `pm-uuid-${Date.now()}`,
+        patientId: "patient-uuid-001", // Hardcoded for mock
+      };
+
+      setPaymentMethods(prev => {
+        // If this is the first card, make it the default
+        if (prev.length === 0) {
+          newPaymentMethod.isDefault = true;
+          return [newPaymentMethod];
+        }
+        // If it's set as default, unset all others
+        if (newPaymentMethod.isDefault) {
+          const unDefaulted = prev.map(pm => ({ ...pm, isDefault: false }));
+          return [...unDefaulted, newPaymentMethod];
+        }
+        return [...prev, newPaymentMethod];
+      });
+    });
+  }, []);
+
+  /**
+   * (DELETE) Removes a payment method from the user's account.
+   */
+  const removePaymentMethod = useCallback(async (paymentMethodId) => {
+    await simulateApi(() => {
+      setPaymentMethods(prev => 
+        prev.filter(pm => pm.id !== paymentMethodId)
+      );
+      // Note: This could leave the user with no default card.
+      // A real app would need logic to assign a new default if the default was removed.
+    });
+  }, []);
+
+  /**
+   * (UPDATE) Sets a specific payment method as the default.
+   */
+  const setDefaultPaymentMethod = useCallback(async (paymentMethodId) => {
+    await simulateApi(() => {
+      setPaymentMethods(prev => 
+        prev.map(pm => ({
+          ...pm,
+          isDefault: pm.id === paymentMethodId
+        }))
+      );
+    });
+  }, []);
+
+
   // --- Payment Functions ---
 
   /**
    * (CREATE) Simulates making a payment for an invoice.
+   * --- UPDATED to accept a paymentMethodId ---
    */
-  const makePayment = useCallback(async (invoiceId, paymentAmount, paymentMethod = 'Credit Card (Online)') => {
+  const makePayment = useCallback(async (invoiceId, paymentAmount, paymentMethodId) => {
     
-    // --- THIS IS THE COMBINED FIX ---
     const { newPayment, invoiceNumber } = await simulateApi(() => {
+      // 1. Find the payment method to get its details
+      const paymentMethod = paymentMethods.find(pm => pm.id === paymentMethodId);
+      if (!paymentMethod) {
+        throw new Error("Payment method not found.");
+      }
+      
+      // 2. Find and update the invoice
       let targetInvoice;
       let foundInvoiceNumber; 
 
-      // 1. Map over the *current state* 'invoices'
       const newInvoices = invoices.map(invoice => {
         if (invoice.id === invoiceId) {
           const amountDue = parseFloat(invoice.financialSummary.amountDue) || 0;
           if (amountDue <= 0) {
             throw new Error("Invoice not found or no amount due.");
           }
+          // --- UPDATED: Allow partial payment ---
           if (paymentAmount > amountDue) {
-            throw new Error("Payment exceeds amount due.");
+            // Allow a small tolerance for floating point issues
+            if (paymentAmount - amountDue > 0.01) {
+              throw new Error("Payment exceeds amount due.");
+            }
+            paymentAmount = amountDue; // Correct to the exact amount due
           }
+
           const newPaymentsMade = (parseFloat(invoice.financialSummary.totalPaymentsMade) || 0) + paymentAmount;
           const newAmountDue = (parseFloat(invoice.financialSummary.patientResponsibility) || 0) - newPaymentsMade;
           
           targetInvoice = {
             ...invoice,
-            status: newAmountDue <= 0 ? "PaidInFull" : "PartiallyPaid",
+            // --- UPDATED: Use a small epsilon for float comparison ---
+            status: newAmountDue <= 0.001 ? "PaidInFull" : "PartiallyPaid",
             financialSummary: {
               ...invoice.financialSummary,
               totalPaymentsMade: newPaymentsMade,
               amountDue: newAmountDue,
             },
           };
-          foundInvoiceNumber = invoice.invoiceNumber; // Store the number
+          foundInvoiceNumber = invoice.invoiceNumber;
           return targetInvoice;
         }
         return invoice;
       });
 
-      // 2. Check *after* the map
       if (!targetInvoice) {
         throw new Error("Invoice not found or no amount due.");
       }
 
-      // 3. *Then* set state
       setInvoices(newInvoices);
 
+      // 3. Create the new payment record
+      const paymentMethodString = `${paymentMethod.cardType} **** ${paymentMethod.lastFour}`;
       const newPayment = {
         id: `pay-uuid-${Date.now()}`,
         patientId: targetInvoice.patientId,
         paymentDate: new Date().toISOString().split('T')[0],
         amount: paymentAmount,
-        method: paymentMethod,
+        method: paymentMethodString, // Use the formatted string
         status: "Succeeded",
-        transactionDetails: { /* ...mock details... */ },
+        transactionDetails: {
+          transactionId: `ch_3Pq...${Date.now().toString().slice(-4)}`,
+          cardType: paymentMethod.cardType,
+          lastFour: paymentMethod.lastFour,
+          gateway: "Stripe"
+        },
         allocations: [{ invoiceId: invoiceId, amountApplied: paymentAmount }],
         unappliedAmount: 0.00,
         systemInfo: { createdAt: new Date().toISOString(), createdBy: "System-Online-Payment" }
@@ -106,23 +183,22 @@ export const BillingProvider = ({ children }) => {
       
       setPayments(prevPayments => [newPayment, ...prevPayments]);
       
-      // 4. Return both objects
       return { newPayment, invoiceNumber: foundInvoiceNumber };
     });
 
+    // 4. Send the confirmation message (no change here)
     try {
       await createNewThread(
         `Payment Received: $${newPayment.amount.toFixed(2)}`,
         'Billing',
         `Thank you for your payment of $${newPayment.amount.toFixed(2)} for Invoice #${invoiceNumber}.`,
         [], // attachments
-        systemAuthor // <-- 5. PASS AUTHOR
+        systemAuthor 
       );
     } catch (msgErr) {
       console.error("Failed to create automated message:", msgErr);
     }
-  // --- 6. ADD DEPENDENCIES ---
-  }, [createNewThread, invoices, systemAuthor]);
+  }, [createNewThread, invoices, systemAuthor, paymentMethods]); // <-- ADD paymentMethods
 
   
   /**
@@ -130,7 +206,6 @@ export const BillingProvider = ({ children }) => {
    */
   const applyUnappliedPayment = useCallback(async (paymentId, invoiceId) => {
     await simulateApi(() => {
-      // This function doesn't create a message, so the original logic is fine.
       let targetPayment = payments.find(p => p.id === paymentId);
       let targetInvoice = invoices.find(i => i.id === invoiceId);
 
@@ -147,7 +222,7 @@ export const BillingProvider = ({ children }) => {
         prevInvoices.map(inv => 
           inv.id === invoiceId ? {
             ...inv,
-            status: (inv.financialSummary.amountDue - amountToApply) <= 0 ? "PaidInFull" : "PartiallyPaid",
+            status: (inv.financialSummary.amountDue - amountToApply) <= 0.001 ? "PaidInFull" : "PartiallyPaid",
             financialSummary: {
               ...inv.financialSummary,
               totalPaymentsMade: inv.financialSummary.totalPaymentsMade + amountToApply,
@@ -172,6 +247,7 @@ export const BillingProvider = ({ children }) => {
   }, [payments, invoices]);
 
   // --- Policy Functions ---
+  // (No changes to policy, claim, or refund functions)
 
   const addInsurancePolicy = useCallback(async (newPolicyData) => {
     const newPolicy = await simulateApi(() => {
@@ -332,6 +408,7 @@ export const BillingProvider = ({ children }) => {
     billingInvoices: invoices,
     billingPayments: payments,
     billingRefunds: refunds,
+    paymentMethods: paymentMethods, // <-- ADD NEW STATE
     loading,
     error,
     makePayment,
@@ -341,6 +418,9 @@ export const BillingProvider = ({ children }) => {
     deleteInsurancePolicy,
     disputeClaim,
     requestRefund,
+    addPaymentMethod, // <-- ADD NEW FUNCTION
+    removePaymentMethod, // <-- ADD NEW FUNCTION
+    setDefaultPaymentMethod, // <-- ADD NEW FUNCTION
     
   }), [
     policies, 
@@ -348,6 +428,7 @@ export const BillingProvider = ({ children }) => {
     invoices, 
     payments, 
     refunds, 
+    paymentMethods, // <-- ADD NEW DEPENDENCY
     loading, 
     error,
     makePayment,
@@ -356,7 +437,10 @@ export const BillingProvider = ({ children }) => {
     updateInsurancePolicy,
     deleteInsurancePolicy,
     disputeClaim,
-    requestRefund
+    requestRefund,
+    addPaymentMethod, // <-- ADD NEW DEPENDENCY
+    removePaymentMethod, // <-- ADD NEW DEPENDENCY
+    setDefaultPaymentMethod // <-- ADD NEW DEPENDENCY
   ]);
 
   // --- Render ---

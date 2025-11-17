@@ -1,0 +1,34 @@
+[
+  {
+    "id": "pm-uuid-001",
+    "patientId": "patient-uuid-001",
+    "isDefault": true,
+    "cardType": "Visa",
+    "lastFour": "4242",
+    "expMonth": "12",
+    "expYear": "2028",
+    "billingAddress": {
+      "line": ["123 Main St"],
+      "city": "Anytown",
+      "state": "CA",
+      "postalCode": "12345",
+      "country": "US"
+    }
+  },
+  {
+    "id": "pm-uuid-002",
+    "patientId": "patient-uuid-001",
+    "isDefault": false,
+    "cardType": "Mastercard",
+    "lastFour": "5678",
+    "expMonth": "06",
+    "expYear": "2026",
+    "billingAddress": {
+      "line": ["123 Main St"],
+      "city": "Anytown",
+      "state": "CA",
+      "postalCode": "12345",
+      "country": "US"
+    }
+  }
+]

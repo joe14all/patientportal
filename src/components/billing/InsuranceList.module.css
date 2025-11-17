@@ -1,0 +1,52 @@
+.insuranceCard {
+  padding: 0; /* Remove default card padding */
+}
+
+.insuranceCard h2 {
+  font-size: 1.25rem;
+  margin-bottom: 0.5rem;
+  border-bottom: 1px solid var(--border-color);
+  padding: 1.5rem 1.5rem 1rem;
+  margin: 0;
+}
+
+.policyList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.policyItem {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid var(--border-color);
+}
+.policyList .policyItem:last-child {
+  border-bottom: none;
+}
+
+.policyItem strong {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+.policyItem span {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+}
+
+.noItemsText {
+  padding: 1.5rem;
+  text-align: center;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.addButton {
+  width: calc(100% - 3rem); /* Full width minus padding */
+  margin: 1.5rem;
+}

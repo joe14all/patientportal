@@ -1,0 +1,16 @@
+.section {
+  /* This component is the primary one, so no card styles */
+}
+
+.section h2 {
+  font-size: 1.25rem;
+  margin-bottom: 1rem;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 0.5rem;
+}
+
+.invoiceList {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
