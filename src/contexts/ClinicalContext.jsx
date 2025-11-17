@@ -1,13 +1,16 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable react-refresh/only-export-components */
 import React, { createContext, useContext, useState, useMemo, useCallback } from 'react';
-import { mockApi } from '../_mock'; // Import the initial mock data
-
+import { mockApi } from '../_mock'; 
+import { useEngagementData } from './EngagementContext'; 
 // 1. Create the context
 export const ClinicalContext = createContext(null);
 
 // 3. Create the Provider component
 export const ClinicalProvider = ({ children }) => {
+  // --- 1. GET createNewThread AND systemAuthor ---
+  const { createNewThread, systemAuthor } = useEngagementData();
+
   // --- State ---
   const [appointments, setAppointments] = useState(mockApi.clinical.appointments);
   const [visitSummaries, setVisitSummaries] = useState(mockApi.clinical.visitSummaries);
@@ -25,7 +28,7 @@ export const ClinicalProvider = ({ children }) => {
       setTimeout(() => {
         try {
           const result = callback();
-          resolve(result);
+          resolve(result); // <-- Return the result
         } catch (err) {
           console.error("Mock API Error:", err.message);
           setError(err.message);
@@ -39,17 +42,13 @@ export const ClinicalProvider = ({ children }) => {
 
   // --- Appointment Functions ---
 
-  /**
-   * (CREATE) Books a new appointment.
-   */
   const bookAppointment = useCallback(async (newAppointmentData) => {
-    // newAppointmentData should include: { providerId, officeId, startDateTime, endDateTime, appointmentType, reasonForVisit }
-    await simulateApi(() => {
+    const newAppointment = await simulateApi(() => {
       const newAppointment = {
         ...newAppointmentData,
         id: `appt-uuid-${Date.now()}`,
-        patientId: "patient-uuid-001", // Hardcoded for mock
-        status: "Confirmed", // Or "Pending" if it needs staff approval
+        patientId: "patient-uuid-001", 
+        status: "Confirmed", 
         confirmation: {
           status: "Confirmed",
           method: "Online Portal",
@@ -61,15 +60,12 @@ export const ClinicalProvider = ({ children }) => {
         systemInfo: {
           isTelehealth: false,
           createdAt: new Date().toISOString(),
-          createdBy: "user-uuid-001", // Get from auth context
+          createdBy: "user-uuid-001", 
           updatedAt: new Date().toISOString(),
         }
       };
       setAppointments(prev => [...prev, newAppointment]);
       
-      // --- ADD LOGIC TO REMOVE THE BOOKED SLOT ---
-      // This is a basic implementation. A real app would be more robust.
-      // We find the date key first, e.g., "2025-11-18"
       const dateKey = newAppointmentData.startDateTime.split('T')[0];
       setAvailableSlots(prevSlots => {
         const updatedSlotsForDate = (prevSlots[dateKey] || []).filter(
@@ -81,68 +77,103 @@ export const ClinicalProvider = ({ children }) => {
           [dateKey]: updatedSlotsForDate
         };
       });
+      return newAppointment; 
     });
-  }, []);
+
+    try {
+      const date = new Date(newAppointment.startDateTime).toLocaleDateString();
+      await createNewThread(
+        `Appointment Confirmed: ${newAppointment.appointmentType}`,
+        'Scheduling',
+        `This is an automated confirmation that your appointment for "${newAppointment.appointmentType}" on ${date} has been successfully booked.`,
+        [], // attachments
+        systemAuthor // <-- 2. PASS AUTHOR
+      );
+    } catch (msgErr) {
+      console.error("Failed to create automated message:", msgErr);
+    }
+  }, [createNewThread, systemAuthor]); // <-- 3. ADD DEPENDENCY
 
   /**
    * (UPDATE) Cancels an existing appointment.
    */
   const cancelAppointment = useCallback(async (appointmentId, reason) => {
-    await simulateApi(() => {
-      setAppointments(prev =>
-        prev.map(appt => {
-          if (appt.id === appointmentId && (appt.status === "Confirmed" || appt.status === "Pending")) {
-            return {
-              ...appt,
-              status: "Cancelled",
-              cancellation: {
-                cancelledAt: new Date().toISOString(),
-                cancelledBy: "Patient",
-                reason: reason || "Cancelled via portal.",
-              }
-            };
-          }
-          return appt;
-        })
-      );
+    const cancelledAppt = await simulateApi(() => {
       
-      // --- ADD LOGIC TO ADD SLOT BACK (if desired) ---
-      // Note: This is complex as you need to know the original slot.
-      // For now, we will *not* add the slot back to keep it simple.
+      let apptToReturn = null;
+      const newAppointments = appointments.map(appt => {
+        if (appt.id === appointmentId && (appt.status === "Confirmed" || appt.status === "Pending")) {
+          apptToReturn = {
+            ...appt,
+            status: "Cancelled",
+            cancellation: {
+              cancelledAt: new Date().toISOString(),
+              cancelledBy: "Patient",
+              reason: reason || "Cancelled via portal.",
+            }
+          };
+          return apptToReturn;
+        }
+        return appt;
+      });
+
+      if (!apptToReturn) {
+        throw new Error("Appointment not found or already cancelled.");
+      }
+
+      setAppointments(newAppointments);
+      return apptToReturn;
     });
-  }, []);
+
+    try {
+      const date = new Date(cancelledAppt.startDateTime).toLocaleDateString();
+      await createNewThread(
+        `Appointment Cancelled: ${cancelledAppt.appointmentType}`,
+        'Scheduling',
+        `This is an automated confirmation that your appointment for "${cancelledAppt.appointmentType}" on ${date} has been cancelled.`,
+        [], // attachments
+        systemAuthor // <-- 2. PASS AUTHOR
+      );
+    } catch (msgErr) {
+      console.error("Failed to create automated message:", msgErr);
+    }
+  }, [createNewThread, appointments, systemAuthor]); // <-- 3. ADD DEPENDENCIES
 
   /**
    * (UPDATE) Reschedules an existing appointment.
-   * --- UPDATED TO REMOVE NEW SLOT ---
    */
   const rescheduleAppointment = useCallback(async (appointmentId, newStart, newEnd) => {
-    await simulateApi(() => {
+    const rescheduledAppt = await simulateApi(() => {
+
       let providerId = null;
-      setAppointments(prev =>
-        prev.map(appt => {
-          if (appt.id === appointmentId) {
-            // Check if appointment can be rescheduled (not already 'Cancelled' or 'Completed')
-            if (appt.status === "Cancelled") throw new Error("Cannot reschedule a cancelled appointment.");
-            
-            providerId = appt.providerId; // Get providerId for slot removal
+      let apptToReturn = null;
+      
+      const newAppointments = appointments.map(appt => {
+        if (appt.id === appointmentId) {
+          if (appt.status === "Cancelled") throw new Error("Cannot reschedule a cancelled appointment.");
+          
+          providerId = appt.providerId;
+          apptToReturn = {
+            ...appt,
+            startDateTime: newStart,
+            endDateTime: newEnd,
+            status: "Confirmed", // Re-confirm
+            systemInfo: {
+              ...appt.systemInfo,
+              updatedAt: new Date().toISOString(),
+            }
+          };
+          return apptToReturn;
+        }
+        return appt;
+      });
 
-            return {
-              ...appt,
-              startDateTime: newStart,
-              endDateTime: newEnd,
-              status: "Confirmed", // Re-confirm
-              systemInfo: {
-                ...appt.systemInfo,
-                updatedAt: new Date().toISOString(),
-              }
-            };
-          }
-          return appt;
-        })
-      );
+      if (!apptToReturn) {
+        throw new Error("Appointment not found.");
+      }
 
-      // --- ADDED: Remove the NEWLY booked slot from availability ---
+      setAppointments(newAppointments);
+
       if (providerId) {
         const dateKey = newStart.split('T')[0];
         setAvailableSlots(prevSlots => {
@@ -156,71 +187,102 @@ export const ClinicalProvider = ({ children }) => {
           };
         });
       }
+      
+      return apptToReturn;
     });
-  }, []);
 
-  // --- Treatment Plan Functions ---
+    try {
+      const date = new Date(rescheduledAppt.startDateTime).toLocaleDateString();
+      await createNewThread(
+        `Appointment Rescheduled: ${rescheduledAppt.appointmentType}`,
+        'Scheduling',
+        `This is an automated confirmation that your appointment for "${rescheduledAppt.appointmentType}" has been rescheduled to ${date}.`,
+        [], // attachments
+        systemAuthor // <-- 2. PASS AUTHOR
+      );
+    } catch (msgErr) {
+      console.error("Failed to create automated message:", msgErr);
+    }
+  }, [createNewThread, appointments, systemAuthor]); // <-- 3. ADD DEPENDENCIES
 
-  /**
-   * (UPDATE) Accepts a treatment plan.
-   */
+  
   const acceptTreatmentPlan = useCallback(async (planId) => {
-    await simulateApi(() => {
-      setTreatmentPlans(prev =>
-        prev.map(plan => {
+    const acceptedPlan = await simulateApi(() => {
+      let planToReturn = null;
+      const newPlans = treatmentPlans.map(plan => {
           if (plan.id === planId && plan.status === "Proposed") {
-            return {
+            planToReturn = {
               ...plan,
               status: "Accepted",
               acceptedAt: new Date().toISOString(),
               patientSignatureId: `doc-uuid-signature-${Date.now()}`, // Mock signature
             };
+            return planToReturn;
           }
           return plan;
-        })
-      );
+        });
+      
+      if (!planToReturn) throw new Error("Plan not found or not in 'Proposed' state.");
+      setTreatmentPlans(newPlans);
+      return planToReturn;
     });
-  }, []);
 
-  /**
-   * (UPDATE) Rejects a treatment plan.
-   */
+    try {
+      await createNewThread(
+        `Treatment Plan Accepted: ${acceptedPlan.planName}`,
+        'Clinical',
+        `Thank you for accepting your treatment plan: "${acceptedPlan.planName}". Our team will reach out to schedule your first procedure.`,
+        [], // attachments
+        systemAuthor // <-- 2. PASS AUTHOR
+      );
+    } catch (msgErr) {
+      console.error("Failed to create automated message:", msgErr);
+    }
+  }, [createNewThread, treatmentPlans, systemAuthor]); // <-- 3. ADD DEPENDENCIES
+
   const rejectTreatmentPlan = useCallback(async (planId, reason) => {
-    await simulateApi(() => {
-      setTreatmentPlans(prev =>
-        prev.map(plan => {
+    const rejectedPlan = await simulateApi(() => {
+      let planToReturn = null;
+      const newPlans = treatmentPlans.map(plan => {
           if (plan.id === planId && plan.status === "Proposed") {
-            return {
+            planToReturn = {
               ...plan,
               status: "Rejected",
               patientNotes: `Patient rejected: ${reason}`,
             };
+            return planToReturn;
           }
           return plan;
-        })
-      );
-      // This would likely also trigger a message to the provider.
-    });
-  }, []);
+        });
 
-  // --- Visit Summary Functions ---
-  // Note: Visit summaries are typically READ-ONLY for patients.
-  // We don't provide functions to create or edit them here.
-  // A `requestAmendment` function could be added, but it
-  // would likely live in the 'Engagement' (messaging) context.
+      if (!planToReturn) throw new Error("Plan not found or not in 'Proposed' state.");
+      setTreatmentPlans(newPlans);
+      return planToReturn;
+    });
+    
+    try {
+      await createNewThread(
+        `Treatment Plan Declined: ${rejectedPlan.planName}`,
+        'Clinical',
+        `This is a notification that you have declined the treatment plan: "${rejectedPlan.planName}". Our team may follow up with you.`,
+        [], // attachments
+        systemAuthor // <-- 2. PASS AUTHOR
+      );
+    } catch (msgErr) {
+      console.error("Failed to create automated message:", msgErr);
+    }
+  }, [createNewThread, treatmentPlans, systemAuthor]); // <-- 3. ADD DEPENDENCIES
+
 
   // --- Value ---
-  // Memoize the context value to prevent unnecessary re-renders
   const value = useMemo(() => ({
-    // State (READ)
     appointments,
     visitSummaries,
     treatmentPlans,
-    availableSlots, // <-- ADDED
+    availableSlots, 
     loading,
     error,
     
-    // Functions (CREATE, UPDATE, DELETE)
     bookAppointment,
     cancelAppointment,
     rescheduleAppointment,
@@ -231,7 +293,7 @@ export const ClinicalProvider = ({ children }) => {
     appointments, 
     visitSummaries, 
     treatmentPlans, 
-    availableSlots, // <-- ADDED
+    availableSlots, 
     loading, 
     error,
     bookAppointment,

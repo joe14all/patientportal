@@ -8,7 +8,7 @@
     "body": "Hi Dr. Farnsworth, I had a question about the crown listed on my plan. Can we discuss alternatives?",
     "attachments": [
       {
-        "documentId": "doc-uuid-007",
+        "documentId": "doc-uuid-003",
         "fileName": "treatment_plan_question.jpg"
       }
     ],
@@ -23,5 +23,45 @@
     "body": "Hi Jane, absolutely. I've asked our treatment coordinator to give you a call this afternoon to discuss the options.",
     "attachments": [],
     "createdAt": "2025-11-15T14:05:00Z"
+  },
+  {
+    "id": "msg-post-uuid-003",
+    "threadId": "msg-thread-uuid-002",
+    "authorType": "Patient",
+    "authorId": "user-uuid-001",
+    "authorName": "Jane Doe",
+    "body": "Hi, I see my invoice INV-2025-1001 shows an amount due, but I thought my insurance covered cleanings at 100%. Can you please check this?",
+    "attachments": [],
+    "createdAt": "2025-11-16T09:15:00Z"
+  },
+  {
+    "id": "msg-post-uuid-004",
+    "threadId": "msg-thread-uuid-002",
+    "authorType": "Staff",
+    "authorId": "user-uuid-staff-001",
+    "authorName": "Brenda (Billing)",
+    "body": "Hi Jane, we've reviewed your invoice and can confirm your insurance benefits. It looks like your plan covers cleanings at 80% after your deductible, which resulted in the small co-payment. Please let us know if you have more questions!",
+    "attachments": [],
+    "createdAt": "2025-11-16T09:30:00Z"
+  },
+  {
+    "id": "msg-post-uuid-005",
+    "threadId": "msg-thread-uuid-003",
+    "authorType": "Staff",
+    "authorId": "user-uuid-staff-002",
+    "authorName": "Carlos (Front Desk)",
+    "body": "You're all set! We've moved your appointment for the crown placement to Nov 28th at 2:00 PM as requested. See you then!",
+    "attachments": [],
+    "createdAt": "2025-11-10T11:00:00Z"
+  },
+  {
+    "id": "msg-post-uuid-006",
+    "threadId": "msg-thread-uuid-002",
+    "authorType": "Patient",
+    "authorId": "user-uuid-001",
+    "authorName": "Jane Doe",
+    "body": "Thanks Brenda, that makes sense. I'll pay that amount now.",
+    "attachments": [],
+    "createdAt": "2025-11-16T10:00:00Z"
   }
 ]

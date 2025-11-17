@@ -25,5 +25,59 @@
       "updatedAt": "2025-11-15T14:05:00Z",
       "closedAt": null
     }
+  },
+  {
+    "id": "msg-thread-uuid-002",
+    "patientId": "patient-uuid-001",
+    "initiatingUserId": "user-uuid-001",
+    "subject": "Invoice question INV-2025-1001",
+    "category": "Billing",
+    "status": "PendingStaff",
+    "priority": "Normal",
+    "assignment": {
+      "assignedType": "Group",
+      "assignedId": "billing-team"
+    },
+    "readStatus": {
+      "isReadByPatient": true,
+      "isReadByStaff": false
+    },
+    "lastMessage": {
+      "timestamp": "2025-11-16T10:00:00Z",
+      "authorType": "Patient",
+      "snippet": "Thanks Brenda, that makes sense. I'll pay that..."
+    },
+    "systemInfo": {
+      "createdAt": "2025-11-16T09:15:00Z",
+      "updatedAt": "2025-11-16T10:00:00Z",
+      "closedAt": null
+    }
+  },
+  {
+    "id": "msg-thread-uuid-003",
+    "patientId": "patient-uuid-001",
+    "initiatingUserId": "user-uuid-001",
+    "subject": "Reschedule my appointment",
+    "category": "Scheduling",
+    "status": "Closed",
+    "priority": "Normal",
+    "assignment": {
+      "assignedType": "Group",
+      "assignedId": "front-desk"
+    },
+    "readStatus": {
+      "isReadByPatient": true,
+      "isReadByStaff": true
+    },
+    "lastMessage": {
+      "timestamp": "2025-11-10T11:00:00Z",
+      "authorType": "Staff",
+      "snippet": "You're all set! We've moved your appointment..."
+    },
+    "systemInfo": {
+      "createdAt": "2025-11-10T10:30:00Z",
+      "updatedAt": "2025-11-10T11:00:00Z",
+      "closedAt": "2025-11-10T11:00:00Z"
+    }
   }
 ]

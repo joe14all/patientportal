@@ -6,22 +6,24 @@ import { ClinicalProvider } from './ClinicalContext';
 import { BillingProvider } from './BillingContext'; 
 import { EngagementProvider } from './EngagementContext'; 
 import { CoreProvider } from './CoreContext';
-import { ThemeProvider } from './ThemeContext'; // 1. Import
+import { ThemeProvider } from './ThemeContext';
 
 export const AppProvider = ({ children }) => {
   return (
     <AccountProvider>
       <ThemeProvider> 
         <PatientProvider>
-          <ClinicalProvider>
-            <BillingProvider>
-              <EngagementProvider>
-                <CoreProvider> 
+
+          <EngagementProvider>
+            <CoreProvider> 
+              <ClinicalProvider>
+                <BillingProvider> 
                   {children}
-                </CoreProvider>
-              </EngagementProvider>
-            </BillingProvider>
-          </ClinicalProvider>
+                </BillingProvider>
+              </ClinicalProvider>
+            </CoreProvider>
+          </EngagementProvider>
+       
         </PatientProvider> 
       </ThemeProvider>
     </AccountProvider>

@@ -2,6 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { useBillingData } from '../contexts';
 import { IconBilling } from '../layouts/components/Icons';
 import styles from './Billing.module.css';
+import Modal from '../components/common/Modal'; // <-- 1. IMPORT THE MODAL
 
 const Billing = () => {
   const {
@@ -13,7 +14,9 @@ const Billing = () => {
     error,
   } = useBillingData();
 
-  const [paymentInProgress, setPaymentInProgress] = useState(null); // Tracks which invoice is being paid
+  // --- 2. ADD STATE FOR THE MODAL ---
+  const [isPayModalOpen, setIsPayModalOpen] = useState(false);
+  const [paymentTarget, setPaymentTarget] = useState(null); // { id, amount, number }
 
   // Find the next invoice that needs payment
   const outstandingInvoices = useMemo(
@@ -21,16 +24,27 @@ const Billing = () => {
     [billingInvoices]
   );
 
-  const handlePayInvoice = async (invoiceId, amount) => {
-    setPaymentInProgress(invoiceId);
+  // --- 3. UPDATE THIS HANDLER TO OPEN THE MODAL ---
+  const handlePayInvoice = (invoiceId, amount, invoiceNumber) => {
+    // Instead of paying, just set the target and open the modal
+    setPaymentTarget({ id: invoiceId, amount, number: invoiceNumber });
+    setIsPayModalOpen(true);
+  };
+
+  // --- 4. CREATE A NEW HANDLER FOR THE MODAL'S "CONFIRM" BUTTON ---
+  const handleConfirmPayment = async () => {
+    if (!paymentTarget) return;
+
     try {
-      await makePayment(invoiceId, amount);
-      // Success! The context state will refresh and this component will re-render.
+      await makePayment(paymentTarget.id, paymentTarget.amount);
+      // Success!
+      setPaymentTarget(null); // Clear target
+      // The modal will close itself on success
     } catch (err) {
-      // Error is handled in context, but we can stop loading here
       console.error("Payment failed", err);
-    } finally {
-      setPaymentInProgress(null);
+      // RE-THROW the error to keep the modal open
+      // so the user knows it failed.
+      throw err; 
     }
   };
 
@@ -41,6 +55,7 @@ const Billing = () => {
         Manage your invoices, payments, and insurance policies.
       </p>
 
+      {/* Show context error OR modal error */ }
       {error && <p className="error-text">Error: {error}</p>}
 
       {/* --- Main Billing Layout Grid --- */}
@@ -62,12 +77,19 @@ const Billing = () => {
                 </div>
                 <p>Date: {invoice.invoiceDate}</p>
                 <p>Total Patient Responsibility: ${invoice.financialSummary.patientResponsibility.toFixed(2)}</p>
+                
+                {/* --- 5. UPDATE THE BUTTON'S onClick --- */}
                 <button
-                  onClick={() => handlePayInvoice(invoice.id, invoice.financialSummary.amountDue)}
-                  disabled={loading || paymentInProgress === invoice.id}
+                  onClick={() => handlePayInvoice(
+                    invoice.id, 
+                    invoice.financialSummary.amountDue,
+                    invoice.invoiceNumber // Pass number for modal
+                  )}
+                  disabled={loading} // Only disable if global state is loading
                   className={styles.payButton}
                 >
-                  {paymentInProgress === invoice.id ? 'Processing...' : `Pay $${invoice.financialSummary.amountDue.toFixed(2)} Now`}
+                  {/* Text is simpler now */ }
+                  {`Pay $${invoice.financialSummary.amountDue.toFixed(2)} Now`}
                 </button>
               </div>
             ))
@@ -78,7 +100,7 @@ const Billing = () => {
 
         {/* --- Column 2: Insurance & Payments --- */}
         <div className={styles.columnSecondary}>
-
+          {/* ... (Insurance and Payment History sections remain unchanged) ... */}
           <section className={styles.section}>
             <h2>Insurance Policies</h2>
             {loading && !insurancePolicies.length && <p>Loading policies...</p>}
@@ -114,9 +136,27 @@ const Billing = () => {
               )}
             </div>
           </section>
-
         </div>
       </div>
+
+      {/* --- 6. ADD THE PAYMENT MODAL --- */}
+      <Modal
+        isOpen={isPayModalOpen}
+        onClose={() => {
+          if (loading) return; // Don't close if context is loading
+          setIsPayModalOpen(false);
+          setPaymentTarget(null);
+        }}
+        title="Confirm Payment"
+        isLoading={loading} // Use the global loading state
+        primaryActionText={paymentTarget ? `Pay $${paymentTarget.amount.toFixed(2)}` : 'Confirm'}
+        onPrimaryAction={handleConfirmPayment}
+        secondaryActionText="Cancel"
+      >
+        <p>You are about to pay <strong>${paymentTarget?.amount.toFixed(2)}</strong> for Invoice <strong>#{paymentTarget?.number}</strong>.</p>
+        <p>This action will charge your card on file.</p>
+      </Modal>
+
     </div>
   );
 };

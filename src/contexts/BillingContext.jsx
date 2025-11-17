@@ -1,16 +1,19 @@
-
 /* eslint-disable react-refresh/only-export-components */
 
 import React, { createContext, useContext, useState, useMemo, useCallback } from 'react';
-import { mockApi } from '../_mock'; // Import the initial mock data
+import { mockApi } from '../_mock'; 
+import { useEngagementData } from './EngagementContext'; 
 
 // 1. Create the context
 export const BillingContext = createContext(null);
 
+
 // 3. Create the Provider component
 export const BillingProvider = ({ children }) => {
+  // --- 1. GET createNewThread AND systemAuthor ---
+  const { createNewThread, systemAuthor } = useEngagementData();
+
   // --- State ---
-  // Initialize state from the mock API
   const [policies, setPolicies] = useState(mockApi.billing.insurancePolicies);
   const [claims, setClaims] = useState(mockApi.billing.insuranceClaims);
   const [invoices, setInvoices] = useState(mockApi.billing.billingInvoices);
@@ -44,41 +47,49 @@ export const BillingProvider = ({ children }) => {
 
   /**
    * (CREATE) Simulates making a payment for an invoice.
-   * This updates both the invoice and adds a new payment record.
    */
   const makePayment = useCallback(async (invoiceId, paymentAmount, paymentMethod = 'Credit Card (Online)') => {
-    await simulateApi(() => {
+    
+    // --- THIS IS THE COMBINED FIX ---
+    const { newPayment, invoiceNumber } = await simulateApi(() => {
       let targetInvoice;
+      let foundInvoiceNumber; 
 
-      setInvoices(prevInvoices =>
-        prevInvoices.map(invoice => {
-          if (invoice.id === invoiceId) {
-            const amountDue = parseFloat(invoice.financialSummary.amountDue) || 0;
-            if (paymentAmount > amountDue) {
-              throw new Error("Payment exceeds amount due.");
-            }
-
-            const newPaymentsMade = (parseFloat(invoice.financialSummary.totalPaymentsMade) || 0) + paymentAmount;
-            const newAmountDue = (parseFloat(invoice.financialSummary.patientResponsibility) || 0) - newPaymentsMade;
-            
-            targetInvoice = {
-              ...invoice,
-              status: newAmountDue <= 0 ? "PaidInFull" : "PartiallyPaid",
-              financialSummary: {
-                ...invoice.financialSummary,
-                totalPaymentsMade: newPaymentsMade,
-                amountDue: newAmountDue,
-              },
-            };
-            return targetInvoice;
+      // 1. Map over the *current state* 'invoices'
+      const newInvoices = invoices.map(invoice => {
+        if (invoice.id === invoiceId) {
+          const amountDue = parseFloat(invoice.financialSummary.amountDue) || 0;
+          if (amountDue <= 0) {
+            throw new Error("Invoice not found or no amount due.");
           }
-          return invoice;
-        })
-      );
+          if (paymentAmount > amountDue) {
+            throw new Error("Payment exceeds amount due.");
+          }
+          const newPaymentsMade = (parseFloat(invoice.financialSummary.totalPaymentsMade) || 0) + paymentAmount;
+          const newAmountDue = (parseFloat(invoice.financialSummary.patientResponsibility) || 0) - newPaymentsMade;
+          
+          targetInvoice = {
+            ...invoice,
+            status: newAmountDue <= 0 ? "PaidInFull" : "PartiallyPaid",
+            financialSummary: {
+              ...invoice.financialSummary,
+              totalPaymentsMade: newPaymentsMade,
+              amountDue: newAmountDue,
+            },
+          };
+          foundInvoiceNumber = invoice.invoiceNumber; // Store the number
+          return targetInvoice;
+        }
+        return invoice;
+      });
 
+      // 2. Check *after* the map
       if (!targetInvoice) {
-        throw new Error("Invoice not found.");
+        throw new Error("Invoice not found or no amount due.");
       }
+
+      // 3. *Then* set state
+      setInvoices(newInvoices);
 
       const newPayment = {
         id: `pay-uuid-${Date.now()}`,
@@ -94,14 +105,32 @@ export const BillingProvider = ({ children }) => {
       };
       
       setPayments(prevPayments => [newPayment, ...prevPayments]);
+      
+      // 4. Return both objects
+      return { newPayment, invoiceNumber: foundInvoiceNumber };
     });
-  }, []);
 
+    try {
+      await createNewThread(
+        `Payment Received: $${newPayment.amount.toFixed(2)}`,
+        'Billing',
+        `Thank you for your payment of $${newPayment.amount.toFixed(2)} for Invoice #${invoiceNumber}.`,
+        [], // attachments
+        systemAuthor // <-- 5. PASS AUTHOR
+      );
+    } catch (msgErr) {
+      console.error("Failed to create automated message:", msgErr);
+    }
+  // --- 6. ADD DEPENDENCIES ---
+  }, [createNewThread, invoices, systemAuthor]);
+
+  
   /**
    * (UPDATE) Applies an unapplied payment to an open invoice.
    */
   const applyUnappliedPayment = useCallback(async (paymentId, invoiceId) => {
     await simulateApi(() => {
+      // This function doesn't create a message, so the original logic is fine.
       let targetPayment = payments.find(p => p.id === paymentId);
       let targetInvoice = invoices.find(i => i.id === invoiceId);
 
@@ -114,7 +143,6 @@ export const BillingProvider = ({ children }) => {
 
       const amountToApply = Math.min(targetPayment.unappliedAmount, targetInvoice.financialSummary.amountDue);
 
-      // Update Invoice
       setInvoices(prevInvoices => 
         prevInvoices.map(inv => 
           inv.id === invoiceId ? {
@@ -128,8 +156,6 @@ export const BillingProvider = ({ children }) => {
           } : inv
         )
       );
-
-      // Update Payment
       setPayments(prevPayments => 
         prevPayments.map(pay => 
           pay.id === paymentId ? {
@@ -147,36 +173,60 @@ export const BillingProvider = ({ children }) => {
 
   // --- Policy Functions ---
 
-  /**
-   * (CREATE) Adds a new insurance policy.
-   */
   const addInsurancePolicy = useCallback(async (newPolicyData) => {
-    await simulateApi(() => {
+    const newPolicy = await simulateApi(() => {
       const newPolicy = {
         ...newPolicyData,
         id: `ins-uuid-${Date.now()}`,
         patientId: "patient-uuid-001", // Hardcoded for mock
       };
       setPolicies(prevPolicies => [newPolicy, ...prevPolicies]);
+      return newPolicy;
     });
-  }, []);
 
-  /**
-   * (UPDATE) Updates an existing insurance policy.
-   */
-  const updateInsurancePolicy = useCallback(async (policyId, updatedPolicyData) => {
-    await simulateApi(() => {
-      setPolicies(prevPolicies =>
-        prevPolicies.map(policy =>
-          policy.id === policyId ? { ...policy, ...updatedPolicyData } : policy
-        )
+    try {
+      await createNewThread(
+        `Insurance Added: ${newPolicy.carrier.name}`,
+        'Billing',
+        `Your new insurance policy for ${newPolicy.carrier.name} (Policy #${newPolicy.plan.policyNumber}) has been successfully added to your account.`,
+        [], // attachments
+        systemAuthor // <-- PASS AUTHOR
       );
-    });
-  }, []);
+    } catch (msgErr) {
+      console.error("Failed to create automated message:", msgErr);
+    }
+  }, [createNewThread, systemAuthor]); // <-- ADD DEPENDENCY
 
-  /**
-   * (DELETE) Sets an insurance policy to "Inactive".
-   */
+  const updateInsurancePolicy = useCallback(async (policyId, updatedPolicyData) => {
+    const updatedPolicy = await simulateApi(() => {
+      let policyToReturn = null;
+      // FIX: Map over 'policies' state, not 'prevPolicies'
+      const newPolicies = policies.map(policy => {
+          if (policy.id === policyId) {
+            policyToReturn = { ...policy, ...updatedPolicyData };
+            return policyToReturn;
+          }
+          return policy;
+        });
+
+      if (!policyToReturn) throw new Error("Policy not found.");
+      setPolicies(newPolicies); // Set new state
+      return policyToReturn;
+    });
+
+    try {
+      await createNewThread(
+        `Insurance Updated: ${updatedPolicy.carrier.name}`,
+        'Billing',
+        `Your insurance policy for ${updatedPolicy.carrier.name} (Policy #${updatedPolicy.plan.policyNumber}) has been updated.`,
+        [], // attachments
+        systemAuthor // <-- PASS AUTHOR
+      );
+    } catch (msgErr) {
+      console.error("Failed to create automated message:", msgErr);
+    }
+  }, [createNewThread, policies, systemAuthor]); // <-- ADD DEPENDENCIES
+
   const deleteInsurancePolicy = useCallback(async (policyId) => {
     await simulateApi(() => {
       setPolicies(prevPolicies =>
@@ -189,34 +239,46 @@ export const BillingProvider = ({ children }) => {
 
   // --- Claim & Refund Functions ---
 
-  /**
-   * (UPDATE) Simulates disputing a claim, changing its status.
-   */
   const disputeClaim = useCallback(async (claimId, reason) => {
-    await simulateApi(() => {
-      setClaims(prevClaims => 
-        prevClaims.map(claim => 
-          claim.id === claimId ? {
-            ...claim,
-            status: "Disputed",
-            notes: `Patient Dispute: ${reason}` // Add a note
-          } : claim
-        )
-      );
-      // In a real app, this would also create an engagement/message
-    });
-  }, []);
+    const disputedClaim = await simulateApi(() => {
+      let claimToReturn = null;
+      // FIX: Map over 'claims' state
+      const newClaims = claims.map(claim => {
+          if (claim.id === claimId) {
+            claimToReturn = {
+              ...claim,
+              status: "Disputed",
+              notes: `Patient Dispute: ${reason}`
+            };
+            return claimToReturn;
+          }
+          return claim;
+        });
 
-  /**
-   * (CREATE) Requests a refund for an unapplied payment.
-   */
+      if (!claimToReturn) throw new Error("Claim not found.");
+      setClaims(newClaims); // Set new state
+      return claimToReturn;
+    });
+    
+    try {
+      await createNewThread(
+        `Claim Disputed: ${disputedClaim.carrierClaimId}`,
+        'Billing',
+        `We have received your dispute for claim ${disputedClaim.carrierClaimId} (Our ID: ${disputedClaim.id}). Our billing team will review your reason: "${reason}".`,
+        [], // attachments
+        systemAuthor // <-- PASS AUTHOR
+      );
+    } catch (msgErr) {
+      console.error("Failed to create automated message:", msgErr);
+    }
+  }, [createNewThread, claims, systemAuthor]); // <-- ADD DEPENDENCIES
+
   const requestRefund = useCallback(async (paymentId, reason) => {
-    await simulateApi(() => {
+    const newRefund = await simulateApi(() => {
       let targetPayment;
       
-      // Update the payment to show 0 unapplied
-      setPayments(prevPayments =>
-        prevPayments.map(pay => {
+      // FIX: Map over 'payments' state
+      const newPayments = payments.map(pay => {
           if (pay.id === paymentId) {
             if (pay.unappliedAmount <= 0) {
               throw new Error("No unapplied balance to refund.");
@@ -225,35 +287,46 @@ export const BillingProvider = ({ children }) => {
             return targetPayment;
           }
           return pay;
-        })
-      );
+        });
 
       if (!targetPayment) {
         throw new Error("Payment not found.");
       }
 
-      // Create a new refund record
+      setPayments(newPayments); // Set new state
+
       const newRefund = {
         id: `ref-uuid-${Date.now()}`,
         patientId: targetPayment.patientId,
         originalPaymentId: paymentId,
         refundDate: new Date().toISOString().split('T')[0],
         amount: targetPayment.unappliedAmount,
-        method: targetPayment.method, // Refund to original method
+        method: targetPayment.method,
         reason: `Patient Request: ${reason}`,
         transactionDetails: { /* ...mock refund details... */ },
         systemInfo: { createdAt: new Date().toISOString(), createdBy: "System-Refund-Request" }
       };
 
       setRefunds(prevRefunds => [newRefund, ...prevRefunds]);
+      return newRefund;
     });
-  }, []);
+
+    try {
+      await createNewThread(
+        `Refund Request Submitted: $${newRefund.amount.toFixed(2)}`,
+        'Billing',
+        `We have received your refund request for $${newRefund.amount.toFixed(2)} from payment ${newRefund.originalPaymentId}. This will be processed by our team.`,
+        [], // attachments
+        systemAuthor // <-- PASS AUTHOR
+      );
+    } catch (msgErr) {
+      console.error("Failed to create automated message:", msgErr);
+    }
+  }, [createNewThread, payments, systemAuthor]); // <-- ADD DEPENDENCIES
 
 
   // --- Value ---
-  // Memoize the context value to prevent unnecessary re-renders
   const value = useMemo(() => ({
-    // State (READ)
     insurancePolicies: policies,
     insuranceClaims: claims,
     billingInvoices: invoices,
@@ -261,8 +334,6 @@ export const BillingProvider = ({ children }) => {
     billingRefunds: refunds,
     loading,
     error,
-    
-    // Functions (CREATE, UPDATE, DELETE)
     makePayment,
     applyUnappliedPayment,
     addInsurancePolicy,

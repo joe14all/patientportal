@@ -15,7 +15,19 @@ export const EngagementProvider = ({ children }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
+  // --- 1. Define default authors ---
+  const patientAuthor = {
+    type: "Patient",
+    id: "user-uuid-001", // Get from auth context
+    name: "Jane Doe" // Get from auth context
+  };
 
+  // This info is from mock data /core/offices.json and a mock ID
+  const systemAuthor = {
+    type: "Staff", // Use "Staff" so it appears as "theirs"
+    id: "system-uuid-Practice", // A unique ID for the practice
+    name: "Downtown Dental Center" // The practice name
+  };
 
   // --- Helper for simulated API calls ---
   const simulateApi = (callback, delay = 500) => {
@@ -43,24 +55,21 @@ export const EngagementProvider = ({ children }) => {
    * (CREATE) Sends a new message (reply) in an existing thread.
    */
   const sendMessage = useCallback(async (threadId, body, attachments = []) => {
-    // Note: `attachments` should be an array of objects like:
-    // { documentId: "doc-uuid-007", fileName: "photo.jpg" }
+    // This function is for patient replies, so it correctly uses patientAuthor
     await simulateApi(() => {
       const newPost = {
         id: `msg-post-uuid-${Date.now()}`,
         threadId: threadId,
-        authorType: "Patient",
-        authorId: "user-uuid-001", // Get from auth context
-        authorName: "Jane Doe", // Get from auth context
+        authorType: patientAuthor.type,
+        authorId: patientAuthor.id,
+        authorName: patientAuthor.name,
         body: body,
         attachments: attachments,
         createdAt: new Date().toISOString()
       };
 
-      // Add the new post
       setPosts(prev => [...prev, newPost]);
 
-      // Update the parent thread
       setThreads(prev =>
         prev.map(thread => {
           if (thread.id === threadId) {
@@ -73,7 +82,7 @@ export const EngagementProvider = ({ children }) => {
               },
               lastMessage: {
                 timestamp: newPost.createdAt,
-                authorType: "Patient",
+                authorType: patientAuthor.type,
                 snippet: body.substring(0, 50) + "...",
               },
               systemInfo: {
@@ -86,12 +95,21 @@ export const EngagementProvider = ({ children }) => {
         })
       );
     });
-  }, []);
+  }, [patientAuthor]); // <-- Add dependency
 
   /**
    * (CREATE) Creates a new message thread.
+   * Can be initiated by the patient or by the system (automated).
+   * --- 2. UPDATE FUNCTION SIGNATURE ---
    */
-  const createNewThread = useCallback(async (subject, category, body, attachments = []) => {
+  const createNewThread = useCallback(async (subject, category, body, attachments = [], authorInfo = null) => {
+    
+    // --- 3. Determine the author ---
+    const author = authorInfo || patientAuthor;
+    
+    // --- 4. Determine read status and thread status ---
+    const isPatientInitiated = author.type === 'Patient';
+    
     await simulateApi(() => {
       const newThreadId = `msg-thread-uuid-${Date.now()}`;
       const newPostId = `msg-post-uuid-${Date.now()}`;
@@ -100,22 +118,26 @@ export const EngagementProvider = ({ children }) => {
       const newThread = {
         id: newThreadId,
         patientId: "patient-uuid-001", // Get from auth
-        initiatingUserId: "user-uuid-001", // Get from auth
+        initiatingUserId: author.id, // <-- Use determined author ID
         subject: subject,
         category: category,
-        status: "PendingStaff",
+        // If patient starts, it's pending staff. If system starts, it's "Closed" or "PendingPatient"
+        // Let's use "PendingPatient" for notifications
+        status: isPatientInitiated ? "PendingStaff" : "PendingPatient", 
         priority: "Normal",
         assignment: {
           assignedType: "Provider",
           assignedId: "provider-uuid-001", // Default provider
         },
         readStatus: {
-          isReadByPatient: true,
-          isReadByStaff: false,
+          // If patient starts, they've read it. If system starts, they haven't.
+          isReadByPatient: isPatientInitiated,
+          // If patient starts, staff hasn't read it. If system starts, staff has "read" it.
+          isReadByStaff: !isPatientInitiated,
         },
         lastMessage: {
           timestamp: timestamp,
-          authorType: "Patient",
+          authorType: author.type, // <-- Use determined author
           snippet: body.substring(0, 50) + "...",
         },
         systemInfo: {
@@ -128,19 +150,19 @@ export const EngagementProvider = ({ children }) => {
       const firstPost = {
         id: newPostId,
         threadId: newThreadId,
-        authorType: "Patient",
-        authorId: "user-uuid-001",
-        authorName: "Jane Doe",
+        authorType: author.type, // <-- Use determined author
+        authorId: author.id, // <-- Use determined author
+        authorName: author.name, // <-- Use determined author
         body: body,
         attachments: attachments,
         createdAt: timestamp,
       };
 
-      // Add both the new thread and the new post
       setThreads(prev => [newThread, ...prev]);
       setPosts(prev => [firstPost, ...prev]);
     });
-  }, []);
+  }, [patientAuthor, systemAuthor]); // <-- Add dependencies
+
 
   /**
    * (UPDATE) Marks a thread as read by the patient.
@@ -224,6 +246,9 @@ export const EngagementProvider = ({ children }) => {
     uploadDocument,
     archiveDocument,
     
+    // --- 5. EXPORT THE SYSTEM AUTHOR FOR OTHER CONTEXTS ---
+    systemAuthor
+    
   }), [
     threads, 
     posts, 
@@ -234,7 +259,8 @@ export const EngagementProvider = ({ children }) => {
     createNewThread,
     markThreadAsRead,
     uploadDocument,
-    archiveDocument
+    archiveDocument,
+    systemAuthor // <-- Add dependency
   ]);
 
   // --- Render ---

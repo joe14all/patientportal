@@ -1,9 +1,8 @@
 import React, { useState, useMemo } from 'react';
 import { useClinicalData } from '../contexts';
-// --- Import our new components ---
 import AppointmentList from '../components/appointments/AppointmentList';
 import BookingForm from '../components/appointments/BookingForm';
-import Modal from '../components/common/Modal'; // <-- 1. Import the Modal
+import Modal from '../components/common/Modal';
 
 import styles from './Appointments.module.css';
 
@@ -18,7 +17,6 @@ const Appointments = () => {
   const [isBooking, setIsBooking] = useState(false);
   const [rescheduleTarget, setRescheduleTarget] = useState(null);
 
-  // --- 2. Add state for the cancel confirmation modal ---
   const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
   const [cancelTargetId, setCancelTargetId] = useState(null);
 
@@ -45,37 +43,31 @@ const Appointments = () => {
 
   // --- Event Handlers ---
   
-  /**
-   * --- 3. Update handleCancel ---
-   * This now opens the modal instead of showing window.confirm
-   */
   const handleCancel = (appointmentId) => {
     setCancelTargetId(appointmentId);
     setIsCancelModalOpen(true);
   };
 
   /**
-   * --- 4. Add a new handler for the modal's "confirm" button ---
+   * --- THIS HANDLER IS UPDATED ---
    */
   const handleConfirmCancel = async () => {
     if (!cancelTargetId) return;
 
     try {
       await cancelAppointment(cancelTargetId, "Patient cancelled via portal.");
+      // Success: clear the target
+      setCancelTargetId(null);
     } catch (err) {
       console.error("Failed to cancel appointment", err);
-      // In a real app, you'd set an error state here
-      // to show in an error modal.
+      // --- RE-THROW THE ERROR ---
+      // This tells the Modal's handlePrimaryClick that something
+      // went wrong, so it won't close and will re-enable the button.
+      throw err;
     }
-    
-    // Clean up state after action is done
-    setCancelTargetId(null);
-    // The modal's onClose will automatically set isCancelModalOpen(false)
   };
   
   const handleReschedule = (appointment) => {
-    // --- THIS IS THE NEW LOGIC ---
-    // Set the target appointment and open the booking form
     setRescheduleTarget(appointment);
     setIsBooking(true); 
   };
@@ -113,7 +105,6 @@ const Appointments = () => {
       {showBookingForm ? (
         <BookingForm 
           onClose={handleCloseBooking} 
-          // --- PASS THE NEW PROP ---
           appointmentToReschedule={rescheduleTarget}
         />
       ) : (
@@ -126,15 +117,22 @@ const Appointments = () => {
         />
       )}
 
-      {/* --- 5. Add the Modal component (it's invisible by default) --- */}
+      {/* --- MODAL PROPS ARE UPDATED --- */}
       <Modal
         isOpen={isCancelModalOpen}
         onClose={() => {
+          if (loading) return; // Don't allow close while loading
           setIsCancelModalOpen(false);
           setCancelTargetId(null); // Clear target if user cancels
         }}
         title="Cancel Appointment"
+        
+        // Pass the global loading state
+        isLoading={loading}
+        
+        // Pass the *base* text. The modal handles "Cancelling..."
         primaryActionText="Confirm Cancellation"
+        
         primaryActionVariant="danger"
         onPrimaryAction={handleConfirmCancel}
         secondaryActionText="Keep Appointment"

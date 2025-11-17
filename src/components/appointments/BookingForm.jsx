@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect } from 'react'; // 1. Ensure useState is imported
 import { useClinicalData, useCoreData } from '../../contexts';
 import TimeSlotPicker from './TimeSlotPicker';
 import styles from './BookingForm.module.css';
@@ -9,7 +9,7 @@ import styles from './BookingForm.module.css';
 const BookingForm = ({ onClose, initialTppId = null, appointmentToReschedule = null }) => {
   const { 
     bookAppointment, 
-    rescheduleAppointment, // <-- Get reschedule function
+    rescheduleAppointment,
     availableSlots, 
     treatmentPlans,
     loading: clinicalLoading 
@@ -22,23 +22,21 @@ const BookingForm = ({ onClose, initialTppId = null, appointmentToReschedule = n
     appointmentTypes: allAppointmentTypes
   } = useCoreData();
 
+  // --- 2. ADD INTERNAL LOADING STATE ---
+  const [isProcessing, setIsProcessing] = useState(false);
+
   // --- State for the booking flow ---
   const [isRescheduling, setIsRescheduling] = useState(!!appointmentToReschedule);
   const [isBookingFromPlan, setIsBookingFromPlan] = useState(!!initialTppId);
   
-  // --- THIS IS THE FIX ---
-  // Always start on step 1. Effects will auto-advance to step 2 if needed.
   const [bookingStep, setBookingStep] = useState(1); 
   
-  // --- State for booking data ---
   const [selectedApptTypeId, setSelectedApptTypeId] = useState('');
   const [selectedSlot, setSelectedSlot] = useState(null);
-  const [tppToBook, setTppToBook] = useState(null); // tpp = Treatment Plan Procedure
+  const [tppToBook, setTppToBook] = useState(null);
   
-  // --- Get all "patient facing" appointment types ---
   const patientFacingAppointmentTypes = getPatientFacingAppointmentTypes;
 
-  // --- Find "proposed" procedures from the treatment plan ---
   const proposedProcedures = useMemo(() => {
     return treatmentPlans
       .filter(plan => plan.status === 'Accepted')
@@ -46,13 +44,11 @@ const BookingForm = ({ onClose, initialTppId = null, appointmentToReschedule = n
       .filter(proc => proc.status === 'Proposed' && !proc.linkedAppointmentId);
   }, [treatmentPlans]);
   
-  // --- Effect to pre-populate form if booking from Treatment Plan ---
+  // ... (all useEffects remain the same) ...
   useEffect(() => {
-    // Only run if we are in step 1 and have an initialTppId
     if (initialTppId && bookingStep === 1) {
       const procedure = proposedProcedures.find(p => p.id === initialTppId);
       if (procedure) {
-        // Find the matching appointment type (e.g., "Crown Placement")
         const apptType = allAppointmentTypes.find(
           at => at.bookingRules.procedureIds.includes(procedure.procedureId)
         );
@@ -61,20 +57,16 @@ const BookingForm = ({ onClose, initialTppId = null, appointmentToReschedule = n
           setTppToBook(procedure);
           setSelectedApptTypeId(apptType.id);
           setIsBookingFromPlan(true);
-          setBookingStep(2); // Skip step 1
+          setBookingStep(2);
         }
       }
     }
-  }, [initialTppId, proposedProcedures, allAppointmentTypes, bookingStep]); // Added bookingStep
+  }, [initialTppId, proposedProcedures, allAppointmentTypes, bookingStep]);
 
-  // --- NEW EFFECT: Pre-populate form if RESCHEDULING ---
   useEffect(() => {
-    // Only run if we are in step 1 and have an appointmentToReschedule
     if (appointmentToReschedule && bookingStep === 1) {
       console.log("BookingForm: Reschedule mode detected for", appointmentToReschedule);
       
-      // Find the appointment type by matching the name
-      // (In a real app, you'd match on `appointmentToReschedule.appointmentTypeId`)
       const apptType = allAppointmentTypes.find(
         at => at.name === appointmentToReschedule.appointmentType
       );
@@ -83,23 +75,20 @@ const BookingForm = ({ onClose, initialTppId = null, appointmentToReschedule = n
         console.log("BookingForm: Found matching apptType for reschedule:", apptType);
         setSelectedApptTypeId(apptType.id);
         setIsRescheduling(true);
-        setBookingStep(2); // Skip step 1
+        setBookingStep(2);
       } else {
         console.error(`Could not find matching apptType for: "${appointmentToReschedule.appointmentType}"`);
-        // Fallback: show an error or close
         onClose();
       }
     }
-  }, [appointmentToReschedule, allAppointmentTypes, onClose, bookingStep]); // Added bookingStep
+  }, [appointmentToReschedule, allAppointmentTypes, onClose, bookingStep]);
 
-  // --- Memoized derived data ---
+  // ... (memoized selectedApptType remains the same) ...
   const selectedApptType = useMemo(() => {
-    // Return the full object
     return getAppointmentTypeById(selectedApptTypeId);
   }, [selectedApptTypeId, getAppointmentTypeById]);
 
-  // --- Event Handlers ---
-  
+  // ... (handleApptTypeSelect and handleSlotSelect remain the same) ...
   const handleApptTypeSelect = (typeId) => {
     console.log('BookingForm: Selected Appt Type ID', typeId);
     setSelectedApptTypeId(typeId);
@@ -109,24 +98,21 @@ const BookingForm = ({ onClose, initialTppId = null, appointmentToReschedule = n
 
   const handleSlotSelect = (slot) => {
     if (slot) {
-      // If user clicks the same slot, deselect it
       if (selectedSlot && selectedSlot.startTime === slot.startTime) {
         setSelectedSlot(null);
-        setBookingStep(2); // Stay on step 2
+        setBookingStep(2);
       } else {
-        // User selected a new slot
         setSelectedSlot(slot);
-        setBookingStep(3); // Go to confirmation
+        setBookingStep(3);
       }
     } else {
-      // slot is null (e.g., date was changed)
       setSelectedSlot(null);
-      setBookingStep(2); // Go back/stay on step 2
+      setBookingStep(2);
     }
   };
 
   /**
-   * --- UPDATED to handle both book and reschedule ---
+   * --- 3. UPDATE handleSubmit ---
    */
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -134,6 +120,8 @@ const BookingForm = ({ onClose, initialTppId = null, appointmentToReschedule = n
       alert("Please select a new time slot.");
       return;
     }
+
+    setIsProcessing(true); // <-- SET PROCESSING IMMEDIATELY
 
     try {
       if (isRescheduling) {
@@ -156,7 +144,7 @@ const BookingForm = ({ onClose, initialTppId = null, appointmentToReschedule = n
           officeId: selectedSlot.officeId,
           startDateTime: selectedSlot.startTime,
           endDateTime: selectedSlot.endTime,
-          appointmentType: selectedApptType.name, // Use the internal name
+          appointmentType: selectedApptType.name,
           reasonForVisit: isBookingFromPlan 
             ? `Treatment Plan: ${tppToBook.description}`
             : selectedApptType.description,
@@ -168,14 +156,16 @@ const BookingForm = ({ onClose, initialTppId = null, appointmentToReschedule = n
       onClose(); // Close the form on success
     } catch (err) {
       console.error("Failed to book/reschedule appointment", err);
+      // On error, re-enable the form
+      setIsProcessing(false); // <-- RESET ON ERROR
     }
+    // Don't reset isProcessing on success, as the component will unmount
   };
   
-  // --- Render Functions for each step ---
+  // ... (renderStep1_Type, renderStep2_Time, renderStep3_Confirm remain the same) ...
   
   const renderStep1_Type = () => (
     <>
-      {/* --- Option 1: Book from Treatment Plan --- */}
       <fieldset className={styles.fieldset}>
         <legend>From Your Treatment Plan</legend>
         {proposedProcedures.length > 0 ? (
@@ -211,7 +201,6 @@ const BookingForm = ({ onClose, initialTppId = null, appointmentToReschedule = n
         )}
       </fieldset>
     
-      {/* --- Option 2: Book a General Appointment --- */}
       <fieldset className={styles.fieldset}>
         <legend>Book a New Appointment</legend>
         {patientFacingAppointmentTypes.map(type => (
@@ -240,7 +229,6 @@ const BookingForm = ({ onClose, initialTppId = null, appointmentToReschedule = n
       
       <div className="form-group">
         <label>{selectedApptType?.patientFacingName || 'Available Times'}</label>
-        {/* --- THIS IS THE CHANGE --- */}
         <TimeSlotPicker 
           allSlots={availableSlots}
           selectedApptType={selectedApptType} 
@@ -284,6 +272,9 @@ const BookingForm = ({ onClose, initialTppId = null, appointmentToReschedule = n
     );
   };
 
+  // --- 4. COMBINE LOADING STATES ---
+  const isDisabled = clinicalLoading || isProcessing;
+
   return (
     <div className={`card ${styles.bookingCard}`}>
       <form onSubmit={handleSubmit}>
@@ -291,12 +282,16 @@ const BookingForm = ({ onClose, initialTppId = null, appointmentToReschedule = n
           <h2>
             {isRescheduling ? 'Reschedule Appointment' : 'Schedule New Appointment'}
           </h2>
-          <button type="button" className="icon-button" onClick={onClose}>
+          <button 
+            type="button" 
+            className="icon-button" 
+            onClick={onClose} 
+            disabled={isDisabled} // <-- 5. DISABLE CLOSE BUTTON
+          >
             &times;
           </button>
         </div>
 
-        {/* --- Render current step --- */}
         {console.log('BookingForm: Rendering step', bookingStep)} 
         {bookingStep === 1 && renderStep1_Type()}
         {bookingStep === 2 && renderStep2_Time()}
@@ -311,35 +306,36 @@ const BookingForm = ({ onClose, initialTppId = null, appointmentToReschedule = n
               if (bookingStep === 1) {
                 onClose();
               } else if (bookingStep === 3) {
-                setSelectedSlot(null); // Clear slot when going back
+                setSelectedSlot(null);
                 setBookingStep(prev => prev - 1);
               } else { // Booking step 2
-                // If new booking or from plan, go to step 1
                 if (isBookingFromPlan || !isRescheduling) {
                   setBookingStep(1);
                   setSelectedApptTypeId('');
                   setTppToBook(null);
                   setIsBookingFromPlan(false);
                 } else {
-                  // If rescheduling, "Back" from step 2 means cancel.
                   onClose();
                 }
               }
             }}
+            disabled={isDisabled} // <-- 6. DISABLE BACK/CANCEL BUTTON
           >
-            {/* --- UPDATED Back button logic --- */}
             {(bookingStep === 1 || (bookingStep === 2 && isRescheduling)) ? 'Cancel' : 'Back'}
           </button>
           
           {bookingStep === 3 && (
             <button 
               type="submit" 
-              disabled={clinicalLoading || !selectedSlot}
+              // --- 7. UPDATE DISABLED LOGIC ---
+              disabled={isDisabled || !selectedSlot}
             >
-              {clinicalLoading 
-                ? (isRescheduling ? 'Rescheduling...' : 'Booking...') 
-                : (isRescheduling ? 'Confirm Reschedule' : 'Confirm Appointment')
-              }
+              {/* --- 8. UPDATE TEXT LOGIC --- */}
+              {isProcessing ? 'Processing...' : (
+                clinicalLoading 
+                  ? (isRescheduling ? 'Rescheduling...' : 'Booking...') 
+                  : (isRescheduling ? 'Confirm Reschedule' : 'Confirm Appointment')
+              )}
             </button>
           )}
         </div>

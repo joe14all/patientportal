@@ -1,20 +1,12 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react'; // 1. Add useState
 import { IconClose } from '../../layouts/components/Icons';
 import styles from './Modal.module.css';
 
 /**
  * A reusable, mobile-first modal component for alerts and confirmations.
  *
- * @param {object} props
- * @param {boolean} props.isOpen - Controls if the modal is visible.
- * @param {function} props.onClose - Function to call when closing the modal (overlay click or 'X' button).
- * @param {string} props.title - The text to display in the modal header.
- * @param {React.ReactNode} props.children - The content to display in the modal body (e.g., <p>Are you sure?</p>).
- * @param {string} [props.primaryActionText] - Text for the main action button (e.g., "Confirm").
- * @param {function} [props.onPrimaryAction] - Function to call when the main action button is clicked.
- * @param {string} [props.secondaryActionText] - Text for the secondary action button (e.g., "Cancel").
- * @param {function} [props.onSecondaryAction] - Function to call when the secondary button is clicked.
- * @param {string} [props.primaryActionVariant] - 'primary' (default) or 'danger'.
+ * ... (all prop comments remain the same) ...
+ * @param {boolean} [props.isLoading] - Disables all buttons and close actions (global loading).
  */
 const Modal = ({
   isOpen,
@@ -25,12 +17,24 @@ const Modal = ({
   onPrimaryAction,
   secondaryActionText,
   onSecondaryAction,
-  primaryActionVariant = 'primary' // 'primary' or 'danger'
+  primaryActionVariant = 'primary',
+  isLoading = false, // This is the GLOBAL loading state
 }) => {
-  // Effect to handle the 'Esc' key press
+  // --- 2. ADD INTERNAL LOADING STATE ---
+  const [isProcessing, setIsProcessing] = useState(false);
+
+  // --- 3. RESET INTERNAL STATE WHEN MODAL IS CLOSED/OPENED ---
+  useEffect(() => {
+    if (isOpen) {
+      setIsProcessing(false); // Reset on open
+    }
+  }, [isOpen]);
+
+  // --- 4. UPDATE ESCAPE KEY HANDLER ---
   useEffect(() => {
     const handleEsc = (event) => {
       if (event.key === 'Escape') {
+        if (isLoading || isProcessing) return; // <-- Use both
         onClose();
       }
     };
@@ -41,32 +45,63 @@ const Modal = ({
     return () => {
       document.removeEventListener('keydown', handleEsc);
     };
-  }, [isOpen, onClose]);
+  }, [isOpen, onClose, isLoading, isProcessing]); // <-- Add all deps
 
   // Prevent modal from rendering if not open
   if (!isOpen) {
     return null;
   }
 
-  // Handle button clicks
-  const handlePrimaryClick = () => {
+  // --- 5. UPDATE CLICK HANDLERS ---
+  const handlePrimaryClick = async () => {
+    setIsProcessing(true); // <-- Set internal state *immediately*
     if (onPrimaryAction) {
-      onPrimaryAction();
+      try {
+        await onPrimaryAction();
+        // Action succeeded, close the modal
+        onClose();
+      } catch (e) {
+        console.error("Modal primary action failed:", e);
+        // Don't close the modal if the action failed
+        setIsProcessing(false); // Re-enable button
+        return; // Stop execution
+      }
+    } else {
+      // If no action, just close
+      onClose();
     }
-    onClose(); // Automatically close modal after action
+    // We only want to setIsProcessing(false) if an error occurs
   };
 
   const handleSecondaryClick = () => {
+    // Secondary action (like "Cancel") should not be async
     if (onSecondaryAction) {
       onSecondaryAction();
     }
-    onClose(); // Automatically close modal after action
+    onClose();
   };
+
+  const handleOverlayClick = () => {
+    if (isLoading || isProcessing) return; // <-- Use both
+    onClose();
+  };
+
+  // --- 6. COMBINE LOADING STATES FOR 'disabled' ---
+  const isDisabled = isLoading || isProcessing;
+  
+  // Determine button text based on loading state
+  let buttonText = primaryActionText;
+  if (isProcessing) {
+    buttonText = "Processing...";
+  } else if (isLoading) {
+    // Use more specific text if available
+    buttonText = primaryActionText.includes("Cancel") ? "Cancelling..." : "Loading...";
+  }
 
   return (
     <div 
       className={styles.overlay} 
-      onClick={onClose} 
+      onClick={handleOverlayClick} 
       role="dialog" 
       aria-modal="true" 
       aria-labelledby="modal-title"
@@ -80,7 +115,12 @@ const Modal = ({
           <h2 id="modal-title" className={styles.modalTitle}>
             {title}
           </h2>
-          <button type="button" className="icon-button" onClick={onClose}>
+          <button 
+            type="button" 
+            className="icon-button" 
+            onClick={handleOverlayClick} 
+            disabled={isDisabled} // <-- Use combined state
+          >
             <IconClose />
           </button>
         </div>
@@ -98,6 +138,7 @@ const Modal = ({
                 type="button" 
                 className="secondary" 
                 onClick={handleSecondaryClick}
+                disabled={isDisabled} // <-- Use combined state
               >
                 {secondaryActionText}
               </button>
@@ -107,8 +148,10 @@ const Modal = ({
                 type="button" 
                 className={primaryActionVariant === 'danger' ? 'danger' : ''}
                 onClick={handlePrimaryClick}
+                disabled={isDisabled} // <-- Use combined state
               >
-                {primaryActionText}
+                {/* --- 7. UPDATE TEXT --- */}
+                {buttonText} 
               </button>
             )}
           </div>
