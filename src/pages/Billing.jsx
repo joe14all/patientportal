@@ -24,7 +24,7 @@ const Billing = () => {
   
   const [isAddCardModalOpen, setIsAddCardModalOpen] = useState(false);
   // Placeholder for future "Add Insurance" functionality
-  const [isAddInsuranceModalOpen, setIsAddInsuranceModalOpen] = useState(false);
+  // const [isAddInsuranceModalOpen, setIsAddInsuranceModalOpen] = useState(false);
 
   
   // --- 3. Filter data for the InvoiceList ---

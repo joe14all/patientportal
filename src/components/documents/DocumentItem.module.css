@@ -1,0 +1,125 @@
+.docItem {
+  display: grid;
+  /* Grid: Icon | Info | Actions */
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  border-radius: 0.75rem;
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  transition: border-color 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.docItem:hover {
+  background-color: var(--bg-surface-hover);
+  border-color: var(--primary);
+  /* Add a subtle shadow on hover */
+  box-shadow: 0 4px 6px -1px rgba(0,0,0,0.03);
+}
+
+body.dark .docItem:hover {
+   box-shadow: none;
+}
+
+.docIcon {
+  /* Make the icon a styled box */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px; /* Larger */
+  height: 40px; /* Larger */
+  border-radius: 0.5rem; /* Rounded corners */
+  background-color: var(--primary-light);
+  color: var(--primary);
+  flex-shrink: 0;
+}
+
+.docIcon svg {
+  width: 20px;
+  height: 20px;
+}
+
+.docInfo {
+  flex-grow: 1;
+  min-width: 0;
+}
+
+/* --- 1. REMOVE ALL CLICKABLE STYLES --- */
+/*
+.docInfo.clickable {
+  cursor: pointer;
+}
+.docInfo.clickable .docName {
+  color: var(--primary); 
+  font-weight: 600;
+}
+.docItem:hover .docInfo.clickable .docName {
+  text-decoration: underline;
+}
+*/
+/* --- End removal --- */
+
+
+.docName {
+  display: block;
+  font-weight: 500;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 1rem; /* Slightly larger */
+  transition: color 0.2s ease;
+}
+
+.docMeta {
+  display: block;
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+}
+
+.docActions {
+  display: flex;
+  gap: 0.5rem;
+  /* --- 2. REMOVE OPACITY/HOVER STYLES --- */
+  /* --- All actions will now be visible by default --- */
+}
+
+/* --- Responsive layout for mobile --- */
+@media (max-width: 640px) {
+  .docItem {
+    /* Grid: Icon | Info */
+    /* ....   | Actions */
+    grid-template-columns: auto 1fr;
+    grid-template-rows: auto auto;
+    gap: 0.5rem 1rem;
+  }
+  
+  .docIcon {
+    /* Top-left */
+    grid-row: 1 / span 2;
+    grid-column: 1 / 2;
+    /* Make icon smaller on mobile to save space */
+    width: 36px;
+    height: 36px;
+  }
+  
+  .docInfo {
+    /* Top-right */
+    grid-row: 1 / 2;
+    grid-column: 2 / 3;
+  }
+  
+  .docActions {
+    /* Bottom-right */
+    grid-row: 2 / 3;
+    grid-column: 2 / 3;
+    justify-content: flex-start; /* Align actions to the left */
+    
+    /* --- 3. REMOVE OPACITY OVERRIDE --- */
+  }
+  
+  .docName {
+    font-size: 0.9rem; /* Smaller on mobile */
+  }
+}

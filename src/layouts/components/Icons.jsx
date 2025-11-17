@@ -196,17 +196,15 @@ export const IconLogout = (props) => (
 );
 
 export const IconPaperclip = (props) => (
-  <svg 
-    viewBox="0 0 24 24"
-    width="20"
-    height="20"
-    strokeWidth="2"
-    fill="none"
-    stroke="currentColor"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    {...props}
-  >
+  <svg {...iconProps} {...props}>
     <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"></path>
+  </svg>
+);
+
+
+export const IconEye = (props) => (
+  <svg {...iconProps} {...props}>
+    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+    <circle cx="12" cy="12" r="3"></circle>
   </svg>
 );

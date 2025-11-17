@@ -187,7 +187,13 @@ export const EngagementProvider = ({ children }) => {
   const uploadDocument = useCallback(async (file, category, linkContext = null) => {
     // `file` would be a File object. We'll mock it.
     // `linkContext` could be { type: "MessagePost", id: "msg-post-uuid-xxx" }
-    await simulateApi(() => {
+    
+    // --- THIS IS THE KEY ---
+    // The `simulateApi` function resolves with the return value of its callback.
+    // The callback creates `newDoc` and returns it.
+    // So, `newDoc` will be returned by `await simulateApi(...)`.
+    
+    const newDoc = await simulateApi(() => {
       const newDoc = {
         id: `doc-uuid-${Date.now()}`,
         patientId: "patient-uuid-001", // Get from auth
@@ -211,6 +217,9 @@ export const EngagementProvider = ({ children }) => {
       setDocuments(prev => [newDoc, ...prev]);
       return newDoc; // Return the new doc so it can be attached to a message
     });
+    
+    return newDoc; // --- This line is correct.
+    
   }, []);
 
   /**

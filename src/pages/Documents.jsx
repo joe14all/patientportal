@@ -1,13 +1,12 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 import { useEngagementData } from '../contexts';
 import styles from './Documents.module.css';
-import { 
-  IconUploadCloud, 
-  IconFileText, 
-  IconImage, 
-  IconDownload, 
-  IconTrash 
-} from '../layouts/components/Icons';
+
+// --- 1. Import all the new components ---
+import DocumentUploadCard from '../components/documents/DocumentUploadCard';
+import DocumentList from '../components/documents/DocumentList';
+import DocumentPreviewModal from '../components/documents/DocumentPreviewModal';
+// (Icons are no longer needed here)
 
 const Documents = () => {
   const { 
@@ -18,35 +17,16 @@ const Documents = () => {
     error 
   } = useEngagementData();
 
-  const [uploading, setUploading] = useState(false);
-  const [fileToUpload, setFileToUpload] = useState(null);
+  // --- 2. State for preview modal ---
+  const [previewDoc, setPreviewDoc] = useState(null);
 
-  // Handle file selection from the input
-  const handleFileChange = (e) => {
-    if (e.target.files && e.target.files[0]) {
-      setFileToUpload(e.target.files[0]);
-    }
-  };
+  // --- 3. Handlers are simplified and passed down ---
+  const handleUpload = useCallback(async (file, category) => {
+    // The component's internal state handles loading
+    await uploadDocument(file, category);
+  }, [uploadDocument]); // Add dependency
 
-  // Handle the upload button click
-  const handleUpload = async () => {
-    if (!fileToUpload) return;
-
-    setUploading(true);
-    try {
-      // "Patient Upload" is a good default category
-      await uploadDocument(fileToUpload, "Patient Upload");
-      setFileToUpload(null); // Clear the file input
-    } catch (err) {
-      console.error("Upload failed", err);
-      // Error is already in context
-    } finally {
-      setUploading(false);
-    }
-  };
-
-  // Handle the delete (archive) button click
-  const handleDelete = async (docId) => {
+  const handleDelete = useCallback(async (docId) => {
     if (window.confirm("Are you sure you want to archive this document?")) {
       try {
         await archiveDocument(docId);
@@ -54,9 +34,17 @@ const Documents = () => {
         console.error("Archive failed", err);
       }
     }
+  }, [archiveDocument]); // Add dependency
+
+  const handlePreview = (doc) => {
+    setPreviewDoc(doc);
   };
 
-  // Group documents by category for display
+  const handleClosePreview = () => {
+    setPreviewDoc(null);
+  };
+
+  // --- 4. Data processing remains the same ---
   const categorizedDocuments = useMemo(() => {
     const activeDocs = documents.filter(doc => doc.systemInfo.status === 'Active');
     
@@ -70,22 +58,6 @@ const Documents = () => {
     }, {});
   }, [documents]);
 
-  // Helper to show a file or image icon
-  const getIconForDoc = (doc) => {
-    if (doc.storage.fileType.startsWith('image/')) {
-      return <IconImage className={styles.docIcon} />;
-    }
-    return <IconFileText className={styles.docIcon} />;
-  };
-
-  // Helper to format file size
-  const formatFileSize = (bytes) => {
-    if (bytes === 0) return '0 Bytes';
-    const k = 1024;
-    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-  };
 
   return (
     <div className={styles.pageWrapper}>
@@ -96,64 +68,26 @@ const Documents = () => {
 
       {error && <p className="error-text">Error: {error}</p>}
 
-      {/* --- Upload Section --- */}
-      <div className={`card ${styles.uploadCard}`}>
-        <IconUploadCloud className={styles.uploadIcon} />
-        <label htmlFor="file-upload" className={styles.uploadLabel}>
-          {fileToUpload ? `Selected: ${fileToUpload.name}` : "Click to select a file"}
-        </label>
-        <input 
-          id="file-upload"
-          type="file" 
-          className={styles.uploadInput}
-          onChange={handleFileChange}
-        />
-        {fileToUpload && (
-          <button 
-            onClick={handleUpload} 
-            disabled={uploading || loading}
-            className={styles.uploadButton}
-          >
-            {uploading ? 'Uploading...' : 'Upload File'}
-          </button>
-        )}
-      </div>
+      {/* --- 5. Render the new components --- */}
+      
+      <DocumentUploadCard 
+        onUpload={handleUpload}
+        loading={loading}
+      />
 
-      {/* --- Document List Section --- */}
       {loading && documents.length === 0 && <p>Loading documents...</p>}
       
-      {Object.keys(categorizedDocuments).map(category => (
-        <section className={styles.docSection} key={category}>
-          <h2>{category}</h2>
-          <ul className={styles.docList}>
-            {categorizedDocuments[category].map(doc => (
-              <li className={styles.docItem} key={doc.id}>
-                {getIconForDoc(doc)}
-                <div className={styles.docInfo}>
-                  <span className={styles.docName}>{doc.fileName}</span>
-                  <span className={styles.docMeta}>
-                    {new Date(doc.systemInfo.createdAt).toLocaleDateString()}
-                    {' • '}
-                    {formatFileSize(doc.storage.fileSize)}
-                  </span>
-                </div>
-                <div className={styles.docActions}>
-                  <a href={doc.storage.url} download={doc.fileName} className="icon-button">
-                    <IconDownload />
-                  </a>
-                  <button 
-                    onClick={() => handleDelete(doc.id)} 
-                    disabled={loading}
-                    className="icon-button danger"
-                  >
-                    <IconTrash />
-                  </button>
-                </div>
-              </li>
-            ))}
-          </ul>
-        </section>
-      ))}
+      <DocumentList
+        categorizedDocuments={categorizedDocuments}
+        onArchive={handleDelete}
+        onPreview={handlePreview}
+        loading={loading}
+      />
+
+      <DocumentPreviewModal
+        doc={previewDoc}
+        onClose={handleClosePreview}
+      />
     </div>
   );
 };
