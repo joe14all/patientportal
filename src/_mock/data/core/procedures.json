@@ -19,7 +19,7 @@
       "isMultiVisit": false
     },
     "billing": {
-      "ucrPrice": 120.00,
+      "ucrPrice": { "amount": 120.00, "currency": "USD" },
       "insuranceFinancialCategory": "Preventive",
       "isTaxable": false,
       "defaultModifiers": [],
@@ -54,7 +54,7 @@
       "isMultiVisit": true
     },
     "billing": {
-      "ucrPrice": 1500.00,
+      "ucrPrice": { "amount": 1500.00, "currency": "USD" },
       "insuranceFinancialCategory": "Major",
       "isTaxable": false,
       "defaultModifiers": ["22"],

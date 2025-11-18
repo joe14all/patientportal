@@ -1,14 +1,11 @@
 import React, { useState } from 'react';
 import styles from './InvoiceCard.module.css';
+import { formatCurrency } from '../../utils/formatting';
+import { IconChevronDown } from '../../layouts/components/Icons'; // <-- 1. IMPORT
 
 /**
  * A card that displays a single outstanding invoice.
  * It manages its own expanded/collapsed state to show line items.
- *
- * @param {object} props
- *_ @param {object} props.invoice - The invoice object to display.
- * @param {function} props.onPayClick - Function to call when "Pay Now" is clicked.
- * @param {boolean} props.isLoading - Whether the app is in a global loading state.
  */
 const InvoiceCard = ({ invoice, onPayClick, isLoading }) => {
   const [isExpanded, setIsExpanded] = useState(false);
@@ -37,9 +34,12 @@ const InvoiceCard = ({ invoice, onPayClick, isLoading }) => {
         </div>
         <div className={styles.headerAmount}>
           <span className={styles.amountDue}>
-            ${financialSummary.amountDue.toFixed(2)} Due
+            {formatCurrency(financialSummary.amountDue)} Due
           </span>
-          <span className={styles.expandIcon}>{isExpanded ? '−' : '+'}</span>
+          {/* --- 2. REPLACE THE SPAN WITH THE ICON --- */}
+          <IconChevronDown 
+            className={`${styles.expandIcon} ${isExpanded ? styles.expanded : ''}`} 
+          />
         </div>
       </div>
 
@@ -53,7 +53,7 @@ const InvoiceCard = ({ invoice, onPayClick, isLoading }) => {
               {lineItems.map(item => (
                 <li key={item.id} className={styles.lineItem}>
                   <span>{item.description}</span>
-                  <span>${item.patientPortion.toFixed(2)}</span>
+                  <span>{formatCurrency(item.patientPortion)}</span>
                 </li>
               ))}
             </ul>
@@ -65,23 +65,23 @@ const InvoiceCard = ({ invoice, onPayClick, isLoading }) => {
             <ul className={styles.summaryList}>
               <li>
                 <span>Total Charges</span>
-                <span>${financialSummary.totalCharges.toFixed(2)}</span>
+                <span>{formatCurrency(financialSummary.totalCharges)}</span>
               </li>
               <li>
                 <span>Insurance Paid</span>
-                <span>-${financialSummary.totalInsurancePaid.toFixed(2)}</span>
+                <span>-{formatCurrency(financialSummary.totalInsurancePaid)}</span>
               </li>
               <li>
                 <span>Your Responsibility</span>
-                <strong>${financialSummary.patientResponsibility.toFixed(2)}</strong>
+                <strong>{formatCurrency(financialSummary.patientResponsibility)}</strong>
               </li>
               <li>
                 <span>Payments Made</span>
-                <span>-${financialSummary.totalPaymentsMade.toFixed(2)}</span>
+                <span>-{formatCurrency(financialSummary.totalPaymentsMade)}</span>
               </li>
               <li className={styles.summaryTotal}>
                 <span>Amount Due</span>
-                <strong>${financialSummary.amountDue.toFixed(2)}</strong>
+                <strong>{formatCurrency(financialSummary.amountDue)}</strong>
               </li>
             </ul>
           </div>
@@ -103,7 +103,7 @@ const InvoiceCard = ({ invoice, onPayClick, isLoading }) => {
           disabled={isLoading}
           className={styles.payButton}
         >
-          {`Pay $${financialSummary.amountDue.toFixed(2)} Now`}
+          {`Pay ${formatCurrency(financialSummary.amountDue)} Now`}
         </button>
       </div>
     </div>

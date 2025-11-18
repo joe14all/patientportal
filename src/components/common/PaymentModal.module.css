@@ -63,25 +63,37 @@
   margin-top: 0.25rem;
 }
 
-/* --- Amount Input w/ '$' Prefix --- */
+/* --- UPDATED: Amount Input w/ Currency Code --- */
 .amountInputWrapper {
   position: relative;
+  display: flex; /* Use flex for better alignment */
 }
-.amountInputWrapper span {
-  position: absolute;
-  left: 1rem;
-  top: 50%;
-  transform: translateY(-50%);
-  font-size: 1rem;
+.currencySymbol {
+  display: flex;
+  align-items: center;
+  padding: 0 0.75rem;
+  font-size: 0.9rem; /* Smaller font for currency code */
   font-weight: 500;
   color: var(--text-secondary);
-  pointer-events: none;
+  background-color: var(--bg-body);
+  border: 1px solid var(--border-color);
+  border-right: none; /* Remove right border */
+  border-radius: 0.5rem 0 0 0.5rem; /* Round left corners */
 }
 .amountInputWrapper input {
-  padding-left: 2.5rem;
+  /* Remove default padding */
+  padding-left: 0.75rem; 
   font-size: 1.25rem;
   font-weight: 500;
+  /* Make input round on the right */
+  border-radius: 0 0.5rem 0.5rem 0;
 }
+.amountInputWrapper input:focus {
+  /* Override default focus shadow to keep elements joined */
+  z-index: 1;
+  position: relative;
+}
+
 
 /* --- Error Text --- */
 .errorText {

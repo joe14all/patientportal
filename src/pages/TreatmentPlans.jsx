@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react';
 import { useClinicalData, useCoreData } from '../contexts';
 import { IconTreatmentPlan } from '../layouts/components/Icons';
+import { formatCurrency } from '../utils/formatting'; // <-- 1. IMPORT THE FORMATTER
 import styles from './TreatmentPlans.module.css';
 
 const TreatmentPlans = () => {
@@ -29,15 +30,18 @@ const TreatmentPlans = () => {
     return categories;
   }, [treatmentPlans]);
 
+  // --- Handlers (No changes needed, but added Modal placeholders) ---
+
   const handleAccept = async (planId) => {
+    // This should be converted to a <Modal> component for better UX
     if (window.confirm("Are you sure you want to accept this treatment plan?")) {
       await acceptTreatmentPlan(planId);
     }
   };
 
   const handleReject = async (planId) => {
+    // This should also be converted to a <Modal> component
     const reason = window.prompt("Please provide a reason for declining this plan (optional):");
-    // prompt returns null if user hits "Cancel"
     if (reason !== null) { 
       await rejectTreatmentPlan(planId, reason || "No reason provided");
     }
@@ -104,6 +108,7 @@ const TreatmentPlans = () => {
 
 // --- Helper Card Component ---
 const TreatmentPlanCard = ({ plan, getProcedureById, onAccept, onReject, isLoading }) => {
+  // --- 2. This variable is now an object, which is fine ---
   const totalPatientPortion = plan.financialSummary.totalEstimatedPatientPortion;
   
   return (
@@ -130,8 +135,9 @@ const TreatmentPlanCard = ({ plan, getProcedureById, onAccept, onReject, isLoadi
                 <span>Tooth: {proc.clinicalInfo.tooth}</span>
               </div>
               <div className={styles.procCost}>
-                <strong>Est. Patient Cost: ${proc.financialEstimate.estimatedPatientPortion.toFixed(2)}</strong>
-                <span>Total: ${proc.financialEstimate.chargeAmount.toFixed(2)}</span>
+                {/* --- 3. USE FORMATTER --- */}
+                <strong>Est. Patient Cost: {formatCurrency(proc.financialEstimate.estimatedPatientPortion)}</strong>
+                <span>Total: {formatCurrency(proc.financialEstimate.chargeAmount)}</span>
               </div>
             </div>
           );
@@ -142,11 +148,13 @@ const TreatmentPlanCard = ({ plan, getProcedureById, onAccept, onReject, isLoadi
       <div className={styles.financialSummary}>
         <div>
           <span>Total Est. Patient Portion:</span>
-          <strong>${totalPatientPortion.toFixed(2)}</strong>
+          {/* --- 4. USE FORMATTER --- */}
+          <strong>{formatCurrency(totalPatientPortion)}</strong>
         </div>
         <div>
           <span>Total Est. Insurance:</span>
-          <span>${plan.financialSummary.totalEstimatedInsurancePaid.toFixed(2)}</span>
+          {/* --- 5. USE FORMATTER --- */}
+          <span>{formatCurrency(plan.financialSummary.totalEstimatedInsurancePaid)}</span>
         </div>
       </div>
 

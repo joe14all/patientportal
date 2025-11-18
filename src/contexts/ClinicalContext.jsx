@@ -3,6 +3,8 @@
 import React, { createContext, useContext, useState, useMemo, useCallback } from 'react';
 import { mockApi } from '../_mock'; 
 import { useEngagementData } from './EngagementContext'; 
+import { formatCurrency } from '../utils/formatting'; // <-- ADDED FOR CONSISTENCY
+
 // 1. Create the context
 export const ClinicalContext = createContext(null);
 

@@ -14,9 +14,9 @@
         "description": "Adult Prophylaxis",
         "tooth": null,
         "surface": null,
-        "chargeAmount": 120.00,
-        "insurancePaid": 96.00,
-        "patientPortion": 24.00
+        "chargeAmount": { "amount": 120.00, "currency": "USD" },
+        "insurancePaid": { "amount": 96.00, "currency": "USD" },
+        "patientPortion": { "amount": 24.00, "currency": "USD" }
       },
       {
         "id": "li-uuid-002",
@@ -24,17 +24,17 @@
         "description": "Periodic Oral Evaluation",
         "tooth": null,
         "surface": null,
-        "chargeAmount": 50.00,
-        "insurancePaid": 40.00,
-        "patientPortion": 10.00
+        "chargeAmount": { "amount": 50.00, "currency": "USD" },
+        "insurancePaid": { "amount": 40.00, "currency": "USD" },
+        "patientPortion": { "amount": 10.00, "currency": "USD" }
       }
     ],
     "financialSummary": {
-      "totalCharges": 170.00,
-      "totalInsurancePaid": 136.00,
-      "patientResponsibility": 34.00,
-      "totalPaymentsMade": 20.00,
-      "amountDue": 14.00
+      "totalCharges": { "amount": 170.00, "currency": "USD" },
+      "totalInsurancePaid": { "amount": 136.00, "currency": "USD" },
+      "patientResponsibility": { "amount": 34.00, "currency": "USD" },
+      "totalPaymentsMade": { "amount": 20.00, "currency": "USD" },
+      "amountDue": { "amount": 14.00, "currency": "USD" }
     },
     "paymentIds": ["pay-uuid-001"],
     "claimIds": ["claim-uuid-001"],

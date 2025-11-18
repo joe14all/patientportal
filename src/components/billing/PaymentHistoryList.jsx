@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useBillingData } from '../../contexts';
 import Modal from '../common/Modal'; // Use the generic modal for confirmation
+import { formatCurrency } from '../../utils/formatting';
 import styles from './PaymentHistoryList.module.css';
 
 /**
@@ -10,35 +11,36 @@ import styles from './PaymentHistoryList.module.css';
 const PaymentHistoryList = () => {
   const { billingPayments, requestRefund, loading } = useBillingData();
   
-  // State for the refund modal
   const [isRefundModalOpen, setIsRefundModalOpen] = useState(false);
-  const [refundTarget, setRefundTarget] = useState(null); // The payment to be refunded
+  const [refundTarget, setRefundTarget] = useState(null); 
   const [refundReason, setRefundReason] = useState('');
 
   // --- Event Handlers ---
 
   const handleRefundClick = (payment) => {
     setRefundTarget(payment);
-    setRefundReason(''); // Clear old reason
+    setRefundReason(''); 
     setIsRefundModalOpen(true);
   };
 
+  // --- 1. UPDATED: Removed validation logic ---
   const handleConfirmRefund = async () => {
-    if (!refundTarget || !refundReason) {
-      // Simple validation
-      alert("Please provide a reason for the refund request.");
-      throw new Error("Reason is required."); // Prevent modal from closing
-    }
+    // We no longer need to check for !refundReason here,
+    // as the button will be disabled.
+    
     try {
       await requestRefund(refundTarget.id, refundReason);
       setRefundTarget(null);
-      // Modal will close on success
+      // On success, the Modal's onPrimaryAction wrapper will close the modal.
     } catch (err) {
       console.error("Failed to request refund:", err);
-      // Re-throw to keep modal open
+      // Re-throw the API error to be displayed by the modal's fallback alert
       throw err;
     }
   };
+
+  // --- 2. NEW: Calculate disabled state ---
+  const isSubmitDisabled = !refundReason.trim();
 
   return (
     <>
@@ -50,16 +52,15 @@ const PaymentHistoryList = () => {
             billingPayments.map(payment => (
               <li className={styles.paymentItem} key={payment.id}>
                 <div className={styles.paymentInfo}>
-                  <strong>${payment.amount.toFixed(2)}</strong> on {payment.paymentDate}
+                  <strong>{formatCurrency(payment.amount)}</strong> on {payment.paymentDate}
                   <span className={styles.paymentMethod}>{payment.method}</span>
                 </div>
                 <span className={styles.status}>{payment.status}</span>
                 
-                {/* --- Unapplied Credit Section --- */}
-                {payment.unappliedAmount > 0 && (
+                {payment.unappliedAmount.amount > 0.01 && (
                   <div className={styles.unappliedSection}>
                     <span>
-                      Unapplied: <strong>${payment.unappliedAmount.toFixed(2)}</strong>
+                      Unapplied: <strong>{formatCurrency(payment.unappliedAmount)}</strong>
                     </span>
                     <button 
                       className={styles.refundButton}
@@ -68,7 +69,6 @@ const PaymentHistoryList = () => {
                     >
                       Request Refund
                     </button>
-                    {/* We could add an "Apply to Invoice" button here in the future */}
                   </div>
                 )}
               </li>
@@ -91,8 +91,9 @@ const PaymentHistoryList = () => {
         onPrimaryAction={handleConfirmRefund}
         secondaryActionText="Cancel"
         isLoading={loading}
+        primaryActionDisabled={isSubmitDisabled} // <-- 3. PASS THE PROP
       >
-        <p>You are requesting a refund for an unapplied credit of <strong>${refundTarget?.unappliedAmount.toFixed(2)}</strong> from your payment on {refundTarget?.paymentDate}.</p>
+        <p>You are requesting a refund for an unapplied credit of <strong>{formatCurrency(refundTarget?.unappliedAmount)}</strong> from your payment on {refundTarget?.paymentDate}.</p>
         <div className="form-group" style={{marginTop: '1rem'}}>
           <label htmlFor="refundReason">Reason for request</label>
           <textarea
@@ -105,6 +106,8 @@ const PaymentHistoryList = () => {
           />
         </div>
       </Modal>
+
+      {/* --- Error modal is no longer needed --- */}
     </>
   );
 };

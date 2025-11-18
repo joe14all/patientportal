@@ -26,9 +26,9 @@
         "status": "Scheduled",
         "linkedAppointmentId": "appt-uuid-003",
         "financialEstimate": {
-          "chargeAmount": 1500.00,
-          "estimatedInsurancePaid": 750.00,
-          "estimatedPatientPortion": 750.00,
+          "chargeAmount": { "amount": 1500.00, "currency": "USD" },
+          "estimatedInsurancePaid": { "amount": 750.00, "currency": "USD" },
+          "estimatedPatientPortion": { "amount": 750.00, "currency": "USD" },
           "notes": "50% coverage after $50 deductible. Deductible assumed met."
         }
       },
@@ -46,18 +46,18 @@
         "status": "Proposed",
         "linkedAppointmentId": null,
         "financialEstimate": {
-          "chargeAmount": 250.00,
-          "estimatedInsurancePaid": 200.00,
-          "estimatedPatientPortion": 50.00,
+          "chargeAmount": { "amount": 250.00, "currency": "USD" },
+          "estimatedInsurancePaid": { "amount": 200.00, "currency": "USD" },
+          "estimatedPatientPortion": { "amount": 50.00, "currency": "USD" },
           "notes": "80% coverage after $50 deductible."
         }
       }
     ],
     
     "financialSummary": {
-      "totalChargeAmount": 1750.00,
-      "totalEstimatedInsurancePaid": 950.00,
-      "totalEstimatedPatientPortion": 800.00
+      "totalChargeAmount": { "amount": 1750.00, "currency": "USD" },
+      "totalEstimatedInsurancePaid": { "amount": 950.00, "currency": "USD" },
+      "totalEstimatedPatientPortion": { "amount": 800.00, "currency": "USD" }
     },
     
     "providerNotes": "Phase 1 (Crown) is clinically urgent. Phase 2 (Filling) can be scheduled at patient's convenience.",

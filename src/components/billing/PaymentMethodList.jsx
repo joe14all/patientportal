@@ -1,15 +1,37 @@
 import React, { useState } from 'react';
 import { useBillingData } from '../../contexts';
-import { IconBilling, IconTrash } from '../../layouts/components/Icons';
+// --- NEW: Import new icons ---
+import { IconBilling, IconTrash, IconBank, IconZap } from '../../layouts/components/Icons';
 import Modal from '../common/Modal'; // Import the common modal
 import styles from './PaymentMethodList.module.css';
+
+// --- NEW: Helper to render card details ---
+const CardDetails = ({ method }) => (
+  <>
+    <strong>{method.cardType} **** {method.lastFour}</strong>
+    <span>Expires {method.expMonth}/{method.expYear}</span>
+  </>
+);
+
+// --- NEW: Helper to render bank details ---
+const BankDetails = ({ method }) => (
+  <>
+    <strong>{method.bankName}</strong>
+    <span>{method.accountType} (....{method.lastFour})</span>
+  </>
+);
+
+// --- NEW: Helper to render online service details ---
+const OnlineDetails = ({ method }) => (
+  <>
+    <strong>{method.serviceName}</strong>
+    <span>{method.email || 'Linked Account'}</span>
+  </>
+);
 
 /**
  * Renders the "Payment Methods" card, allowing users to view,
  * add, remove, and set default payment methods.
- *
- * @param {object} props
- * @param {function} props.onAddNew - Function to call to open the "Add New" modal.
  */
 const PaymentMethodList = ({ onAddNew }) => {
   const { 
@@ -22,35 +44,69 @@ const PaymentMethodList = ({ onAddNew }) => {
   const [isRemoveModalOpen, setIsRemoveModalOpen] = useState(false);
   const [removeTarget, setRemoveTarget] = useState(null);
 
-  // --- Event Handlers ---
-
-  // Opens the confirmation modal before removing
+  // --- (Event Handlers remain the same) ---
   const handleRemoveClick = (method) => {
     setRemoveTarget(method);
     setIsRemoveModalOpen(true);
   };
 
-  // Called by the modal's "Remove" button
   const handleConfirmRemove = async () => {
     if (!removeTarget) return;
     try {
       await removePaymentMethod(removeTarget.id);
       setRemoveTarget(null);
-      // Modal closes on success
     } catch (err) {
       console.error("Failed to remove payment method", err);
-      // Re-throw to keep modal open and show error
       throw err;
     }
   };
 
-  // Sets a card as default
   const handleSetDefault = async (methodId) => {
-    // This action is low-risk, no modal needed
     try {
       await setDefaultPaymentMethod(methodId);
     } catch (err) {
       console.error("Failed to set default payment method", err);
+    }
+  };
+
+  // --- NEW: Helper to get the correct icon ---
+  const getIconForMethod = (method) => {
+    switch (method.type) {
+      case 'card':
+        return <IconBilling className={styles.cardIcon} />;
+      case 'bank':
+        return <IconBank className={styles.cardIcon} />;
+      case 'online':
+        return <IconZap className={styles.cardIcon} />;
+      default:
+        return <IconBilling className={styles.cardIcon} />;
+    }
+  };
+
+  // --- NEW: Helper to get the correct details ---
+  const renderMethodDetails = (method) => {
+    switch (method.type) {
+      case 'card':
+        return <CardDetails method={method} />;
+      case 'bank':
+        return <BankDetails method={method} />;
+      case 'online':
+        return <OnlineDetails method={method} />;
+      default:
+        return <strong>Unknown Payment Type</strong>;
+    }
+  };
+  
+  // --- NEW: Helper to get item title for modal ---
+  const getMethodTitle = (method) => {
+    if (!method) return '';
+    switch (method.type) {
+      case 'card':
+        return `${method.cardType} **** ${method.lastFour}`;
+      case 'bank':
+        return `${method.bankName} (....${method.lastFour})`;
+      default:
+        return 'this method';
     }
   };
 
@@ -62,11 +118,14 @@ const PaymentMethodList = ({ onAddNew }) => {
           <ul className={styles.paymentList}>
             {paymentMethods.map(method => (
               <li className={styles.paymentItem} key={method.id}>
-                <IconBilling className={styles.cardIcon} />
+                {/* --- UPDATED: Dynamic Icon --- */}
+                {getIconForMethod(method)}
+                
+                {/* --- UPDATED: Dynamic Details --- */}
                 <div className={styles.cardInfo}>
-                  <strong>{method.cardType} **** {method.lastFour}</strong>
-                  <span>Expires {method.expMonth}/{method.expYear}</span>
+                  {renderMethodDetails(method)}
                 </div>
+
                 <div className={styles.cardMeta}>
                   {method.isDefault ? (
                     <span className={styles.defaultBadge}>Default</span>
@@ -85,7 +144,7 @@ const PaymentMethodList = ({ onAddNew }) => {
                     className="icon-button danger"
                     onClick={() => handleRemoveClick(method)}
                     disabled={loading}
-                    title="Remove card"
+                    title="Remove method"
                   >
                     <IconTrash />
                   </button>
@@ -110,7 +169,7 @@ const PaymentMethodList = ({ onAddNew }) => {
         </button>
       </section>
 
-      {/* Confirmation Modal for Removing a Card */}
+      {/* --- UPDATED: Dynamic Modal Text --- */}
       <Modal
         isOpen={isRemoveModalOpen}
         onClose={() => setIsRemoveModalOpen(false)}
@@ -121,9 +180,9 @@ const PaymentMethodList = ({ onAddNew }) => {
         secondaryActionText="Cancel"
         isLoading={loading}
       >
-        <p>Are you sure you want to remove this card?</p>
+        <p>Are you sure you want to remove this payment method?</p>
         {removeTarget && (
-          <p><strong>{removeTarget.cardType} **** {removeTarget.lastFour}</strong></p>
+          <p><strong>{getMethodTitle(removeTarget)}</strong></p>
         )}
       </Modal>
     </>

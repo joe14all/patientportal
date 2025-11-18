@@ -234,4 +234,22 @@ export const IconAppleCalendar = (props) => (
   </svg>
 );
 
-{/* --- IconOutlookCalendar is removed --- */}
+export const IconBank = (props) => (
+  <svg {...iconProps} {...props} viewBox="0 0 24 24">
+    <path d="M3 21h18M3 10h18M5 6l7-4 7 4M4 10v11M20 10v11M8 14v3M12 14v3M16 14v3"></path>
+  </svg>
+);
+
+export const IconZap = (props) => (
+  <svg {...iconProps} {...props} viewBox="0 0 24 24">
+    <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+  </svg>
+);
+
+// Add this to the end of your Icons.jsx file
+
+export const IconChevronDown = (props) => (
+  <svg {...iconProps} {...props} viewBox="0 0 24 24">
+    <polyline points="6 9 12 15 18 9"></polyline>
+  </svg>
+);

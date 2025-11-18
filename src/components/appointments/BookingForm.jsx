@@ -1,7 +1,8 @@
-import React, { useState, useMemo, useEffect } from 'react'; // 1. Ensure useState is imported
+import React, { useState, useMemo, useEffect } from 'react';
 import { useClinicalData, useCoreData } from '../../contexts';
 import TimeSlotPicker from './TimeSlotPicker';
 import styles from './BookingForm.module.css';
+import { formatCurrency } from '../../utils/formatting'; // <-- 1. IMPORT THE FORMATTER
 
 /**
  * A multi-step form for booking OR RESCHEDULING an appointment.
@@ -22,15 +23,10 @@ const BookingForm = ({ onClose, initialTppId = null, appointmentToReschedule = n
     appointmentTypes: allAppointmentTypes
   } = useCoreData();
 
-  // --- 2. ADD INTERNAL LOADING STATE ---
   const [isProcessing, setIsProcessing] = useState(false);
-
-  // --- State for the booking flow ---
   const [isRescheduling, setIsRescheduling] = useState(!!appointmentToReschedule);
   const [isBookingFromPlan, setIsBookingFromPlan] = useState(!!initialTppId);
-  
   const [bookingStep, setBookingStep] = useState(1); 
-  
   const [selectedApptTypeId, setSelectedApptTypeId] = useState('');
   const [selectedSlot, setSelectedSlot] = useState(null);
   const [tppToBook, setTppToBook] = useState(null);
@@ -44,7 +40,7 @@ const BookingForm = ({ onClose, initialTppId = null, appointmentToReschedule = n
       .filter(proc => proc.status === 'Proposed' && !proc.linkedAppointmentId);
   }, [treatmentPlans]);
   
-  // ... (all useEffects remain the same) ...
+  // --- useEffects (no changes) ---
   useEffect(() => {
     if (initialTppId && bookingStep === 1) {
       const procedure = proposedProcedures.find(p => p.id === initialTppId);
@@ -83,12 +79,11 @@ const BookingForm = ({ onClose, initialTppId = null, appointmentToReschedule = n
     }
   }, [appointmentToReschedule, allAppointmentTypes, onClose, bookingStep]);
 
-  // ... (memoized selectedApptType remains the same) ...
   const selectedApptType = useMemo(() => {
     return getAppointmentTypeById(selectedApptTypeId);
   }, [selectedApptTypeId, getAppointmentTypeById]);
 
-  // ... (handleApptTypeSelect and handleSlotSelect remain the same) ...
+  // --- Handlers (no changes) ---
   const handleApptTypeSelect = (typeId) => {
     console.log('BookingForm: Selected Appt Type ID', typeId);
     setSelectedApptTypeId(typeId);
@@ -111,9 +106,6 @@ const BookingForm = ({ onClose, initialTppId = null, appointmentToReschedule = n
     }
   };
 
-  /**
-   * --- 3. UPDATE handleSubmit ---
-   */
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!selectedApptType || !selectedSlot) {
@@ -121,7 +113,7 @@ const BookingForm = ({ onClose, initialTppId = null, appointmentToReschedule = n
       return;
     }
 
-    setIsProcessing(true); // <-- SET PROCESSING IMMEDIATELY
+    setIsProcessing(true);
 
     try {
       if (isRescheduling) {
@@ -156,13 +148,11 @@ const BookingForm = ({ onClose, initialTppId = null, appointmentToReschedule = n
       onClose(); // Close the form on success
     } catch (err) {
       console.error("Failed to book/reschedule appointment", err);
-      // On error, re-enable the form
-      setIsProcessing(false); // <-- RESET ON ERROR
+      setIsProcessing(false);
     }
-    // Don't reset isProcessing on success, as the component will unmount
   };
   
-  // ... (renderStep1_Type, renderStep2_Time, renderStep3_Confirm remain the same) ...
+  // --- Render Functions ---
   
   const renderStep1_Type = () => (
     <>
@@ -190,7 +180,10 @@ const BookingForm = ({ onClose, initialTppId = null, appointmentToReschedule = n
                 }}
               >
                 <strong>Book: {proc.description}</strong>
-                <span>Est. Patient Cost: ${proc.financialEstimate.estimatedPatientPortion.toFixed(2)}</span>
+                {/* --- 2. USE THE FORMATTER --- */}
+                <span>
+                  Est. Patient Cost: {formatCurrency(proc.financialEstimate.estimatedPatientPortion)}
+                </span>
               </button>
             );
           })
@@ -286,7 +279,7 @@ const BookingForm = ({ onClose, initialTppId = null, appointmentToReschedule = n
             type="button" 
             className="icon-button" 
             onClick={onClose} 
-            disabled={isDisabled} // <-- 5. DISABLE CLOSE BUTTON
+            disabled={isDisabled}
           >
             &times;
           </button>
@@ -319,7 +312,7 @@ const BookingForm = ({ onClose, initialTppId = null, appointmentToReschedule = n
                 }
               }
             }}
-            disabled={isDisabled} // <-- 6. DISABLE BACK/CANCEL BUTTON
+            disabled={isDisabled}
           >
             {(bookingStep === 1 || (bookingStep === 2 && isRescheduling)) ? 'Cancel' : 'Back'}
           </button>
@@ -327,10 +320,8 @@ const BookingForm = ({ onClose, initialTppId = null, appointmentToReschedule = n
           {bookingStep === 3 && (
             <button 
               type="submit" 
-              // --- 7. UPDATE DISABLED LOGIC ---
               disabled={isDisabled || !selectedSlot}
             >
-              {/* --- 8. UPDATE TEXT LOGIC --- */}
               {isProcessing ? 'Processing...' : (
                 clinicalLoading 
                   ? (isRescheduling ? 'Rescheduling...' : 'Booking...') 

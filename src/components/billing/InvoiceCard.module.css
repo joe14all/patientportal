@@ -41,12 +41,19 @@
   color: var(--primary);
 }
 
+/* --- 3. STYLE THE ICON --- */
 .expandIcon {
-  font-size: 1.5rem;
-  font-weight: 300;
+  width: 20px;
+  height: 20px;
   color: var(--text-secondary);
-  line-height: 1;
+  transition: transform 0.2s ease-in-out;
 }
+
+/* --- 4. ADD THE ROTATION --- */
+.expandIcon.expanded {
+  transform: rotate(180deg);
+}
+
 
 /* --- Details (Expanded) --- */
 .invoiceDetails {

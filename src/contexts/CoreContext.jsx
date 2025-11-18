@@ -2,6 +2,7 @@
 /* eslint-disable react-refresh/only-export-components */
 import React, { createContext, useContext, useState, useMemo, useCallback } from 'react';
 import { mockApi } from '../_mock'; // Import the initial mock data
+import { formatCurrency } from '../utils/formatting'; // <-- 1. IMPORT FOR CONSISTENCY
 
 // 1. Create the context
 export const CoreContext = createContext(null);

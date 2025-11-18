@@ -3,6 +3,7 @@
     "id": "pm-uuid-001",
     "patientId": "patient-uuid-001",
     "isDefault": true,
+    "type": "card",
     "cardType": "Visa",
     "lastFour": "4242",
     "expMonth": "12",
@@ -19,6 +20,7 @@
     "id": "pm-uuid-002",
     "patientId": "patient-uuid-001",
     "isDefault": false,
+    "type": "card",
     "cardType": "Mastercard",
     "lastFour": "5678",
     "expMonth": "06",
@@ -30,5 +32,15 @@
       "postalCode": "12345",
       "country": "US"
     }
+  },
+  {
+    "id": "pm-uuid-003",
+    "patientId": "patient-uuid-001",
+    "isDefault": false,
+    "type": "bank",
+    "bankName": "Chase Bank",
+    "accountType": "Checking",
+    "lastFour": "9876",
+    "billingAddress": null
   }
 ]

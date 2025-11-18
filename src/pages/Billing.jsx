@@ -2,14 +2,15 @@ import React, { useState, useMemo } from 'react';
 import { useBillingData } from '../contexts';
 import styles from './Billing.module.css';
 
-// --- 1. Import all our new components ---
+// --- 1. Import all our components ---
 import InvoiceList from '../components/billing/InvoiceList';
 import InsuranceList from '../components/billing/InsuranceList';
 import PaymentHistoryList from '../components/billing/PaymentHistoryList';
 import PaymentMethodList from '../components/billing/PaymentMethodList';
-import PaymentModal from '../components/common/PaymentModal'; // The specific payment modal
-import Modal from '../components/common/Modal'; // The generic modal for forms
+import PaymentModal from '../components/common/PaymentModal';
+import Modal from '../components/common/Modal';
 import AddPaymentMethodForm from '../components/billing/AddPaymentMethodForm';
+import AddInsuranceForm from '../components/billing/AddInsuranceForm'; // <-- 1. IMPORT
 
 const Billing = () => {
   const {
@@ -20,22 +21,21 @@ const Billing = () => {
 
   // --- 2. State for all our modals ---
   const [isPayModalOpen, setIsPayModalOpen] = useState(false);
-  const [invoiceToPay, setInvoiceToPay] = useState(null); // The specific invoice
+  const [invoiceToPay, setInvoiceToPay] = useState(null);
   
   const [isAddCardModalOpen, setIsAddCardModalOpen] = useState(false);
-  // Placeholder for future "Add Insurance" functionality
-  // const [isAddInsuranceModalOpen, setIsAddInsuranceModalOpen] = useState(false);
+  // --- 2. UNCOMMENT INSURANCE MODAL STATE ---
+  const [isAddInsuranceModalOpen, setIsAddInsuranceModalOpen] = useState(false);
 
   
   // --- 3. Filter data for the InvoiceList ---
   const outstandingInvoices = useMemo(
-    () => billingInvoices.filter(inv => inv.financialSummary.amountDue > 0.01),
+    () => billingInvoices.filter(inv => inv.financialSummary.amountDue.amount > 0.01),
     [billingInvoices]
   );
 
   // --- 4. Handlers to open/close modals ---
   
-  // Called by InvoiceCard -> InvoiceList
   const handlePayInvoiceClick = (invoice) => {
     setInvoiceToPay(invoice);
     setIsPayModalOpen(true);
@@ -46,16 +46,13 @@ const Billing = () => {
     setIsPayModalOpen(false);
   };
   
-  // Called by PaymentMethodList
   const handleAddNewCard = () => {
     setIsAddCardModalOpen(true);
   };
   
-  // Called by InsuranceList
+  // --- 3. UPDATE HANDLER ---
   const handleAddNewInsurance = () => {
-    // This is just a placeholder for now
-    alert("Add Insurance form is not implemented yet.");
-    // setIsAddInsuranceModalOpen(true);
+    setIsAddInsuranceModalOpen(true); // <-- REMOVE ALERT
   };
 
   return (
@@ -100,24 +97,23 @@ const Billing = () => {
         onClose={() => setIsAddCardModalOpen(false)}
         title="Add New Payment Method"
       >
-        {/* The AddPaymentMethodForm has its own buttons,
-          so we pass a function to close this modal on success.
-        */}
         <AddPaymentMethodForm
           onSuccess={() => setIsAddCardModalOpen(false)}
           onCancel={() => setIsAddCardModalOpen(false)}
         />
       </Modal>
       
-      {/* Placeholder modal for Add Insurance
+      {/* --- 4. ADD THE NEW MODAL --- */}
       <Modal
         isOpen={isAddInsuranceModalOpen}
         onClose={() => setIsAddInsuranceModalOpen(false)}
         title="Add Insurance Policy"
       >
-        <p>Insurance form will go here.</p>
+        <AddInsuranceForm
+          onSuccess={() => setIsAddInsuranceModalOpen(false)}
+          onCancel={() => setIsAddInsuranceModalOpen(false)}
+        />
       </Modal>
-      */}
 
     </div>
   );

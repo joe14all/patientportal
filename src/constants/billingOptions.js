@@ -1,14 +1,42 @@
-// A list of common credit card types for the "Add Card" form
-export const CARD_TYPES = [
-  "Visa",
-  "Mastercard",
-  "American Express",
-  "Discover",
-  "HSA/FSA Card",
+import { IconBilling, IconBank, IconZap } from "../layouts/components/Icons";
+
+/**
+ * Configuration for all payment methods supported.
+ */
+export const PAYMENT_METHOD_CONFIG = [
+  // ... (existing config for card, bank, online)
+  {
+    id: "card",
+    name: "Credit / Debit Card",
+    icon: IconBilling,
+    types: [
+      "Visa",
+      "Mastercard",
+      "American Express",
+      "Discover",
+      "JCB",
+      "UnionPay",
+      "Diners Club",
+      "HSA/FSA Card",
+    ],
+  },
+  {
+    id: "bank",
+    name: "Bank Account",
+    icon: IconBank,
+    types: ["Bank Wire (International)", "ACH Direct Debit (US)"],
+  },
+  {
+    id: "online",
+    name: "Digital Wallet",
+    icon: IconZap,
+    types: ["Instapay", "PayPal", "Apple Pay", "Google Pay"],
+  },
 ];
 
-// Generates a list of months for the expiration date dropdown
+// --- Helpers for the Credit Card Form ---
 export const EXPIRATION_MONTHS = [
+  // ... (existing months)
   { name: "01 - January", value: "01" },
   { name: "02 - February", value: "02" },
   { name: "03 - March", value: "03" },
@@ -23,12 +51,8 @@ export const EXPIRATION_MONTHS = [
   { name: "12 - December", value: "12" },
 ];
 
-/**
- * Generates a list of upcoming years for the expiration date dropdown.
- * @param {number} count - The number of years to generate (e.g., 10).
- * @returns {string[]} An array of years as strings.
- */
 export const getExpirationYears = (count = 10) => {
+  // ... (existing function)
   const currentYear = new Date().getFullYear();
   const years = [];
   for (let i = 0; i < count; i++) {
@@ -36,3 +60,8 @@ export const getExpirationYears = (count = 10) => {
   }
   return years;
 };
+
+// --- NEW: OPTIONS FOR INSURANCE FORM ---
+export const SUBSCRIBER_RELATIONSHIP = ["Self", "Spouse", "Child", "Other"];
+export const PLAN_TYPES = ["PPO", "HMO", "EPO", "Other"];
+export const COVERAGE_PRIORITY = ["Primary", "Secondary", "Tertiary"];

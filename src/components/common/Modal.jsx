@@ -5,8 +5,9 @@ import styles from './Modal.module.css';
 /**
  * A reusable, mobile-first modal component for alerts and confirmations.
  *
- * ... (all other props) ...
- * @param {string} [props.modalClassName] - An optional extra class for the modal card.
+ * ... (all prop comments) ...
+ * @param {boolean} [props.isLoading] - Disables all buttons and close actions (global loading).
+ * @param {boolean} [props.primaryActionDisabled] - Disables just the primary action button.
  */
 const Modal = ({
   isOpen,
@@ -18,57 +19,55 @@ const Modal = ({
   secondaryActionText,
   onSecondaryAction,
   primaryActionVariant = 'primary',
-  isLoading = false,
-  modalClassName = '', // <-- ADD THIS PROP
+  isLoading = false, // This is the GLOBAL loading state
+  primaryActionDisabled = false, // <-- 1. ADD NEW PROP
+  modalClassName = '',
 }) => {
-  // --- Internal loading state ---
   const [isProcessing, setIsProcessing] = useState(false);
+  // --- 2. REMOVED internalError state ---
 
-  // --- Reset internal state when modal is closed/opened ---
   useEffect(() => {
     if (isOpen) {
-      setIsProcessing(false); // Reset on open
+      setIsProcessing(false);
+      // --- 3. REMOVED error reset ---
     }
   }, [isOpen]);
 
-  // --- Escape key handler ---
   useEffect(() => {
     const handleEsc = (event) => {
       if (event.key === 'Escape') {
-        if (isLoading || isProcessing) return; // <-- Use both
+        if (isLoading || isProcessing) return;
         onClose();
       }
     };
     if (isOpen) {
       document.addEventListener('keydown', handleEsc);
     }
-    // Cleanup
     return () => {
       document.removeEventListener('keydown', handleEsc);
     };
-  }, [isOpen, onClose, isLoading, isProcessing]); // <-- Add all deps
+  }, [isOpen, onClose, isLoading, isProcessing]);
 
-  // Prevent modal from rendering if not open
   if (!isOpen) {
     return null;
   }
 
-  // --- Click Handlers ---
+  // --- 4. SIMPLIFIED handlePrimaryClick ---
   const handlePrimaryClick = async () => {
-    setIsProcessing(true); // <-- Set internal state *immediately*
+    setIsProcessing(true);
     if (onPrimaryAction) {
       try {
         await onPrimaryAction();
         // Action succeeded, close the modal
         onClose();
       } catch (e) {
+        // We still want to catch API errors (e.g., network failure)
         console.error("Modal primary action failed:", e);
-        // Don't close the modal if the action failed
+        alert(e.message || "An unexpected error occurred."); // Use alert as a fallback
         setIsProcessing(false); // Re-enable button
-        return; // Stop execution
+        return; 
       }
     } else {
-      // If no action, just close
       onClose();
     }
   };
@@ -81,18 +80,18 @@ const Modal = ({
   };
 
   const handleOverlayClick = () => {
-    if (isLoading || isProcessing) return; // <-- Use both
+    if (isLoading || isProcessing) return;
     onClose();
   };
 
-  // --- Combined loading states ---
-  const isDisabled = isLoading || isProcessing;
+  // --- 5. UPDATE DISABLED LOGIC ---
+  const isFormLoading = isLoading || isProcessing;
+  const isPrimaryDisabled = isFormLoading || primaryActionDisabled; // <-- Combine
   
   let buttonText = primaryActionText;
   if (isProcessing) {
     buttonText = "Processing...";
   } else if (isLoading) {
-    // Use more specific text if available
     buttonText = primaryActionText.includes("Cancel") ? "Cancelling..." : "Loading...";
   }
 
@@ -105,11 +104,9 @@ const Modal = ({
       aria-labelledby="modal-title"
     >
       <div 
-        // --- THIS IS THE CHANGE ---
-        className={`card ${styles.modalCard} ${modalClassName}`} // <-- APPLY THE PROP
-        onClick={(e) => e.stopPropagation()} // Prevent overlay click when clicking card
+        className={`card ${styles.modalCard} ${modalClassName}`}
+        onClick={(e) => e.stopPropagation()}
       >
-        {/* --- Modal Header --- */}
         <div className={styles.modalHeader}>
           <h2 id="modal-title" className={styles.modalTitle}>
             {title}
@@ -118,18 +115,17 @@ const Modal = ({
             type="button" 
             className="icon-button" 
             onClick={handleOverlayClick} 
-            disabled={isDisabled} // <-- Use combined state
+            disabled={isFormLoading} // <-- Use this
           >
             <IconClose />
           </button>
         </div>
 
-        {/* --- Modal Body --- */}
         <div className={styles.modalBody}>
           {children}
+          {/* --- 6. REMOVED error display area --- */}
         </div>
 
-        {/* --- Modal Footer (Actions) --- */}
         {(primaryActionText || secondaryActionText) && (
           <div className={styles.modalFooter}>
             {secondaryActionText && (
@@ -137,7 +133,7 @@ const Modal = ({
                 type="button" 
                 className="secondary" 
                 onClick={handleSecondaryClick}
-                disabled={isDisabled} // <-- Use combined state
+                disabled={isFormLoading} // <-- Use this
               >
                 {secondaryActionText}
               </button>
@@ -147,7 +143,7 @@ const Modal = ({
                 type="button" 
                 className={primaryActionVariant === 'danger' ? 'danger' : ''}
                 onClick={handlePrimaryClick}
-                disabled={isDisabled} // <-- Use combined state
+                disabled={isPrimaryDisabled} // <-- 7. USE NEW COMBINED STATE
               >
                 {buttonText} 
               </button>

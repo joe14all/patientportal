@@ -3,6 +3,7 @@
 import React, { createContext, useContext, useState, useMemo, useCallback } from 'react';
 import { mockApi } from '../_mock'; 
 import { useEngagementData } from './EngagementContext'; 
+import { formatCurrency } from '../utils/formatting'; // <-- IMPORT THE FORMATTER
 
 // 1. Create the context
 export const BillingContext = createContext(null);
@@ -19,7 +20,6 @@ export const BillingProvider = ({ children }) => {
   const [invoices, setInvoices] = useState(mockApi.billing.billingInvoices);
   const [payments, setPayments] = useState(mockApi.billing.billingPayments);
   const [refunds, setRefunds] = useState(mockApi.billing.billingRefunds);
-  // --- ADD NEW PAYMENT METHODS STATE ---
   const [paymentMethods, setPaymentMethods] = useState(mockApi.billing.paymentMethods);
 
   const [loading, setLoading] = useState(false);
@@ -45,26 +45,23 @@ export const BillingProvider = ({ children }) => {
     });
   };
 
-  // --- Payment Method Functions (NEW) ---
+  // --- Payment Method Functions ---
 
   /**
    * (CREATE) Adds a new payment method to the user's account.
    */
-  const addPaymentMethod = useCallback(async (newCardData) => {
+  const addPaymentMethod = useCallback(async (newMethodData) => {
     await simulateApi(() => {
       const newPaymentMethod = {
-        ...newCardData, // This would be the tokenized card data in a real app
+        ...newMethodData,
         id: `pm-uuid-${Date.now()}`,
-        patientId: "patient-uuid-001", // Hardcoded for mock
+        patientId: "patient-uuid-001",
       };
-
       setPaymentMethods(prev => {
-        // If this is the first card, make it the default
         if (prev.length === 0) {
           newPaymentMethod.isDefault = true;
           return [newPaymentMethod];
         }
-        // If it's set as default, unset all others
         if (newPaymentMethod.isDefault) {
           const unDefaulted = prev.map(pm => ({ ...pm, isDefault: false }));
           return [...unDefaulted, newPaymentMethod];
@@ -82,8 +79,6 @@ export const BillingProvider = ({ children }) => {
       setPaymentMethods(prev => 
         prev.filter(pm => pm.id !== paymentMethodId)
       );
-      // Note: This could leave the user with no default card.
-      // A real app would need logic to assign a new default if the default was removed.
     });
   }, []);
 
@@ -106,47 +101,36 @@ export const BillingProvider = ({ children }) => {
 
   /**
    * (CREATE) Simulates making a payment for an invoice.
-   * --- UPDATED to accept a paymentMethodId ---
    */
-  const makePayment = useCallback(async (invoiceId, paymentAmount, paymentMethodId) => {
-    
+  const makePayment = useCallback(async (invoiceId, paymentAmount, paymentMethodId, currency) => {    
     const { newPayment, invoiceNumber } = await simulateApi(() => {
-      // 1. Find the payment method to get its details
+      // 1. Find the payment method
       const paymentMethod = paymentMethods.find(pm => pm.id === paymentMethodId);
       if (!paymentMethod) {
         throw new Error("Payment method not found.");
       }
       
-      // 2. Find and update the invoice
+      // 2. Find and update the invoice (this logic is correct)
       let targetInvoice;
       let foundInvoiceNumber; 
-
+      // ... (invoice mapping logic is correct)
       const newInvoices = invoices.map(invoice => {
         if (invoice.id === invoiceId) {
-          const amountDue = parseFloat(invoice.financialSummary.amountDue) || 0;
-          if (amountDue <= 0) {
-            throw new Error("Invoice not found or no amount due.");
-          }
-          // --- UPDATED: Allow partial payment ---
+          const amountDue = parseFloat(invoice.financialSummary.amountDue.amount) || 0;
+          if (amountDue <= 0) { throw new Error("Invoice not found or no amount due."); }
           if (paymentAmount > amountDue) {
-            // Allow a small tolerance for floating point issues
-            if (paymentAmount - amountDue > 0.01) {
-              throw new Error("Payment exceeds amount due.");
-            }
-            paymentAmount = amountDue; // Correct to the exact amount due
+            if (paymentAmount - amountDue > 0.01) { throw new Error("Payment exceeds amount due."); }
+            paymentAmount = amountDue;
           }
-
-          const newPaymentsMade = (parseFloat(invoice.financialSummary.totalPaymentsMade) || 0) + paymentAmount;
-          const newAmountDue = (parseFloat(invoice.financialSummary.patientResponsibility) || 0) - newPaymentsMade;
-          
+          const newPaymentsMade = (parseFloat(invoice.financialSummary.totalPaymentsMade.amount) || 0) + paymentAmount;
+          const newAmountDue = (parseFloat(invoice.financialSummary.patientResponsibility.amount) || 0) - newPaymentsMade;
           targetInvoice = {
             ...invoice,
-            // --- UPDATED: Use a small epsilon for float comparison ---
             status: newAmountDue <= 0.001 ? "PaidInFull" : "PartiallyPaid",
             financialSummary: {
               ...invoice.financialSummary,
-              totalPaymentsMade: newPaymentsMade,
-              amountDue: newAmountDue,
+              totalPaymentsMade: { amount: newPaymentsMade, currency: currency },
+              amountDue: { amount: newAmountDue, currency: currency },
             },
           };
           foundInvoiceNumber = invoice.invoiceNumber;
@@ -154,30 +138,50 @@ export const BillingProvider = ({ children }) => {
         }
         return invoice;
       });
-
-      if (!targetInvoice) {
-        throw new Error("Invoice not found or no amount due.");
-      }
-
+      if (!targetInvoice) { throw new Error("Invoice not found or no amount due."); }
       setInvoices(newInvoices);
 
-      // 3. Create the new payment record
-      const paymentMethodString = `${paymentMethod.cardType} **** ${paymentMethod.lastFour}`;
+
+      // --- 3. THIS IS THE UPDATE ---
+      let paymentMethodString = "Unknown";
+      let transactionDetails = {};
+
+      if (paymentMethod.type === 'card') {
+        paymentMethodString = `${paymentMethod.cardType} **** ${paymentMethod.lastFour}`;
+        transactionDetails = {
+          transactionId: `ch_${Date.now()}`,
+          cardType: paymentMethod.cardType,
+          lastFour: paymentMethod.lastFour,
+          gateway: "Stripe"
+        };
+      } else if (paymentMethod.type === 'bank') {
+        paymentMethodString = `${paymentMethod.bankName} (....${paymentMethod.lastFour})`;
+        transactionDetails = {
+          transactionId: `wire_${Date.now()}`,
+          bankName: paymentMethod.bankName,
+          lastFour: paymentMethod.lastFour,
+          gateway: "Mock Bank Transfer"
+        };
+      } else if (paymentMethod.type === 'online') { // <-- ADDED THIS BLOCK
+        paymentMethodString = `${paymentMethod.serviceName} (${paymentMethod.email || paymentMethod.phone})`;
+        transactionDetails = {
+          transactionId: `online_${Date.now()}`,
+          service: paymentMethod.serviceName,
+          identifier: paymentMethod.email || paymentMethod.phone,
+          gateway: "Mock Online Payment"
+        };
+      }
+
       const newPayment = {
         id: `pay-uuid-${Date.now()}`,
         patientId: targetInvoice.patientId,
         paymentDate: new Date().toISOString().split('T')[0],
-        amount: paymentAmount,
-        method: paymentMethodString, // Use the formatted string
+        amount: { amount: paymentAmount, currency: currency },        
+        method: paymentMethodString, // <-- Uses new string
         status: "Succeeded",
-        transactionDetails: {
-          transactionId: `ch_3Pq...${Date.now().toString().slice(-4)}`,
-          cardType: paymentMethod.cardType,
-          lastFour: paymentMethod.lastFour,
-          gateway: "Stripe"
-        },
-        allocations: [{ invoiceId: invoiceId, amountApplied: paymentAmount }],
-        unappliedAmount: 0.00,
+        transactionDetails: transactionDetails, // <-- Uses new details
+        allocations: [{ invoiceId: invoiceId, amountApplied: { amount: paymentAmount, currency: currency } }],
+        unappliedAmount: { amount: 0.00, currency: currency },
         systemInfo: { createdAt: new Date().toISOString(), createdBy: "System-Online-Payment" }
       };
       
@@ -186,19 +190,20 @@ export const BillingProvider = ({ children }) => {
       return { newPayment, invoiceNumber: foundInvoiceNumber };
     });
 
-    // 4. Send the confirmation message (no change here)
+    // 4. Send the confirmation message (this logic is correct)
     try {
+      const formattedAmount = formatCurrency(newPayment.amount); // Use formatter
       await createNewThread(
-        `Payment Received: $${newPayment.amount.toFixed(2)}`,
+        `Payment Received: ${formattedAmount}`,
         'Billing',
-        `Thank you for your payment of $${newPayment.amount.toFixed(2)} for Invoice #${invoiceNumber}.`,
+        `Thank you for your payment of ${formattedAmount} for Invoice #${invoiceNumber}.`,
         [], // attachments
         systemAuthor 
       );
     } catch (msgErr) {
       console.error("Failed to create automated message:", msgErr);
     }
-  }, [createNewThread, invoices, systemAuthor, paymentMethods]); // <-- ADD paymentMethods
+  }, [createNewThread, invoices, systemAuthor, paymentMethods]);
 
   
   /**
@@ -209,24 +214,36 @@ export const BillingProvider = ({ children }) => {
       let targetPayment = payments.find(p => p.id === paymentId);
       let targetInvoice = invoices.find(i => i.id === invoiceId);
 
-      if (!targetPayment || targetPayment.unappliedAmount <= 0) {
+      // --- 1. READ FROM OBJECT ---
+      const unappliedAmount = targetPayment?.unappliedAmount?.amount || 0;
+      const amountDue = targetInvoice?.financialSummary?.amountDue?.amount || 0;
+      const currency = targetPayment?.unappliedAmount?.currency || 'USD';
+
+      if (!targetPayment || unappliedAmount <= 0) {
         throw new Error("No unapplied funds available for this payment.");
       }
-      if (!targetInvoice || targetInvoice.financialSummary.amountDue <= 0) {
+      if (!targetInvoice || amountDue <= 0) {
         throw new Error("Invoice not found or is already paid.");
       }
 
-      const amountToApply = Math.min(targetPayment.unappliedAmount, targetInvoice.financialSummary.amountDue);
+      const amountToApply = Math.min(unappliedAmount, amountDue);
 
       setInvoices(prevInvoices => 
         prevInvoices.map(inv => 
           inv.id === invoiceId ? {
             ...inv,
-            status: (inv.financialSummary.amountDue - amountToApply) <= 0.001 ? "PaidInFull" : "PartiallyPaid",
+            // --- 2. UPDATE INVOICE WITH OBJECTS ---
+            status: (inv.financialSummary.amountDue.amount - amountToApply) <= 0.001 ? "PaidInFull" : "PartiallyPaid",
             financialSummary: {
               ...inv.financialSummary,
-              totalPaymentsMade: inv.financialSummary.totalPaymentsMade + amountToApply,
-              amountDue: inv.financialSummary.amountDue - amountToApply
+              totalPaymentsMade: {
+                amount: inv.financialSummary.totalPaymentsMade.amount + amountToApply,
+                currency: currency
+              },
+              amountDue: {
+                amount: inv.financialSummary.amountDue.amount - amountToApply,
+                currency: currency
+              }
             }
           } : inv
         )
@@ -235,11 +252,15 @@ export const BillingProvider = ({ children }) => {
         prevPayments.map(pay => 
           pay.id === paymentId ? {
             ...pay,
+            // --- 3. UPDATE PAYMENT WITH OBJECTS ---
             allocations: [
               ...pay.allocations,
-              { invoiceId: invoiceId, amountApplied: amountToApply }
+              { invoiceId: invoiceId, amountApplied: { amount: amountToApply, currency: currency } }
             ],
-            unappliedAmount: pay.unappliedAmount - amountToApply
+            unappliedAmount: {
+              amount: pay.unappliedAmount.amount - amountToApply,
+              currency: currency
+            }
           } : pay
         )
       );
@@ -247,7 +268,7 @@ export const BillingProvider = ({ children }) => {
   }, [payments, invoices]);
 
   // --- Policy Functions ---
-  // (No changes to policy, claim, or refund functions)
+  // (These do not handle money, so they are fine)
 
   const addInsurancePolicy = useCallback(async (newPolicyData) => {
     const newPolicy = await simulateApi(() => {
@@ -266,18 +287,17 @@ export const BillingProvider = ({ children }) => {
         'Billing',
         `Your new insurance policy for ${newPolicy.carrier.name} (Policy #${newPolicy.plan.policyNumber}) has been successfully added to your account.`,
         [], // attachments
-        systemAuthor // <-- PASS AUTHOR
+        systemAuthor 
       );
     } catch (msgErr) {
       console.error("Failed to create automated message:", msgErr);
     }
-  }, [createNewThread, systemAuthor]); // <-- ADD DEPENDENCY
+  }, [createNewThread, systemAuthor]); 
 
   const updateInsurancePolicy = useCallback(async (policyId, updatedPolicyData) => {
     const updatedPolicy = await simulateApi(() => {
       let policyToReturn = null;
-      // FIX: Map over 'policies' state, not 'prevPolicies'
-      const newPolicies = policies.map(policy => {
+      const newPolicies = policies.map(policy => { // <-- Use 'policies' from state
           if (policy.id === policyId) {
             policyToReturn = { ...policy, ...updatedPolicyData };
             return policyToReturn;
@@ -286,7 +306,7 @@ export const BillingProvider = ({ children }) => {
         });
 
       if (!policyToReturn) throw new Error("Policy not found.");
-      setPolicies(newPolicies); // Set new state
+      setPolicies(newPolicies);
       return policyToReturn;
     });
 
@@ -296,12 +316,12 @@ export const BillingProvider = ({ children }) => {
         'Billing',
         `Your insurance policy for ${updatedPolicy.carrier.name} (Policy #${updatedPolicy.plan.policyNumber}) has been updated.`,
         [], // attachments
-        systemAuthor // <-- PASS AUTHOR
+        systemAuthor 
       );
     } catch (msgErr) {
       console.error("Failed to create automated message:", msgErr);
     }
-  }, [createNewThread, policies, systemAuthor]); // <-- ADD DEPENDENCIES
+  }, [createNewThread, policies, systemAuthor]); // <-- Added 'policies'
 
   const deleteInsurancePolicy = useCallback(async (policyId) => {
     await simulateApi(() => {
@@ -318,8 +338,7 @@ export const BillingProvider = ({ children }) => {
   const disputeClaim = useCallback(async (claimId, reason) => {
     const disputedClaim = await simulateApi(() => {
       let claimToReturn = null;
-      // FIX: Map over 'claims' state
-      const newClaims = claims.map(claim => {
+      const newClaims = claims.map(claim => { // <-- Use 'claims' from state
           if (claim.id === claimId) {
             claimToReturn = {
               ...claim,
@@ -332,7 +351,7 @@ export const BillingProvider = ({ children }) => {
         });
 
       if (!claimToReturn) throw new Error("Claim not found.");
-      setClaims(newClaims); // Set new state
+      setClaims(newClaims); 
       return claimToReturn;
     });
     
@@ -342,24 +361,31 @@ export const BillingProvider = ({ children }) => {
         'Billing',
         `We have received your dispute for claim ${disputedClaim.carrierClaimId} (Our ID: ${disputedClaim.id}). Our billing team will review your reason: "${reason}".`,
         [], // attachments
-        systemAuthor // <-- PASS AUTHOR
+        systemAuthor
       );
     } catch (msgErr) {
       console.error("Failed to create automated message:", msgErr);
     }
-  }, [createNewThread, claims, systemAuthor]); // <-- ADD DEPENDENCIES
+  }, [createNewThread, claims, systemAuthor]); // <-- Added 'claims'
 
   const requestRefund = useCallback(async (paymentId, reason) => {
     const newRefund = await simulateApi(() => {
       let targetPayment;
+      let currency = 'USD'; // Default currency
       
-      // FIX: Map over 'payments' state
-      const newPayments = payments.map(pay => {
+      const newPayments = payments.map(pay => { // <-- Use 'payments' from state
           if (pay.id === paymentId) {
-            if (pay.unappliedAmount <= 0) {
+            // --- 1. READ FROM OBJECT ---
+            const unappliedAmount = pay.unappliedAmount?.amount || 0;
+            if (unappliedAmount <= 0) {
               throw new Error("No unapplied balance to refund.");
             }
-            targetPayment = { ...pay, unappliedAmount: 0 };
+            currency = pay.unappliedAmount.currency; // Get currency
+            targetPayment = { 
+              ...pay, 
+              // --- 2. UPDATE OBJECT ---
+              unappliedAmount: { amount: 0, currency: currency } 
+            };
             return targetPayment;
           }
           return pay;
@@ -376,7 +402,11 @@ export const BillingProvider = ({ children }) => {
         patientId: targetPayment.patientId,
         originalPaymentId: paymentId,
         refundDate: new Date().toISOString().split('T')[0],
-        amount: targetPayment.unappliedAmount,
+        // --- 3. STORE OBJECT ---
+        amount: { 
+          amount: targetPayment.unappliedAmount.amount, // Get old amount
+          currency: currency 
+        },
         method: targetPayment.method,
         reason: `Patient Request: ${reason}`,
         transactionDetails: { /* ...mock refund details... */ },
@@ -388,17 +418,19 @@ export const BillingProvider = ({ children }) => {
     });
 
     try {
+      // --- 4. USE FORMATTER ---
+      const formattedAmount = formatCurrency(newRefund.amount);
       await createNewThread(
-        `Refund Request Submitted: $${newRefund.amount.toFixed(2)}`,
+        `Refund Request Submitted: ${formattedAmount}`,
         'Billing',
-        `We have received your refund request for $${newRefund.amount.toFixed(2)} from payment ${newRefund.originalPaymentId}. This will be processed by our team.`,
+        `We have received your refund request for ${formattedAmount} from payment ${newRefund.originalPaymentId}. This will be processed by our team.`,
         [], // attachments
-        systemAuthor // <-- PASS AUTHOR
+        systemAuthor
       );
     } catch (msgErr) {
       console.error("Failed to create automated message:", msgErr);
     }
-  }, [createNewThread, payments, systemAuthor]); // <-- ADD DEPENDENCIES
+  }, [createNewThread, payments, systemAuthor]); // <-- Added 'payments'
 
 
   // --- Value ---
@@ -408,7 +440,7 @@ export const BillingProvider = ({ children }) => {
     billingInvoices: invoices,
     billingPayments: payments,
     billingRefunds: refunds,
-    paymentMethods: paymentMethods, // <-- ADD NEW STATE
+    paymentMethods: paymentMethods,
     loading,
     error,
     makePayment,
@@ -418,9 +450,9 @@ export const BillingProvider = ({ children }) => {
     deleteInsurancePolicy,
     disputeClaim,
     requestRefund,
-    addPaymentMethod, // <-- ADD NEW FUNCTION
-    removePaymentMethod, // <-- ADD NEW FUNCTION
-    setDefaultPaymentMethod, // <-- ADD NEW FUNCTION
+    addPaymentMethod,
+    removePaymentMethod,
+    setDefaultPaymentMethod,
     
   }), [
     policies, 
@@ -428,7 +460,7 @@ export const BillingProvider = ({ children }) => {
     invoices, 
     payments, 
     refunds, 
-    paymentMethods, // <-- ADD NEW DEPENDENCY
+    paymentMethods,
     loading, 
     error,
     makePayment,
@@ -438,9 +470,9 @@ export const BillingProvider = ({ children }) => {
     deleteInsurancePolicy,
     disputeClaim,
     requestRefund,
-    addPaymentMethod, // <-- ADD NEW DEPENDENCY
-    removePaymentMethod, // <-- ADD NEW DEPENDENCY
-    setDefaultPaymentMethod // <-- ADD NEW DEPENDENCY
+    addPaymentMethod,
+    removePaymentMethod,
+    setDefaultPaymentMethod
   ]);
 
   // --- Render ---

@@ -1,16 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useBillingData } from '../../contexts';
-import { IconBilling, IconClose } from '../../layouts/components/Icons';
+import { IconBilling, IconClose, IconBank, IconZap } from '../../layouts/components/Icons'; // <-- 1. IMPORT ICONS
 import styles from './PaymentModal.module.css';
+import { formatCurrency } from '../../utils/formatting';
 
 /**
  * A specific modal for handling an invoice payment.
- * It allows selecting a payment method and paying a partial amount.
- *
- * @param {object} props
- * @param {boolean} props.isOpen - Whether the modal is open.
- * @param {function} props.onClose - Function to close the modal.
- * @param {object} props.invoiceToPay - The invoice object to be paid.
  */
 const PaymentModal = ({ isOpen, onClose, invoiceToPay }) => {
   const { 
@@ -19,31 +14,28 @@ const PaymentModal = ({ isOpen, onClose, invoiceToPay }) => {
     loading: contextLoading 
   } = useBillingData();
 
-  // --- Internal State ---
   const [selectedMethodId, setSelectedMethodId] = useState('');
   const [paymentAmount, setPaymentAmount] = useState(0);
   const [error, setError] = useState(null);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [currency, setCurrency] = useState('USD'); 
 
-  // --- Effects ---
-
-  // When the modal opens, reset its internal state
   useEffect(() => {
     if (isOpen && invoiceToPay) {
-      // 1. Set the payment amount to the full amount due
-      setPaymentAmount(invoiceToPay.financialSummary.amountDue.toFixed(2));
+      const amountDue = invoiceToPay.financialSummary.amountDue.amount;
+      const currencyCode = invoiceToPay.financialSummary.amountDue.currency;
+
+      setPaymentAmount(amountDue.toFixed(2));
+      setCurrency(currencyCode);
       
-      // 2. Find and select the default payment method
       const defaultMethod = paymentMethods.find(pm => pm.isDefault);
+      // --- 2. LOGIC IS FINE, just ensure paymentMethods[0] exists ---
       setSelectedMethodId(defaultMethod ? defaultMethod.id : (paymentMethods[0]?.id || ''));
       
-      // 3. Clear old errors
       setError(null);
       setIsProcessing(false);
     }
   }, [isOpen, invoiceToPay, paymentMethods]);
-
-  // --- Event Handlers ---
 
   const handleAmountChange = (e) => {
     if (error) setError(null);
@@ -54,16 +46,14 @@ const PaymentModal = ({ isOpen, onClose, invoiceToPay }) => {
     setSelectedMethodId(e.target.value);
   };
 
-  // Main submission handler
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (isProcessing || contextLoading) return;
 
     setError(null);
     const amount = parseFloat(paymentAmount);
-    const amountDue = invoiceToPay.financialSummary.amountDue;
+    const amountDue = invoiceToPay.financialSummary.amountDue.amount;
 
-    // --- Validation ---
     if (!selectedMethodId) {
       setError("Please select a payment method.");
       return;
@@ -72,17 +62,16 @@ const PaymentModal = ({ isOpen, onClose, invoiceToPay }) => {
       setError("Please enter a valid payment amount.");
       return;
     }
-    // Use a small tolerance for floating point comparisons
     if (amount - amountDue > 0.01) {
-      setError(`Amount cannot exceed the $${amountDue.toFixed(2)} due.`);
+      const formattedAmountDue = formatCurrency({ amount: amountDue, currency });
+      setError(`Amount cannot exceed the ${formattedAmountDue} due.`);
       return;
     }
 
-    // --- Process Payment ---
     setIsProcessing(true);
     try {
-      await makePayment(invoiceToPay.id, amount, selectedMethodId);
-      onClose(); // Success! Close the modal.
+      await makePayment(invoiceToPay.id, amount, selectedMethodId, currency);
+      onClose(); 
     } catch (err) {
       console.error("Payment failed:", err);
       setError(err.message || "Payment failed. Please try again.");
@@ -91,13 +80,26 @@ const PaymentModal = ({ isOpen, onClose, invoiceToPay }) => {
     }
   };
 
-  // Prevent modal from rendering if not open
+  // --- 3. HELPER TO RENDER OPTION TEXT ---
+  const getMethodTitle = (pm) => {
+    switch (pm.type) {
+      case 'card':
+        return `${pm.cardType} **** ${pm.lastFour} ${pm.isDefault ? '(Default)' : ''}`;
+      case 'bank':
+        return `${pm.bankName} (....${pm.lastFour}) ${pm.isDefault ? '(Default)' : ''}`;
+      case 'online':
+        return `${pm.serviceName} ${pm.isDefault ? '(Default)' : ''}`;
+      default:
+        return 'Unknown Method';
+    }
+  };
+
   if (!isOpen || !invoiceToPay) {
     return null;
   }
 
-  // Combine loading states
   const isLoading = contextLoading || isProcessing;
+  const amountToPay = parseFloat(paymentAmount || 0);
 
   return (
     <div 
@@ -111,7 +113,6 @@ const PaymentModal = ({ isOpen, onClose, invoiceToPay }) => {
         className={`card ${styles.modalCard}`} 
         onClick={(e) => e.stopPropagation()}
       >
-        {/* --- Modal Header --- */}
         <div className={styles.modalHeader}>
           <h2 id="payment-modal-title" className={styles.modalTitle}>
             Pay Invoice #{invoiceToPay.invoiceNumber}
@@ -126,15 +127,16 @@ const PaymentModal = ({ isOpen, onClose, invoiceToPay }) => {
           </button>
         </div>
 
-        {/* --- Modal Body (The Form) --- */}
         <form onSubmit={handleSubmit}>
           <div className={styles.modalBody}>
             <p className={styles.totalDue}>
               Total Amount Due: 
-              <strong>${invoiceToPay.financialSummary.amountDue.toFixed(2)}</strong>
+              <strong>
+                {formatCurrency(invoiceToPay.financialSummary.amountDue)}
+              </strong>
             </p>
 
-            {/* --- 1. Payment Method Select --- */}
+            {/* --- 4. UPDATED PAYMENT METHOD SELECT --- */}
             <div className="form-group">
               <label htmlFor="paymentMethod">Pay with</label>
               <select
@@ -145,20 +147,20 @@ const PaymentModal = ({ isOpen, onClose, invoiceToPay }) => {
                 className={styles.select}
                 disabled={isLoading}
               >
-                <option value="" disabled>Select a card...</option>
+                <option value="" disabled>Select a payment method...</option>
                 {paymentMethods.map(pm => (
                   <option key={pm.id} value={pm.id}>
-                    {pm.cardType} **** {pm.lastFour} {pm.isDefault ? '(Default)' : ''}
+                    {getMethodTitle(pm)}
                   </option>
                 ))}
               </select>
             </div>
             
-            {/* --- 2. Payment Amount Input (Partial Payment) --- */}
             <div className="form-group">
               <label htmlFor="paymentAmount">Amount to pay</label>
               <div className={styles.amountInputWrapper}>
-                <span>$</span>
+                {/* --- 5. UPDATED CURRENCY SPAN --- */}
+                <span className={styles.currencySymbol}>{currency}</span> 
                 <input
                   type="number"
                   id="paymentAmount"
@@ -168,7 +170,7 @@ const PaymentModal = ({ isOpen, onClose, invoiceToPay }) => {
                   disabled={isLoading}
                   step="0.01"
                   min="0.01"
-                  max={invoiceToPay.financialSummary.amountDue.toFixed(2)}
+                  max={invoiceToPay.financialSummary.amountDue.amount.toFixed(2)}
                 />
               </div>
             </div>
@@ -178,7 +180,6 @@ const PaymentModal = ({ isOpen, onClose, invoiceToPay }) => {
             )}
           </div>
 
-          {/* --- Modal Footer (Actions) --- */}
           <div className={styles.modalFooter}>
             <button 
               type="button" 
@@ -192,7 +193,9 @@ const PaymentModal = ({ isOpen, onClose, invoiceToPay }) => {
               type="submit" 
               disabled={isLoading || !selectedMethodId}
             >
-              {isProcessing ? 'Processing...' : `Pay $${parseFloat(paymentAmount || 0).toFixed(2)}`}
+              {isProcessing ? 'Processing...' : 
+                `Pay ${formatCurrency({ amount: amountToPay, currency })}`
+              }
             </button>
           </div>
         </form>

@@ -4,7 +4,7 @@
     "patientId": "patient-uuid-001",
     "originalPaymentId": "pay-uuid-002",
     "refundDate": "2026-01-12",
-    "amount": 150.00,
+    "amount": { "amount": 150.00, "currency": "USD" },
     "method": "Check",
     "reason": "Patient overpaid and requested unapplied credit be refunded.",
     "transactionDetails": {

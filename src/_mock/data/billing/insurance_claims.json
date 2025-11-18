@@ -10,22 +10,22 @@
     "submissionType": "Electronic",
     "submissionDate": "2025-11-21T00:00:00Z",
     "carrierClaimId": "C-987654321",
-    "totalCharge": 170.00,
-    "totalPaid": 136.00,
-    "patientResponsibility": 34.00,
+    "totalCharge": { "amount": 170.00, "currency": "USD" },
+    "totalPaid": { "amount": 136.00, "currency": "USD" },
+    "patientResponsibility": { "amount": 34.00, "currency": "USD" },
     "adjudicationDate": "2025-12-05T00:00:00Z",
     "eobDocumentId": "doc-uuid-003",
     "lineItems": [
       {
         "procedureId": "D1110",
-        "charge": 120.00,
-        "paid": 96.00,
+        "charge": { "amount": 120.00, "currency": "USD" },
+        "paid": { "amount": 96.00, "currency": "USD" },
         "reasonCode": "CO-1"
       },
       {
         "procedureId": "D0120",
-        "charge": 50.00,
-        "paid": 40.00,
+        "charge": { "amount": 50.00, "currency": "USD" },
+        "paid": { "amount": 40.00, "currency": "USD" },
         "reasonCode": "CO-1"
       }
     ]

@@ -3,7 +3,7 @@
     "id": "pay-uuid-001",
     "patientId": "patient-uuid-001",
     "paymentDate": "2025-11-22",
-    "amount": 170.00,
+    "amount": { "amount": 170.00, "currency": "USD" },
     "method": "Credit Card (Online)",
     "status": "Succeeded",
     "transactionDetails": {
@@ -15,10 +15,10 @@
     "allocations": [
       {
         "invoiceId": "inv-uuid-001",
-        "amountApplied": 170.00
+        "amountApplied": { "amount": 170.00, "currency": "USD" }
       }
     ],
-    "unappliedAmount": 0.00,
+    "unappliedAmount": { "amount": 0.00, "currency": "USD" },
     "systemInfo": {
       "createdAt": "2025-11-22T09:30:00Z",
       "createdBy": "System-Online-Payment"
@@ -28,7 +28,7 @@
     "id": "pay-uuid-002",
     "patientId": "patient-uuid-001",
     "paymentDate": "2026-01-10",
-    "amount": 500.00,
+    "amount": { "amount": 500.00, "currency": "USD" },
     "method": "Check",
     "status": "Succeeded",
     "transactionDetails": {
@@ -38,10 +38,10 @@
     "allocations": [
       {
         "invoiceId": "inv-uuid-002",
-        "amountApplied": 350.00
+        "amountApplied": { "amount": 350.00, "currency": "USD" }
       }
     ],
-    "unappliedAmount": 150.00,
+    "unappliedAmount": { "amount": 150.00, "currency": "USD" },
     "systemInfo": {
       "createdAt": "2026-01-10T11:00:00Z",
       "createdBy": "user-uuid-staff-001"
