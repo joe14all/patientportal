@@ -88,38 +88,6 @@
   }
 }
 
-/* ... (all existing .overlay, .modalCard, .modalHeader, etc. styles) ... */
-
-.modalBody p {
-  font-size: 1rem;
-  color: var(--text-secondary);
-  margin: 0;
-}
-.modalBody p + p {
-  margin-top: 1rem;
-}
-
-.modalFooter {
-  display: flex;
-  flex-direction: column-reverse; /* Mobile-first: stack buttons */
-  gap: 0.75rem;
-  padding: 1rem 1.5rem;
-  border-top: 1px solid var(--border-color);
-  background-color: var(--bg-surface-hover);
-}
-
-/* ... (existing .modalFooter button styles) ... */
-
-/* --- 1. NEW STYLE --- */
-.modalErrorText {
-  color: var(--error-500);
-  font-weight: 500;
-  font-size: 0.875rem;
-  text-align: center;
-  margin-top: 1.5rem; /* Space it from the children */
-  margin-bottom: 0; /* Remove default p margin */
-}
-
-.modalFooter button {
-  width: auto; /* Auto-width on desktop */
-}
+/* The .modalErrorText style was here, but it's no longer used 
+  by the Modal.jsx component, so it has been removed.
+*/

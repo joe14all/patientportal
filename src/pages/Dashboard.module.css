@@ -1,6 +1,5 @@
-.pageWrapper {
-  /* No styles needed, just a container */
-}
+/* .pageWrapper {
+} */
 
 .pageDescription {
   font-size: 1rem;
@@ -57,6 +56,8 @@ body.dark .alertCard strong {
   flex-direction: column;
   cursor: pointer;
   transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+  /* --- NEW: Set a min-height for consistency --- */
+  min-height: 180px;
 }
 
 .widgetCard:hover {
@@ -98,11 +99,24 @@ body.dark .alertCard strong {
 
 .widgetContent {
   flex-grow: 1;
+  /* --- NEW: Use flex to push action text to bottom --- */
+  display: flex;
+  flex-direction: column;
 }
 .widgetContent p {
   margin: 0.25rem 0 0;
   color: var(--text-secondary);
 }
+
+/* --- Action Text (pushes to bottom) --- */
+.actionText {
+  margin-top: auto !important; /* Pushes to bottom */
+  padding-top: 0.5rem; /* Space above */
+  font-weight: 500;
+  font-size: 0.875rem;
+  color: var(--primary) !important;
+}
+
 
 /* --- Appointment Widget --- */
 .apptDate {
@@ -162,4 +176,40 @@ body.dark .alertCard strong {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+/* --- NEW: Treatment Plan Widget --- */
+.planName {
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--text-primary) !important;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.planCost {
+  font-size: 0.9rem;
+  color: var(--text-secondary) !important;
+}
+
+/* --- NEW: Medical History Widget --- */
+.historyText {
+  font-size: 1rem;
+  color: var(--text-primary) !important;
+}
+.historyDate {
+  font-size: 0.875rem;
+  color: var(--text-secondary) !important;
+}
+
+/* --- NEW: Forms Widget --- */
+.formName {
+  font-size: 1rem;
+  color: var(--text-primary) !important;
+}
+.formType {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--text-secondary) !important;
+  text-transform: capitalize;
 }

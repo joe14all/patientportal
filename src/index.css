@@ -162,7 +162,7 @@ button {
   background-color: var(--primary);
   color: var(--text-inverted);
 }
-button:hover {
+button:hover:not(:disabled) { /* --- MODIFIED --- */
   background-color: var(--primary-hover);
 }
 button:focus,
@@ -171,14 +171,21 @@ button:focus-visible {
   outline-offset: 2px;
 }
 
+/* --- ADDED THIS RULE --- */
+button:disabled,
+button[disabled] {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 /* Secondary/Ghost Button Style */
 button.secondary {
   background-color: var(--bg-surface);
   color: var(--primary);
   border-color: var(--primary);
 }
-button.secondary:hover {
-  background-color: var(--primary-light);
+button.secondary:hover:not(:disabled) {
+  background-color: var(--bg-surface-hover); /* CHANGED from --primary-light */
 }
 
 /* 5. GLOBAL FORM & INPUT STYLES */

@@ -10,14 +10,21 @@ import {
 import { 
   IconAppointments, 
   IconBilling, 
-  IconMessages 
+  IconMessages,
+  IconTreatmentPlan, // --- ADDED ---
+  IconMedicalHistory, // --- ADDED ---
+  IconDocuments, // --- ADDED ---
 } from '../layouts/components/Icons';
+import { formatCurrency } from '../utils/formatting'; // --- ADDED ---
 import styles from './Dashboard.module.css';
+
+// --- This is our app's "current" time ---
+const MOCK_TODAY = new Date('2025-11-15T12:00:00Z');
 
 const Dashboard = () => {
   const navigate = useNavigate();
-  const { patient, alerts } = usePatientData();
-  const { appointments } = useClinicalData();
+  const { patient, alerts, consents, medicalHistory } = usePatientData();
+  const { appointments, treatmentPlans } = useClinicalData();
   const { billingInvoices } = useBillingData();
   const { messageThreads } = useEngagementData();
   const { getProviderById } = useCoreData();
@@ -31,8 +38,9 @@ const Dashboard = () => {
 
   // 2. Find next upcoming appointment
   const nextAppointment = useMemo(() => {
+    // --- FIX: Use mock today's date for consistent filtering ---
     const upcoming = [...appointments]
-      .filter(a => new Date(a.startDateTime) > new Date() && a.status === 'Confirmed')
+      .filter(a => new Date(a.startDateTime) > MOCK_TODAY && a.status === 'Confirmed')
       .sort((a, b) => new Date(a.startDateTime) - new Date(b.startDateTime));
     return upcoming[0];
   }, [appointments]);
@@ -46,10 +54,30 @@ const Dashboard = () => {
 
   // 4. Calculate total outstanding balance
   const totalDue = useMemo(() => {
+    // --- FIX: Access the .amount property of the money object ---
     return billingInvoices.reduce((total, inv) => {
-      return total + (inv.financialSummary.amountDue || 0);
+      return total + (inv.financialSummary.amountDue?.amount || 0);
     }, 0);
   }, [billingInvoices]);
+
+  // --- 5. NEW: Find a pending treatment plan ---
+  const pendingPlan = useMemo(() => {
+    return [...treatmentPlans]
+      .filter(plan => plan.status === 'Proposed')
+      .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))[0]; // Get most recent
+  }, [treatmentPlans]);
+
+  // --- 6. NEW: Find a pending consent form ---
+  const pendingConsent = useMemo(() => {
+    return consents.find(c => c.status === 'Pending');
+  }, [consents]);
+
+  // --- 7. NEW: Get last medical history update date ---
+  const lastHistoryUpdate = useMemo(() => {
+    if (!medicalHistory || medicalHistory.length === 0) return null;
+    return medicalHistory[0].submissionDate; // Assumes first is current
+  }, [medicalHistory]);
+
 
   return (
     <div className={styles.pageWrapper}>
@@ -93,6 +121,33 @@ const Dashboard = () => {
           onClick={() => navigate(unreadThread ? `/messages/${unreadThread.id}` : '/messages')}
         >
           <MessageContent thread={unreadThread} />
+        </WidgetCard>
+
+        {/* --- NEW: Pending Treatment Plan --- */}
+        <WidgetCard
+          title="Treatment Plan"
+          icon={<IconTreatmentPlan />}
+          onClick={() => navigate('/plans')}
+        >
+          <TreatmentPlanContent plan={pendingPlan} />
+        </WidgetCard>
+
+        {/* --- NEW: Medical History --- */}
+        <WidgetCard
+          title="Medical History"
+          icon={<IconMedicalHistory />}
+          onClick={() => navigate('/history')}
+        >
+          <MedicalHistoryContent lastUpdate={lastHistoryUpdate} />
+        </WidgetCard>
+
+        {/* --- NEW: Forms to Sign --- */}
+        <WidgetCard
+          title="Forms to Sign"
+          icon={<IconDocuments />}
+          onClick={() => navigate('/documents')} // Send user to documents page
+        >
+          <PendingConsentContent consent={pendingConsent} />
         </WidgetCard>
 
       </div>
@@ -154,7 +209,10 @@ const BillingContent = ({ totalDue }) => (
   <>
     {totalDue > 0 ? (
       <>
-        <p className={styles.billingDue}>${totalDue.toFixed(2)}</p>
+        {/* --- FIX: Use formatter and pass money object --- */}
+        <p className={styles.billingDue}>
+          {formatCurrency({ amount: totalDue, currency: 'USD' })}
+        </p>
         <p className={styles.billingStatus}>Total Amount Due</p>
       </>
     ) : (
@@ -180,5 +238,43 @@ const MessageContent = ({ thread }) => (
     )}
   </>
 );
+
+// --- NEW: Content for Treatment Plan Widget ---
+const TreatmentPlanContent = ({ plan }) => {
+  if (!plan) return <p>No treatment plans require your review.</p>;
+  return (
+    <>
+      <p className={styles.planName}>{plan.planName}</p>
+      <p className={styles.planCost}>
+        Est. Patient Cost: {formatCurrency(plan.financialSummary.totalEstimatedPatientPortion)}
+      </p>
+      <p className={styles.actionText}>Click to review and accept.</p>
+    </>
+  );
+};
+
+// --- NEW: Content for Medical History Widget ---
+const MedicalHistoryContent = ({ lastUpdate }) => {
+  const lastUpdateDate = lastUpdate ? new Date(lastUpdate).toLocaleDateString() : 'N/A';
+  return (
+    <>
+      <p className={styles.historyText}>Help us keep your records up to date.</p>
+      <p className={styles.historyDate}>Last reviewed: {lastUpdateDate}</p>
+      <p className={styles.actionText}>Click to review or update.</p>
+    </>
+  );
+};
+
+// --- NEW: Content for Pending Consent Widget ---
+const PendingConsentContent = ({ consent }) => {
+  if (!consent) return <p>You have no new forms to sign.</p>;
+  return (
+    <>
+      <p className={styles.formName}>You have a new form to sign:</p>
+      <p className={styles.formType}>{consent.type.replace('_', ' ')}</p>
+      <p className={styles.actionText}>Click here to review and sign.</p>
+    </>
+  );
+};
 
 export default Dashboard;

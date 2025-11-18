@@ -100,6 +100,8 @@ const VisitSummary = () => {
               ))}
             </ul>
           </div>
+          
+          {/* --- THIS BLOCK IS MODIFIED --- */}
           <div className={`card ${styles.nextStepsCard}`}>
             <h2>Next Steps</h2>
             <p>{summary.nextSteps.nextVisitReason}</p>
@@ -108,7 +110,14 @@ const VisitSummary = () => {
                 Recommended Date: {new Date(summary.nextSteps.nextVisitRecommendedDate).toLocaleDateString(undefined, { timeZone: 'UTC', month: 'long', year: 'numeric' })}
               </span>
             )}
+            
+            {/* --- THIS IS THE NEW LINK --- */}
+            <Link to="/appointments" className={styles.scheduleButton}>
+              Schedule Appointment
+            </Link>
           </div>
+          {/* --- END MODIFIED BLOCK --- */}
+
         </div>
       </div>
     </div>

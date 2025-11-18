@@ -32,7 +32,14 @@
 }
 
 .syncButton:hover {
-  background-color: var(--primary-light);
+  background-color: var(--bg-surface-hover);
+  color: var(--primary-50);
+}
+
+/* --- ADD THIS TO OVERRIDE THE BLUE FOCUS RING --- */
+.syncButton:focus,
+.syncButton:focus-visible {
+  outline: 4px auto var(--text-secondary); /* Use a neutral gray for the outline */
 }
 
 .syncButton .icon {

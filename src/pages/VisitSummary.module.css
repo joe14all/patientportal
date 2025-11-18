@@ -1,6 +1,5 @@
-.pageWrapper {
-  /* No styles needed */
-}
+/* .pageWrapper {
+} */
 
 .pageHeader {
   margin-bottom: 2rem;
@@ -123,3 +122,25 @@
   margin-top: 0.25rem;
   display: block;
 }
+
+/* --- ADD THIS NEW STYLE --- */
+.scheduleButton {
+  /* Use styles from a secondary button */
+  display: inline-flex;
+  background-color: var(--bg-surface);
+  color: var(--primary);
+  border: 1px solid var(--primary);
+  padding: 0.5rem 1rem;
+  font-size: 0.9rem;
+  font-weight: 500;
+  border-radius: 0.5rem;
+  text-decoration: none;
+  margin-top: 1rem;
+  width: fit-content; /* Make button only as wide as its content */
+}
+
+.scheduleButton:hover {
+  background-color: var(--bg-surface-hover);
+  text-decoration: none;
+}
+/* --- END NEW STYLE --- */

@@ -51,8 +51,6 @@ const AddInsuranceForm = ({ onSuccess, onCancel }) => {
     if (loading) return;
     setError(null);
 
-    // --- THIS IS THE FIX ---
-
     // 1. Validate the fields that are *always* required
     if (!formData.carrier.name || !formData.plan.policyNumber) {
       setError("Please fill in all required fields (Carrier Name and Policy #).");
@@ -62,19 +60,16 @@ const AddInsuranceForm = ({ onSuccess, onCancel }) => {
     // 2. Conditionally validate the subscriber fields
     if (formData.subscriber.relationshipToPatient !== 'Self') {
       if (!formData.subscriber.firstName || !formData.subscriber.lastName) {
-        // Use the original error message if this part fails
         setError("Please fill in all required fields (Carrier, Policy #, and Subscriber Name).");
         return;
       }
     }
-    // --- END FIX ---
 
     try {
       // Prepare the data (it's already in the correct nested structure)
       const newPolicyData = {
         ...formData,
         status: "Active", // Set new policies to Active
-        // Add other required fields by the context
         patientId: "patient-uuid-001", // This would come from context
         documentIds: { front: null, back: null }, // User would upload these separately
       };
@@ -104,20 +99,26 @@ const AddInsuranceForm = ({ onSuccess, onCancel }) => {
             onChange={(e) => handleNestedChange('carrier', e.target.name, e.target.value)}
             disabled={loading}
             placeholder="e.g., Delta Dental"
+            required
           />
         </div>
+        
+        {/* --- THIS GRID IS MODIFIED --- */}
         <div className={styles.grid}>
           <div className="form-group">
-            <label htmlFor="planName">Plan Name (Optional)</label>
-            <input
-              type="text"
-              id="planName"
-              name="planName"
-              value={formData.plan.planName}
-              onChange={(e) => handleNestedChange('plan', e.target.name, e.target.value)}
+            <label htmlFor="coveragePriority">Coverage Priority</label>
+            <select
+              id="coveragePriority"
+              name="coveragePriority"
+              value={formData.coveragePriority}
+              onChange={handleChange} // <-- FIX: Using handleChange
+              className={styles.select}
               disabled={loading}
-              placeholder="e.g., PPO 2000"
-            />
+            >
+              {COVERAGE_PRIORITY.map(type => (
+                <option key={type} value={type}>{type}</option>
+              ))}
+            </select>
           </div>
           <div className="form-group">
             <label htmlFor="planType">Plan Type</label>
@@ -135,16 +136,33 @@ const AddInsuranceForm = ({ onSuccess, onCancel }) => {
             </select>
           </div>
         </div>
+
+        {/* --- THIS FIELD IS MOVED (Full Width) --- */}
+        <div className="form-group">
+          <label htmlFor="policyNumber">Policy / Member ID</label>
+          <input
+            type="text"
+            id="policyNumber"
+            name="policyNumber"
+            value={formData.plan.policyNumber}
+            onChange={(e) => handleNestedChange('plan', e.target.name, e.target.value)}
+            disabled={loading}
+            required
+          />
+        </div>
+
+        {/* --- THIS GRID IS MODIFIED --- */}
         <div className={styles.grid}>
           <div className="form-group">
-            <label htmlFor="policyNumber">Policy / Member ID</label>
+            <label htmlFor="planName">Plan Name (Optional)</label>
             <input
               type="text"
-              id="policyNumber"
-              name="policyNumber"
-              value={formData.plan.policyNumber}
+              id="planName"
+              name="planName"
+              value={formData.plan.planName}
               onChange={(e) => handleNestedChange('plan', e.target.name, e.target.value)}
               disabled={loading}
+              placeholder="e.g., PPO 2000"
             />
           </div>
           <div className="form-group">
@@ -192,6 +210,7 @@ const AddInsuranceForm = ({ onSuccess, onCancel }) => {
                   value={formData.subscriber.firstName}
                   onChange={(e) => handleNestedChange('subscriber', e.target.name, e.target.value)}
                   disabled={loading}
+                  required
                 />
               </div>
               <div className="form-group">
@@ -203,6 +222,7 @@ const AddInsuranceForm = ({ onSuccess, onCancel }) => {
                   value={formData.subscriber.lastName}
                   onChange={(e) => handleNestedChange('subscriber', e.target.name, e.target.value)}
                   disabled={loading}
+                  required
                 />
               </div>
             </div>
