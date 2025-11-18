@@ -9,18 +9,18 @@
     }
   ],
   "legalName": {
-    "fullText": "Mrs. Jane Elizabeth Doe",
-    "family": "Doe",
-    "given": ["Jane", "Elizabeth"],
-    "prefix": "Mrs.",
+    "fullText": "Mr. Joseph Shenouda",
+    "family": "Shenouda",
+    "given": ["Joseph"],
+    "prefix": "Mr.",
     "suffix": null
   },
-  "preferredName": "Jane",
+  "preferredName": "Joe",
   "dateOfBirth": "1990-05-15",
   "demographics": {
-    "genderIdentity": "Woman",
-    "sexAtBirth": "Female",
-    "pronouns": "she/her",
+    "genderIdentity": "Man",
+    "sexAtBirth": "Male",
+    "pronouns": "he/him",
     "ethnicity": "Not Hispanic or Latino",
     "race": ["White"],
     "maritalStatus": "Married"
@@ -37,7 +37,7 @@
     ],
     "emails": [
       {
-        "address": "jane.doe@example.com",
+        "address": "joseph.shenouda@example.com",
         "isPrimary": true,
         "isVerified": true
       }
