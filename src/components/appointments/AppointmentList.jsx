@@ -1,10 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import AppointmentCard from './AppointmentCard';
+import { IconChevronDown } from '../../layouts/components/Icons';
 import styles from './AppointmentList.module.css';
 
 /**
  * Renders the sections for "Upcoming" and "Past" appointments.
- * It takes the lists and renders AppointmentCard components for each item.
+ * "Past Appointments" is collapsible and collapsed by default.
  */
 const AppointmentList = ({ 
   upcoming, 
@@ -14,9 +15,13 @@ const AppointmentList = ({
   onCheckIn, 
   loading 
 }) => {
+  // State to toggle past appointments visibility. 
+  // Default is false (collapsed/hidden).
+  const [isPastExpanded, setIsPastExpanded] = useState(false);
+
   return (
     <>
-      {/* --- Upcoming Appointments --- */}
+      {/* --- Upcoming Appointments (Always Visible) --- */}
       <section className={styles.section}>
         <h2>Upcoming Appointments</h2>
         {loading && !upcoming.length && <p>Loading appointments...</p>}
@@ -28,7 +33,7 @@ const AppointmentList = ({
                 appt={appt} 
                 onCancel={onCancel}
                 onReschedule={onReschedule}
-                onCheckIn={onCheckIn} // <--- 2. PASS PROP
+                onCheckIn={onCheckIn}
                 isLoading={loading}
                 isPast={false}
               />
@@ -39,25 +44,40 @@ const AppointmentList = ({
         )}
       </section>
 
-      {/* --- Past Appointments --- */}
+      {/* --- Past Appointments (Collapsible) --- */}
       <section className={styles.section}>
-        <h2>Past Appointments</h2>
-        {loading && !past.length && <p>Loading appointments...</p>}
-        {past.length > 0 ? (
-          <div className={styles.appointmentList}>
-            {past.map(appt => (
-              <AppointmentCard 
-                key={appt.id} 
-                appt={appt}
-                onCancel={onCancel}
-                onReschedule={onReschedule}
-                isLoading={loading}
-                isPast={true} 
-              />
-            ))}
-          </div>
-        ) : (
-          !loading && <p>You have no past appointments.</p>
+        <div 
+          className={styles.headerRow} 
+          onClick={() => setIsPastExpanded(prev => !prev)}
+          role="button"
+          tabIndex={0}
+        >
+          <h2>Past Appointments</h2>
+          <IconChevronDown 
+            className={`${styles.chevron} ${isPastExpanded ? styles.expanded : ''}`} 
+          />
+        </div>
+
+        {isPastExpanded && (
+          <>
+            {loading && !past.length && <p>Loading appointments...</p>}
+            {past.length > 0 ? (
+              <div className={styles.appointmentList}>
+                {past.map(appt => (
+                  <AppointmentCard 
+                    key={appt.id} 
+                    appt={appt}
+                    onCancel={onCancel}
+                    onReschedule={onReschedule}
+                    isLoading={loading}
+                    isPast={true} 
+                  />
+                ))}
+              </div>
+            ) : (
+              !loading && <p>You have no past appointments.</p>
+            )}
+          </>
         )}
       </section>
     </>

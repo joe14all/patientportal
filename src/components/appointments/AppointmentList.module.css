@@ -1,12 +1,17 @@
- /* These styles are moved from /src/pages/Appointments.module.css 
-*/
+/* These styles are moved from /src/pages/Appointments.module.css */
 
 .section {
   margin-bottom: 2.5rem;
 }
 
+/* Base H2 styling */
 .section h2 {
   font-size: 1.25rem;
+  color: var(--text-primary);
+}
+
+/* Specific styling for the Upcoming header (non-collapsible) */
+.section > h2 {
   margin-bottom: 1rem;
   border-bottom: 1px solid var(--border-color);
   padding-bottom: 0.5rem;
@@ -16,4 +21,39 @@
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
+}
+
+/* --- Collapsible Header Styles --- */
+.headerRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--border-color);
+  margin-bottom: 1rem;
+  transition: background-color 0.2s ease;
+}
+
+.headerRow:hover {
+  background-color: var(--bg-surface-hover);
+}
+
+/* Override the base H2 margin/border inside the flex header */
+.headerRow h2 {
+  margin: 0;
+  border: none;
+  padding: 0;
+}
+
+.chevron {
+  width: 24px;
+  height: 24px;
+  color: var(--text-secondary);
+  transition: transform 0.3s ease;
+}
+
+/* Rotate icon when expanded */
+.expanded {
+  transform: rotate(180deg);
 }
