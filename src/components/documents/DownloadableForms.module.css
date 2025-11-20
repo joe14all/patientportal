@@ -1,195 +1,271 @@
-.formsCard {
-  margin-bottom: 2.5rem;
-  padding: 1.5rem;
+/* =========================================
+   CONTAINER & HEADER
+   ========================================= */
+.container {
+  background-color: var(--bg-surface);
+  border-radius: 0.75rem;
+  border: 1px solid var(--border-color);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 2rem;
 }
 
 .header {
-  margin-bottom: 1.5rem;
-  border-bottom: 1px solid var(--border-color);
-  padding-bottom: 1rem;
-}
-
-.formGrid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 1rem;
-}
-
-@media (min-width: 768px) {
-  .formGrid {
-    grid-template-columns: 1fr 1fr;
-  }
-}
-
-.formItem {
   display: flex;
-  flex-direction: column;
-  padding: 1.25rem;
-  border: 1px solid var(--border-color);
-  border-radius: 0.75rem;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
   background-color: var(--bg-body);
-  transition: all 0.2s ease;
+  border-bottom: 1px solid var(--border-color);
 }
 
-/* Status-based borders */
-.formItem.rejected { border-left: 4px solid var(--error-500); }
-.formItem.expired { border-left: 4px solid var(--warning-500); }
-.formItem.complete { border-left: 4px solid var(--success-500); background-color: var(--bg-surface); }
-.formItem.pending { border-left: 4px solid var(--neutral-400); }
-
-.itemHeader {
-  display: flex;
-  align-items: flex-start;
-  gap: 1rem;
-  margin-bottom: 1rem;
-}
-
-.iconWrapper {
-  color: var(--primary);
-  margin-top: 0.2rem;
-}
-
-.formInfo {
-  flex-grow: 1;
-}
-
-.formInfo strong {
-  display: block;
+.header h3 {
+  margin: 0;
   font-size: 1rem;
+  font-weight: 600;
   color: var(--text-primary);
 }
 
-.freq {
+/* =========================================
+   LIST GRID SYSTEM
+   ========================================= */
+.listGroup {
+  display: flex;
+  flex-direction: column;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 24px 1fr auto; 
+  align-items: start; /* Uplift alignment */
+  gap: 0.75rem;
+  padding: 1rem;
+  border-bottom: 1px solid var(--border-color);
+  background-color: var(--bg-surface);
+  transition: background-color 0.2s ease;
+  min-height: 60px;
+}
+
+.row:last-child { border-bottom: none; }
+.row:hover { background-color: var(--bg-surface-hover); }
+.rowError { background-color: var(--error-bg-subtle); }
+
+.listHeader { display: none; }
+
+/* =========================================
+   COLUMN 1: STATUS
+   ========================================= */
+.statusCol {
+  display: flex;
+  justify-content: center;
+  padding-top: 0.15rem; 
+}
+
+.statusIcon {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+}
+
+/* Icon Colors */
+.statusIcon.complete { color: var(--success-500); }
+.statusIcon.pending  { color: var(--warning-500); }
+.statusIcon.error    { color: var(--error-500); }
+
+/* Missing (Red Dot) */
+.statusIcon.missing {
+  width: 12px; 
+  height: 12px;
+  background-color: var(--error-500);
+  border-radius: 50%;
+  margin-top: 4px;
+}
+
+/* Optional (Gray Hollow Circle) - NEW */
+.statusIcon.optional {
+  width: 12px; 
+  height: 12px;
+  border: 2px solid var(--neutral-400); /* Gray border */
+  border-radius: 50%;
+  margin-top: 4px;
+}
+
+.statusBadge { display: none; }
+
+/* =========================================
+   COLUMN 2: INFO
+   ========================================= */
+.infoCol {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  min-width: 0;
+  gap: 0.25rem;
+}
+
+.fileIconBig { display: none; }
+
+.textWrapper {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.title {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  white-space: normal;
+  line-height: 1.3;
+}
+
+.meta {
   font-size: 0.8rem;
   color: var(--text-secondary);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-
-/* --- Badges --- */
-.badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.3rem;
-  font-size: 0.75rem;
-  font-weight: 600;
-  padding: 0.2rem 0.6rem;
-  border-radius: 99px;
-  text-transform: uppercase;
-}
-
-/* Light Mode Colors */
-.success { background-color: var(--success-100); color: var(--success-500); }
-.warning { background-color: var(--warning-100); color: var(--warning-500); }
-.error   { background-color: var(--error-100); color: var(--error-500); }
-.neutral { background-color: var(--neutral-200); color: var(--neutral-800); }
-
-/* Dark Mode Colors - High Contrast Updates */
-body.dark .success { 
-  background-color: var(--success-bg); 
-  color: var(--success-500); 
-  border: 1px solid var(--success-bg);
-}
-body.dark .warning { 
-  background-color: var(--warning-bg); 
-  color: var(--warning-500); 
-  border: 1px solid var(--warning-bg);
-}
-body.dark .error { 
-  background-color: var(--error-bg);   
-  color: var(--error-500);   
-  border: 1px solid var(--error-bg);
-}
-body.dark .neutral { 
-  background-color: var(--bg-surface-hover); 
-  color: var(--text-secondary); 
-  border: 1px solid var(--border-color); 
-}
-
-
-/* --- Messages --- */
-.feedbackMsg {
-  font-size: 0.85rem;
-  color: var(--error-500);
-  background-color: var(--error-100);
-  padding: 0.5rem;
-  border-radius: 0.25rem;
-  margin-bottom: 1rem;
-}
-body.dark .feedbackMsg {
-  background-color: var(--error-bg);
-  color: var(--error-500);
-}
-
-.expired .feedbackMsg {
-  color: var(--warning-500);
-  background-color: var(--warning-100);
-}
-body.dark .expired .feedbackMsg {
-  background-color: var(--warning-bg);
-  color: var(--warning-500);
-}
-
-/* --- Actions --- */
-.actions {
   display: flex;
-  gap: 1rem;
-  align-items: center;
-  margin-top: auto; /* Push to bottom */
-  padding-top: 1rem;
-  border-top: 1px solid var(--border-color);
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  line-height: 1.2;
+  margin-top: 2px;
 }
 
-.actionLink {
-  font-size: 0.85rem;
-  font-weight: 500;
+.errorText { color: var(--error-500); font-weight: 600; }
+.optionalText { color: var(--text-tertiary); font-style: italic; } /* New style for text */
+
+/* =========================================
+   COLUMN 3: ACTIONS
+   ========================================= */
+.actionCol {
   display: flex;
   align-items: center;
-  gap: 0.4rem;
-  color: var(--primary);
-  text-decoration: none;
+  gap: 0.5rem;
+  align-self: center; 
 }
-.actionLink:hover { text-decoration: underline; }
 
-/* --- UPDATED UPLOAD BUTTON STYLES --- */
-.uploadBtn {
-  margin-left: auto; /* Push to right */
-  font-size: 0.85rem;
-  padding: 0.5rem 1rem; /* Larger padding */
-  
-  /* Layout */
-  display: inline-flex;
+.actionBtn {
+  display: flex;
   align-items: center;
-  gap: 0.5rem; /* Space between icon and text */
-  
-  /* Appearance (Primary Button Style) */
-  background-color: var(--primary);
-  color: var(--text-inverted);
-  border: 1px solid var(--primary);
-  border-radius: 0.5rem;
-  font-weight: 500;
+  justify-content: center;
+  border: none;
   cursor: pointer;
-  transition: background-color 0.2s ease, transform 0.1s ease;
+  transition: all 0.2s ease;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
 }
 
-.uploadBtn:hover:not(:disabled) {
-  background-color: var(--primary-hover);
-  border-color: var(--primary-hover);
+.actionBtn.upload {
+  color: var(--primary); 
+  background-color: var(--bg-surface); 
+  border: 1px solid var(--primary);
+  min-width: 32px; 
+  min-height: 32px;
 }
-
-.uploadBtn:active:not(:disabled) {
-  transform: translateY(1px);
+.actionBtn.upload svg { stroke: currentColor; }
+.actionBtn.upload:hover:not(:disabled) {
+  background-color: var(--primary);
+  color: #ffffff;
 }
-
-.uploadBtn:disabled {
-  opacity: 0.6;
+.actionBtn.upload:disabled {
+  border-color: var(--neutral-300);
+  color: var(--neutral-400);
   cursor: not-allowed;
-  background-color: var(--neutral-400);
-  border-color: var(--neutral-400);
 }
 
-/* Ensure icon fits nicely */
-.uploadBtn svg {
-  width: 16px;
-  height: 16px;
+.actionBtn.download {
+  background-color: transparent;
+  color: var(--text-secondary);
+}
+.actionBtn.download:hover {
+  background-color: var(--neutral-100);
+  color: var(--text-primary);
+}
+
+/* =========================================
+   DESKTOP MEDIA QUERY
+   ========================================= */
+@media (min-width: 768px) {
+  .listHeader {
+    display: grid;
+    grid-template-columns: 120px 1fr 100px; 
+    padding: 0.75rem 1.25rem;
+    background-color: var(--bg-surface-hover);
+    border-bottom: 1px solid var(--border-color);
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+  }
+
+  .row {
+    grid-template-columns: 120px 1fr 100px;
+    padding: 0.85rem 1.25rem;
+    gap: 1rem;
+    align-items: center;
+  }
+
+  .statusCol {
+    justify-content: flex-start;
+    padding-top: 0;
+  }
+
+  .statusIcon { display: none; }
+
+  .statusBadge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.25rem 0.75rem;
+    border-radius: 99px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    min-width: 80px;
+    text-align: center;
+  }
+
+  /* Badge Colors */
+  .statusBadge.complete { background-color: var(--success-100); color: var(--success-700); }
+  .statusBadge.pending  { background-color: var(--warning-100); color: var(--warning-700); }
+  .statusBadge.rejected { background-color: var(--error-100);   color: var(--error-700); }
+  .statusBadge.expired  { background-color: var(--error-100);   color: var(--error-700); }
+  .statusBadge.missing  { background-color: var(--error-100);   color: var(--error-700); }
+  
+  /* Optional Badge - Gray */
+  .statusBadge.optional { 
+    background-color: var(--neutral-100); 
+    color: var(--neutral-600); 
+    border: 1px solid var(--neutral-200);
+  }
+
+  .infoCol {
+    flex-direction: row;
+    align-items: center;
+  }
+
+  .fileIconBig {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    background-color: var(--neutral-100);
+    color: var(--neutral-500);
+    border-radius: 8px;
+    flex-shrink: 0;
+  }
+  
+  .actionBtn {
+    border-radius: 6px;
+    width: 32px;
+    height: 32px;
+  }
+}
+
+body.dark .statusBadge.optional {
+  background-color: var(--bg-surface-hover);
+  color: var(--text-secondary);
+  border-color: var(--border-color);
 }

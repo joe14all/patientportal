@@ -14,30 +14,10 @@ const DownloadableForms = ({ onFormUpload, loading }) => {
   const { downloadableForms } = useCoreData();
   const { documents } = useEngagementData();
   
-  // --- NEW: Refs for handling file upload ---
   const fileInputRef = useRef(null);
   const [activeForm, setActiveForm] = useState(null);
 
-  // --- 1. Trigger the hidden input ---
-  const handleUploadClick = (form) => {
-    setActiveForm(form);
-    // Clear previous value so same file can be selected again if needed
-    if (fileInputRef.current) {
-      fileInputRef.current.value = ''; 
-      fileInputRef.current.click();
-    }
-  };
-
-  // --- 2. Handle file selection ---
-  const handleFileChange = (e) => {
-    if (e.target.files && e.target.files[0] && activeForm) {
-      const file = e.target.files[0];
-      // Pass the file AND the form definition up to the parent
-      onFormUpload(file, activeForm);
-      setActiveForm(null);
-    }
-  };
-
+  // --- Logic: Determine Form Status ---
   const getFormStatus = (formDef) => {
     const linkedDocs = documents.filter(
       doc => doc.linkContext?.type === 'FormDefinition' && 
@@ -45,7 +25,11 @@ const DownloadableForms = ({ onFormUpload, loading }) => {
              doc.systemInfo.status === 'Active'
     );
 
-    if (linkedDocs.length === 0) return { status: 'Missing', doc: null };
+    // 1. If no document found...
+    if (linkedDocs.length === 0) {
+      // Check if it is required or optional
+      return { status: formDef.required ? 'Missing' : 'Optional', doc: null };
+    }
 
     linkedDocs.sort((a, b) => new Date(b.systemInfo.createdAt) - new Date(a.systemInfo.createdAt));
     const latestDoc = linkedDocs[0];
@@ -54,9 +38,11 @@ const DownloadableForms = ({ onFormUpload, loading }) => {
     if (verification.status === 'Rejected') {
       return { status: 'Rejected', doc: latestDoc, reason: verification.reason };
     }
+    
     if (verification.status === 'Pending') {
       return { status: 'Pending', doc: latestDoc };
     }
+    
     if (verification.status === 'Verified') {
       if (formDef.frequency === 'Annually') {
         const oneYearAgo = new Date();
@@ -67,97 +53,138 @@ const DownloadableForms = ({ onFormUpload, loading }) => {
       }
       return { status: 'Complete', doc: latestDoc };
     }
-    return { status: 'Missing', doc: null };
+    
+    // Fallback
+    return { status: formDef.required ? 'Missing' : 'Optional', doc: null };
   };
 
-  const renderStatusBadge = (statusInfo) => {
-    const { status } = statusInfo;
-    switch (status) {
-      case 'Complete':
-        return <span className={`${styles.badge} ${styles.success}`}><IconCheck /> Verified</span>;
-      case 'Pending':
-        return <span className={`${styles.badge} ${styles.warning}`}><IconClock /> In Review</span>;
-      case 'Rejected':
-        return <span className={`${styles.badge} ${styles.error}`}><IconAlertCircle /> Action Needed</span>;
-      case 'Expired':
-        return <span className={`${styles.badge} ${styles.warning}`}>Update Due</span>;
-      default:
-        return <span className={`${styles.badge} ${styles.neutral}`}>To Do</span>;
+  const handleUploadClick = (form) => {
+    setActiveForm(form);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = ''; 
+      fileInputRef.current.click();
+    }
+  };
+
+  const handleFileChange = (e) => {
+    if (e.target.files && e.target.files[0] && activeForm) {
+      const file = e.target.files[0];
+      onFormUpload(file, activeForm); 
+      setActiveForm(null);
     }
   };
 
   return (
-    <section className={`card ${styles.formsCard}`}>
+    <section className={styles.container}>
       <div className={styles.header}>
-        <h2>Required Forms</h2>
-        <p>Please ensure these documents are up to date.</p>
+        <h3>Required Documents</h3>
       </div>
 
-      <div className={styles.formGrid}>
+      <div className={styles.listHeader}>
+        <span style={{textAlign: 'center'}}>Stat</span>
+        <span>Document Details</span>
+        <span style={{textAlign: 'right'}}>Action</span>
+      </div>
+
+      <div className={styles.listGroup}>
         {downloadableForms.map((form) => {
-          const statusInfo = getFormStatus(form);
-          const isComplete = statusInfo.status === 'Complete';
+          const { status, reason } = getFormStatus(form);
+          const isComplete = status === 'Complete';
+          const isOptional = status === 'Optional';
+          const isMissing = status === 'Missing';
           
+          // Only highlight row as error if it's an actual issue
+          const isRowError = status === 'Rejected' || status === 'Expired' || (isMissing && form.required);
+
           return (
-            <div key={form.id} className={`${styles.formItem} ${styles[statusInfo.status.toLowerCase()]}`}>
-              <div className={styles.itemHeader}>
-                <div className={styles.iconWrapper}><IconFileText /></div>
-                <div className={styles.formInfo}>
-                  <strong>{form.title}</strong>
-                  <span className={styles.freq}>{form.frequency === 'Once' ? 'One-time' : form.frequency}</span>
-                </div>
-                <div className={styles.statusWrapper}>{renderStatusBadge(statusInfo)}</div>
+            <div key={form.id} className={`${styles.row} ${isRowError ? styles.rowError : ''}`}>
+              
+              {/* COLUMN 1: STATUS */}
+              <div className={styles.statusCol}>
+                {isComplete && <IconCheck className={`${styles.statusIcon} ${styles.complete}`} />}
+                {status === 'Pending' && <IconClock className={`${styles.statusIcon} ${styles.pending}`} />}
+                {(status === 'Rejected' || status === 'Expired') && <IconAlertCircle className={`${styles.statusIcon} ${styles.error}`} />}
+                
+                {/* Red Dot for Missing */}
+                {isMissing && <div className={`${styles.statusIcon} ${styles.missing}`} />}
+                {/* Gray Circle for Optional */}
+                {isOptional && <div className={`${styles.statusIcon} ${styles.optional}`} />}
+
+                <span className={`${styles.statusBadge} ${styles[status.toLowerCase()]}`}>
+                  {status}
+                </span>
               </div>
 
-              {statusInfo.status === 'Rejected' && (
-                <div className={styles.feedbackMsg}><strong>Issue:</strong> {statusInfo.reason}</div>
-              )}
-              {statusInfo.status === 'Expired' && (
-                <div className={styles.feedbackMsg}>Update Required</div>
-              )}
+              {/* COLUMN 2: INFO */}
+              <div className={styles.infoCol}>
+                <div className={styles.fileIconBig}>
+                  <IconFileText />
+                </div>
+                
+                <div className={styles.textWrapper}>
+                  <div className={styles.title}>{form.title}</div>
+                  <div className={styles.meta}>
+                    {status === 'Rejected' ? (
+                       <span className={styles.errorText}>{reason || 'Resubmission needed'}</span>
+                    ) : status === 'Expired' ? (
+                       <span className={styles.errorText}>Update Required</span>
+                    ) : isMissing ? (
+                       <span className={styles.errorText}>Required</span>
+                    ) : (
+                       <>
+                         <span>{form.frequency === 'Once' ? 'One-time' : 'Annual'}</span>
+                         {isOptional && <span className={styles.optionalText}> (Optional)</span>}
+                       </>
+                    )}
+                  </div>
+                </div>
+              </div>
 
-              <div className={styles.actions}>
+              {/* COLUMN 3: ACTIONS */}
+              <div className={styles.actionCol} style={{justifyContent: 'flex-end'}}>
                 {isComplete ? (
-                  <a 
-                    href={statusInfo.doc.storage.url} 
-                    download={statusInfo.doc.fileName}
-                    className={styles.actionLink}
-                  >
-                    <IconDownload /> Download Signed Copy
-                  </a>
+                  /* SCENARIO 1: COMPLETE - Show NOTHING (Hide download icon) */
+                  null
                 ) : (
+                  /* SCENARIO 2: NOT COMPLETE - Show Template Download + Upload */
                   <>
                     <a 
                       href={form.fileUrl} 
                       download={form.fileName}
-                      className={styles.actionLink}
+                      className={`${styles.actionBtn} ${styles.download}`}
+                      style={{marginRight: '0.5rem'}}
+                      title="Download Template"
                     >
-                      <IconDownload /> Get Blank Form
+                      <IconDownload size={18} />
                     </a>
-                    
-                    {/* --- 3. Wired Up Button --- */}
+
                     <button 
-                      className={styles.uploadBtn}
+                      className={`${styles.actionBtn} ${styles.upload}`}
                       onClick={() => handleUploadClick(form)}
                       disabled={loading}
+                      title="Upload Document"
                     >
-                      <IconUploadCloud /> {loading ? '...' : 'Upload'}
+                      <IconUploadCloud 
+                        width="20" 
+                        height="20" 
+                        style={{ minWidth: '20px', color: 'currentColor' }} 
+                      />
                     </button>
                   </>
                 )}
               </div>
+
             </div>
           );
         })}
       </div>
 
-      {/* --- 4. Hidden Input --- */}
       <input
         type="file"
         ref={fileInputRef}
         style={{ display: 'none' }}
         onChange={handleFileChange}
-        accept="application/pdf,image/*"
+        accept="application/pdf,image/jpeg,image/png"
       />
     </section>
   );

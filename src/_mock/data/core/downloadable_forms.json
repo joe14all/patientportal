@@ -1,42 +1,62 @@
 [
   {
-    "id": "form-reg-001",
-    "title": "New Patient Registration",
-    "description": "Required for all new patients.",
-    "fileName": "Registration_Packet_v2.pdf",
+    "id": "form-admin-001",
+    "title": "Patient Registration & Demographics",
+    "description": "Personal details, emergency contacts, and insurance/syndicate information.",
+    "fileName": "New_Patient_Registration.pdf",
     "fileUrl": "/src/assets/Test/Test.pdf",
     "frequency": "Once",
     "required": true,
     "defaultCategory": "Registration"
   },
   {
-    "id": "form-hipaa-001",
-    "title": "HIPAA Release Authorization",
-    "description": "Authorize us to share your records.",
-    "fileName": "HIPAA_Auth_Form.pdf",
+    "id": "form-clin-001",
+    "title": "Medical & Dental History",
+    "description": "Required health background, allergies, and medication list.",
+    "fileName": "Health_History_Form.pdf",
+    "fileUrl": "/src/assets/Test/Test.pdf",
+    "frequency": "Annually",
+    "required": true,
+    "defaultCategory": "Clinical"
+  },
+  {
+    "id": "form-legal-001",
+    "title": "Notice of Privacy Practices & Data Consent",
+    "description": "Acknowledgement of how your health data is stored, processed, and protected.",
+    "fileName": "Privacy_Practices_Ack.pdf",
     "fileUrl": "/src/assets/Test/Test.pdf",
     "frequency": "Once",
     "required": true,
-    "defaultCategory": "Consent Form"
+    "defaultCategory": "Legal"
   },
   {
     "id": "form-fin-001",
     "title": "Financial Policy Agreement",
-    "description": "Must be updated every year.",
-    "fileName": "Financial_Policy_2025.pdf",
+    "description": "Payment terms, insurance billing, and cancellation fee policies.",
+    "fileName": "Financial_Agreement.pdf",
     "fileUrl": "/src/assets/Test/Test.pdf",
     "frequency": "Annually",
     "required": true,
-    "defaultCategory": "Consent Form"
+    "defaultCategory": "Financial"
   },
   {
-    "id": "form-covid-001",
-    "title": "Health Screening (COVID-19)",
-    "description": "Required before every in-person visit.",
-    "fileName": "Health_Screen_v4.pdf",
+    "id": "form-legal-002",
+    "title": "Authorization for Release of Records",
+    "description": "Permission to share your files with family members or other providers.",
+    "fileName": "Records_Release_Auth.pdf",
     "fileUrl": "/src/assets/Test/Test.pdf",
-    "frequency": "PerVisit",
+    "frequency": "AsNeeded",
+    "required": false,
+    "defaultCategory": "Legal"
+  },
+  {
+    "id": "form-legal-003",
+    "title": "Teledentistry & Electronic Communication",
+    "description": "Consent to communicate via email/SMS and receive remote care.",
+    "fileName": "Electronic_Comm_Consent.pdf",
+    "fileUrl": "/src/assets/Test/Test.pdf",
+    "frequency": "Once",
     "required": true,
-    "defaultCategory": "Clinical Form"
+    "defaultCategory": "Legal"
   }
 ]

@@ -11,11 +11,11 @@ import {
   IconAppointments, 
   IconBilling, 
   IconMessages,
-  IconTreatmentPlan, // --- ADDED ---
-  IconMedicalHistory, // --- ADDED ---
-  IconDocuments, // --- ADDED ---
+  IconTreatmentPlan, 
+  IconMedicalHistory, 
+  IconDocuments, 
 } from '../layouts/components/Icons';
-import { formatCurrency } from '../utils/formatting'; // --- ADDED ---
+import { formatCurrency } from '../utils/formatting';
 import styles from './Dashboard.module.css';
 
 // --- This is our app's "current" time ---
@@ -23,11 +23,13 @@ const MOCK_TODAY = new Date('2025-11-15T12:00:00Z');
 
 const Dashboard = () => {
   const navigate = useNavigate();
-  const { patient, alerts, consents, medicalHistory } = usePatientData();
+  const { patient, alerts, medicalHistory } = usePatientData(); 
   const { appointments, treatmentPlans } = useClinicalData();
   const { billingInvoices } = useBillingData();
-  const { messageThreads } = useEngagementData();
-  const { getProviderById } = useCoreData();
+  
+  // --- 1. Get Documents & Forms Data ---
+  const { messageThreads, documents } = useEngagementData(); 
+  const { getProviderById, downloadableForms } = useCoreData(); 
 
   // --- Process Data from Contexts ---
 
@@ -38,7 +40,6 @@ const Dashboard = () => {
 
   // 2. Find next upcoming appointment
   const nextAppointment = useMemo(() => {
-    // --- FIX: Use mock today's date for consistent filtering ---
     const upcoming = [...appointments]
       .filter(a => new Date(a.startDateTime) > MOCK_TODAY && a.status === 'Confirmed')
       .sort((a, b) => new Date(a.startDateTime) - new Date(b.startDateTime));
@@ -54,29 +55,68 @@ const Dashboard = () => {
 
   // 4. Calculate total outstanding balance
   const totalDue = useMemo(() => {
-    // --- FIX: Access the .amount property of the money object ---
     return billingInvoices.reduce((total, inv) => {
       return total + (inv.financialSummary.amountDue?.amount || 0);
     }, 0);
   }, [billingInvoices]);
 
-  // --- 5. NEW: Find a pending treatment plan ---
+  // 5. Find a pending treatment plan
   const pendingPlan = useMemo(() => {
     return [...treatmentPlans]
       .filter(plan => plan.status === 'Proposed')
-      .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))[0]; // Get most recent
+      .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))[0];
   }, [treatmentPlans]);
 
-  // --- 6. NEW: Find a pending consent form ---
-  const pendingConsent = useMemo(() => {
-    return consents.find(c => c.status === 'Pending');
-  }, [consents]);
-
-  // --- 7. NEW: Get last medical history update date ---
+  // 6. Get last medical history update date
   const lastHistoryUpdate = useMemo(() => {
     if (!medicalHistory || medicalHistory.length === 0) return null;
-    return medicalHistory[0].submissionDate; // Assumes first is current
+    return medicalHistory[0].submissionDate;
   }, [medicalHistory]);
+
+  // --- 7. NEW: Find Actionable Documents (Missing/Rejected/Expired) ---
+  const actionableForm = useMemo(() => {
+    if (!downloadableForms || !documents) return null;
+
+    // Logic to determine status (matches Documents page logic)
+    const getStatus = (form) => {
+      const linkedDocs = documents.filter(
+        doc => doc.linkContext?.type === 'FormDefinition' && 
+               doc.linkContext?.id === form.id && 
+               doc.systemInfo.status === 'Active'
+      );
+      
+      if (linkedDocs.length === 0) return form.required ? 'Missing' : 'Optional';
+
+      linkedDocs.sort((a, b) => new Date(b.systemInfo.createdAt) - new Date(a.systemInfo.createdAt));
+      const latest = linkedDocs[0];
+      const verification = latest.verification || { status: 'Pending' };
+
+      if (verification.status === 'Rejected') return 'Rejected';
+      if (verification.status === 'Verified') {
+        if (form.frequency === 'Annually') {
+           const oneYearAgo = new Date();
+           oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
+           if (new Date(verification.verifiedAt) < oneYearAgo) return 'Expired';
+        }
+        return 'Complete';
+      }
+      return 'Pending';
+    };
+
+    const formsWithStatus = downloadableForms.map(f => ({ ...f, status: getStatus(f) }));
+    
+    // Priority: Rejected > Expired > Missing
+    const rejected = formsWithStatus.find(f => f.status === 'Rejected');
+    if (rejected) return rejected;
+
+    const expired = formsWithStatus.find(f => f.status === 'Expired');
+    if (expired) return expired;
+
+    const missing = formsWithStatus.find(f => f.status === 'Missing');
+    if (missing) return missing;
+
+    return null;
+  }, [downloadableForms, documents]);
 
 
   return (
@@ -84,12 +124,10 @@ const Dashboard = () => {
       <h1>Welcome, {patient.preferredName}!</h1>
       <p className={styles.pageDescription}>Here's your summary for today.</p>
       
-      {/* --- Critical Alerts --- */}
       {activeAlerts.length > 0 && (
         <AlertCard alert={activeAlerts[0]} />
       )}
 
-      {/* --- Main Widget Grid --- */}
       <div className={styles.widgetGrid}>
         
         {/* Next Appointment */}
@@ -123,7 +161,7 @@ const Dashboard = () => {
           <MessageContent thread={unreadThread} />
         </WidgetCard>
 
-        {/* --- NEW: Pending Treatment Plan --- */}
+        {/* Treatment Plan */}
         <WidgetCard
           title="Treatment Plan"
           icon={<IconTreatmentPlan />}
@@ -132,7 +170,7 @@ const Dashboard = () => {
           <TreatmentPlanContent plan={pendingPlan} />
         </WidgetCard>
 
-        {/* --- NEW: Medical History --- */}
+        {/* Medical History */}
         <WidgetCard
           title="Medical History"
           icon={<IconMedicalHistory />}
@@ -141,13 +179,13 @@ const Dashboard = () => {
           <MedicalHistoryContent lastUpdate={lastHistoryUpdate} />
         </WidgetCard>
 
-        {/* --- NEW: Forms to Sign --- */}
+        {/* --- NEW: Documents Widget --- */}
         <WidgetCard
-          title="Forms to Sign"
+          title="Documents" 
           icon={<IconDocuments />}
-          onClick={() => navigate('/documents')} // Send user to documents page
+          onClick={() => navigate('/documents')}
         >
-          <PendingConsentContent consent={pendingConsent} />
+          <DocumentsWidgetContent form={actionableForm} />
         </WidgetCard>
 
       </div>
@@ -157,7 +195,6 @@ const Dashboard = () => {
 
 // --- Child Components for Widgets ---
 
-// This is the generic clickable card wrapper
 const WidgetCard = ({ title, icon, onClick, children }) => (
   <div className={`card ${styles.widgetCard}`} onClick={onClick}>
     <div className={styles.widgetHeader}>
@@ -170,14 +207,12 @@ const WidgetCard = ({ title, icon, onClick, children }) => (
   </div>
 );
 
-// Alert Card (Special, not a generic widget)
 const AlertCard = ({ alert }) => (
   <div className={`card ${styles.alertCard}`}>
     <strong>Critical Alert:</strong> {alert.text}
   </div>
 );
 
-// Content for Appointment Widget
 const AppointmentContent = ({ appt, getProviderById }) => {
   const provider = getProviderById(appt.providerId);
   const apptDate = new Date(appt.startDateTime);
@@ -204,12 +239,10 @@ const AppointmentContent = ({ appt, getProviderById }) => {
   );
 };
 
-// Content for Billing Widget
 const BillingContent = ({ totalDue }) => (
   <>
     {totalDue > 0 ? (
       <>
-        {/* --- FIX: Use formatter and pass money object --- */}
         <p className={styles.billingDue}>
           {formatCurrency({ amount: totalDue, currency: 'USD' })}
         </p>
@@ -224,7 +257,6 @@ const BillingContent = ({ totalDue }) => (
   </>
 );
 
-// Content for Message Widget
 const MessageContent = ({ thread }) => (
   <>
     {thread ? (
@@ -239,7 +271,6 @@ const MessageContent = ({ thread }) => (
   </>
 );
 
-// --- NEW: Content for Treatment Plan Widget ---
 const TreatmentPlanContent = ({ plan }) => {
   if (!plan) return <p>No treatment plans require your review.</p>;
   return (
@@ -253,7 +284,6 @@ const TreatmentPlanContent = ({ plan }) => {
   );
 };
 
-// --- NEW: Content for Medical History Widget ---
 const MedicalHistoryContent = ({ lastUpdate }) => {
   const lastUpdateDate = lastUpdate ? new Date(lastUpdate).toLocaleDateString() : 'N/A';
   return (
@@ -265,14 +295,29 @@ const MedicalHistoryContent = ({ lastUpdate }) => {
   );
 };
 
-// --- NEW: Content for Pending Consent Widget ---
-const PendingConsentContent = ({ consent }) => {
-  if (!consent) return <p>You have no new forms to sign.</p>;
+// --- NEW: Content for Documents Widget ---
+const DocumentsWidgetContent = ({ form }) => {
+  if (!form) return <p>All required documents are up to date.</p>;
+  
+  let statusText = "Action Required";
+  let statusColor = "var(--error-500)"; // Default to error red
+
+  if (form.status === 'Missing') {
+    statusText = "Missing Document";
+  } else if (form.status === 'Rejected') {
+    statusText = "Upload Rejected";
+  } else if (form.status === 'Expired') {
+    statusText = "Update Required";
+    statusColor = "var(--warning-500)"; // Warning orange
+  }
+
   return (
     <>
-      <p className={styles.formName}>You have a new form to sign:</p>
-      <p className={styles.formType}>{consent.type.replace('_', ' ')}</p>
-      <p className={styles.actionText}>Click here to review and sign.</p>
+      <p className={styles.formName} style={{ color: statusColor, fontWeight: 600 }}>
+        {statusText}
+      </p>
+      <p className={styles.formType}>{form.title}</p>
+      <p className={styles.actionText}>Click to manage.</p>
     </>
   );
 };
