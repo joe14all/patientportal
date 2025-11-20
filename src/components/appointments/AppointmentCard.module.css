@@ -73,6 +73,12 @@ body.dark .cardHeader {
   background-color: var(--neutral-200);
 }
 
+/* --- NEW: Checked In Status --- */
+.checkedin {
+  color: var(--primary-700);
+  background-color: var(--primary-100);
+  border: 1px solid var(--primary-200);
+}
 
 body.dark .confirmed {
   color: var(--success-200);
@@ -89,6 +95,11 @@ body.dark .pending {
 body.dark .completed {
   color: var(--neutral-200);
   background-color: var(--neutral-700);
+}
+body.dark .checkedin {
+  color: var(--primary-200);
+  background-color: var(--primary-900);
+  border-color: var(--primary-700);
 }
 
 
@@ -123,6 +134,61 @@ body.dark .completed {
 .details strong {
   color: var(--text-primary);
   margin-right: 0.5rem;
+}
+
+/* --- NEW: Telehealth Banner --- */
+.telehealthBanner {
+  display: flex;
+  flex-wrap: wrap; /* Allow wrapping on very small screens */
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  
+  background-color: var(--primary-light);
+  border: 1px solid var(--primary-100);
+  border-radius: 0.5rem;
+  padding: 1rem;
+  margin-top: 0.5rem;
+}
+
+body.dark .telehealthBanner {
+  background-color: rgba(59, 130, 246, 0.1); /* Transparent primary */
+  border-color: var(--primary-700);
+}
+
+.telehealthBanner strong {
+  color: var(--primary-700);
+  font-size: 1rem;
+}
+body.dark .telehealthBanner strong {
+  color: var(--primary-300);
+}
+
+/* --- NEW: Video Join Button --- */
+.videoButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--primary);
+  color: var(--text-inverted);
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.9rem;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.videoButton:hover {
+  background-color: var(--primary-hover);
+  color: var(--text-inverted); /* Ensure white text in light mode */
+  text-decoration: none;
+}
+
+/* --- FIX: Dark Mode Contrast Fix --- */
+/* In dark mode, hover becomes light blue, so text must be dark */
+body.dark .videoButton:hover {
+  color: var(--neutral-900); 
 }
 
 .cardActions {

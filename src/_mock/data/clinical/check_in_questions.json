@@ -1,0 +1,53 @@
+[
+  {
+    "id": "q-health-001",
+    "text": "Have there been any changes to your medical history or medications since your last visit?",
+    "type": "YesNo",
+    "required": true,
+    "flagIf": "Yes"
+  },
+  {
+    "id": "q-insurance-001",
+    "text": "Has your dental insurance coverage changed?",
+    "type": "YesNo",
+    "required": true,
+    "flagIf": "Yes"
+  },
+  {
+    "id": "q-pain-001",
+    "text": "Are you experiencing any dental pain or sensitivity today?",
+    "type": "YesNo",
+    "required": true,
+    "flagIf": "Yes"
+  },
+  {
+    "id": "q-pain-desc-001",
+    "text": "If yes, please describe where the pain is located and how long you've had it.",
+    "type": "Text",
+    "required": false,
+    "condition": {
+      "questionId": "q-pain-001",
+      "value": "Yes"
+    }
+  },
+  {
+    "id": "q-goals-001",
+    "text": "What is the primary goal for your visit today?",
+    "type": "MultiChoice",
+    "options": [
+      "Routine Cleaning",
+      "Fix a broken tooth",
+      "Toothache / Pain",
+      "Cosmetic Consultation",
+      "Follow-up"
+    ],
+    "required": true
+  },
+  {
+    "id": "q-contact-001",
+    "text": "Is your contact information (Phone, Address, Email) still current?",
+    "type": "YesNo",
+    "required": true,
+    "flagIf": "No"
+  }
+]

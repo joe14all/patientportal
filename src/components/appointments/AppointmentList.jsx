@@ -11,6 +11,7 @@ const AppointmentList = ({
   past, 
   onCancel, 
   onReschedule, 
+  onCheckIn, 
   loading 
 }) => {
   return (
@@ -27,6 +28,7 @@ const AppointmentList = ({
                 appt={appt} 
                 onCancel={onCancel}
                 onReschedule={onReschedule}
+                onCheckIn={onCheckIn} // <--- 2. PASS PROP
                 isLoading={loading}
                 isPast={false}
               />
@@ -47,7 +49,7 @@ const AppointmentList = ({
               <AppointmentCard 
                 key={appt.id} 
                 appt={appt}
-                onCancel={onCancel} // Pass handlers even for past (for consistency, though unused)
+                onCancel={onCancel}
                 onReschedule={onReschedule}
                 isLoading={loading}
                 isPast={true} 

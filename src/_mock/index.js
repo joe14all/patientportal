@@ -18,6 +18,7 @@ import appointments from "./data/clinical/appointments.json";
 import visitSummaries from "./data/clinical/visit_summaries.json";
 import treatmentPlans from "./data/clinical/treatment_plans.json";
 import availableSlots from "./data/clinical/available_slots.json";
+import checkInQuestions from "./data/clinical/check_in_questions.json"; // <--- 1. IMPORT NEW FILE
 
 // --- Billing ---
 import insurancePolicies from "./data/billing/insurance_policies.json";
@@ -56,7 +57,8 @@ export const mockApi = {
     appointments,
     visitSummaries,
     treatmentPlans,
-    availableSlots, // 4. EXPORT NEW
+    availableSlots,
+    checkInQuestions, // <--- 2. EXPORT NEW DATA
   },
   // Financial data
   billing: {

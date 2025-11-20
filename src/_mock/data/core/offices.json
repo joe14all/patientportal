@@ -24,7 +24,12 @@
       "city": "Anytown",
       "state": "CA",
       "postalCode": "12346",
-      "country": "US"
+      "country": "US",
+      "coordinates": {
+        "lat": 34.0522,
+        "lng": -118.2437
+      },
+      "googleMapsUrl": "https://www.google.com/maps/search/?api=1&query=456+Oak+Ave,+Suite+100,+Anytown,+CA"
     }
   },
   "operatingHours": {

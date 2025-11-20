@@ -13,7 +13,6 @@ export const AppProvider = ({ children }) => {
     <AccountProvider>
       <ThemeProvider> 
         <PatientProvider>
-
           <EngagementProvider>
             <CoreProvider> 
               <ClinicalProvider>
@@ -23,7 +22,6 @@ export const AppProvider = ({ children }) => {
               </ClinicalProvider>
             </CoreProvider>
           </EngagementProvider>
-       
         </PatientProvider> 
       </ThemeProvider>
     </AccountProvider>

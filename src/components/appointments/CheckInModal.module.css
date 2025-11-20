@@ -1,0 +1,107 @@
+.intro {
+  background-color: var(--primary-light);
+  padding: 1rem;
+  border-radius: 0.5rem;
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.intro p {
+  margin: 0;
+  font-size: 0.95rem;
+  color: var(--primary-700);
+}
+.intro p + p {
+  margin-top: 0.5rem;
+  font-size: 0.85rem;
+}
+
+/* --- Question List --- */
+.questionList {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.questionItem {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.questionText {
+  font-weight: 500;
+  color: var(--text-primary);
+  margin: 0;
+  font-size: 1rem;
+}
+
+.required {
+  color: var(--error-500);
+  margin-left: 0.25rem;
+}
+
+/* --- Inputs --- */
+
+/* Radio Buttons (Yes/No) */
+.radioGroup {
+  display: flex;
+  gap: 1rem;
+}
+
+.radioLabel {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem;
+  border: 1px solid var(--border-color);
+  border-radius: 0.5rem;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.radioLabel:hover {
+  background-color: var(--bg-surface-hover);
+}
+
+.radioLabel.selected {
+  background-color: var(--primary-light);
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.radioLabel input {
+  /* Hide default radio visually but keep it accessible? 
+     Or just standard size */
+  width: 1.2rem;
+  height: 1.2rem;
+  accent-color: var(--primary);
+}
+
+/* Text Area */
+.textInput {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid var(--border-color);
+  border-radius: 0.5rem;
+  font-family: inherit;
+  resize: vertical;
+}
+.textInput:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px var(--primary-light);
+}
+
+/* Select */
+.selectInput {
+  width: 100%;
+  padding: 0.75rem;
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: 0.5rem;
+  font-size: 1rem;
+}

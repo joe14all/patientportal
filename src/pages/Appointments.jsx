@@ -2,6 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { useClinicalData } from '../contexts';
 import AppointmentList from '../components/appointments/AppointmentList';
 import BookingForm from '../components/appointments/BookingForm';
+import CheckInModal from '../components/appointments/CheckInModal'; 
 import Modal from '../components/common/Modal';
 
 import styles from './Appointments.module.css';
@@ -19,27 +20,35 @@ const Appointments = () => {
 
   const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
   const [cancelTargetId, setCancelTargetId] = useState(null);
+const [checkInTarget, setCheckInTarget] = useState(null);
 
-  // --- Data Processing ---
+  // --- Data Processing (MOCK NOW for testing) ---
   const { upcoming, past } = useMemo(() => {
-    // Use mock "today" to be consistent with booking calendar
-    const now = new Date('2025-11-15T12:00:00Z');
+    const now = new Date('2025-11-15T12:00:00Z'); 
+    // ... (rest of logic is same) ...
     const upcoming = [];
     const past = [];
-    
-    // Sort by date, most recent first
     [...appointments]
       .sort((a, b) => new Date(b.startDateTime) - new Date(a.startDateTime))
       .forEach(appt => {
-        // Use status 'Completed' or 'Cancelled' or time to define past
         if (appt.status === 'Completed' || appt.status === 'Cancelled' || new Date(appt.startDateTime) < now) {
           past.push(appt);
         } else {
-          upcoming.unshift(appt); // Add to beginning to keep future-most first
+          upcoming.unshift(appt); 
         }
       });
     return { upcoming, past };
   }, [appointments]);
+
+  // --- Event Handlers ---
+  
+  const handleCheckInClick = (appt) => {
+    setCheckInTarget(appt); // Open modal
+  };
+
+  const handleCloseCheckIn = () => {
+    setCheckInTarget(null);
+  };
 
   // --- Event Handlers ---
   
@@ -74,7 +83,7 @@ const Appointments = () => {
   
   const handleStartBooking = () => {
     setIsBooking(true);
-    setRescheduleTarget(null); // Ensure we're not in reschedule mode
+    setRescheduleTarget(null); 
   };
   
   const handleCloseBooking = () => {
@@ -113,9 +122,17 @@ const Appointments = () => {
           past={past}
           onCancel={handleCancel}
           onReschedule={handleReschedule}
+          onCheckIn={handleCheckInClick}
           loading={loading}
         />
       )}
+
+      {/* --- RENDER CHECK-IN MODAL --- */}
+      <CheckInModal
+        isOpen={!!checkInTarget}
+        onClose={handleCloseCheckIn}
+        appointment={checkInTarget}
+      />
 
       {/* --- MODAL PROPS ARE UPDATED --- */}
       <Modal

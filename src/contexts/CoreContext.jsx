@@ -1,8 +1,8 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable react-refresh/only-export-components */
 import React, { createContext, useContext, useState, useMemo, useCallback } from 'react';
-import { mockApi } from '../_mock'; // Import the initial mock data
-import { formatCurrency } from '../utils/formatting'; // <-- 1. IMPORT FOR CONSISTENCY
+import { mockApi } from '../_mock'; 
+import { formatCurrency } from '../utils/formatting';
 
 // 1. Create the context
 export const CoreContext = createContext(null);
@@ -10,20 +10,13 @@ export const CoreContext = createContext(null);
 // 3. Create the Provider component
 export const CoreProvider = ({ children }) => {
   // --- State ---
-  // This data is static (read-only definitions), so we don't
-  // need 'set' functions for them. We just provide the data.
-  // We use 'useState' in case a real app would fetch this on load.
   const [providers, setProviders] = useState(mockApi.core.providers);
-  const [offices, setOffices] = useState(mockApi.core.offices);
+  const [offices, setOffices] = useState(mockApi.core.offices); // Now contains googleMapsUrl & coordinates
   const [procedures, setProcedures] = useState(mockApi.core.procedures);
-  // --- ADD NEW STATE ---
   const [appointmentTypes, setAppointmentTypes] = useState(mockApi.core.appointmentTypes);
   const [operatories, setOperatories] = useState(mockApi.core.operatories);
   const [downloadableForms, setDownloadableForms] = useState(mockApi.core.downloadableForms);
 
-  // This context has no "actions", so loading/error state
-  // is less critical unless we were simulating an initial fetch.
-  // We'll keep the state for consistency, but won't add functions.
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
@@ -45,8 +38,6 @@ export const CoreProvider = ({ children }) => {
 
   /**
    * (READ) Gets a single provider.
-   * In our mock, there's only one, but this shows the pattern.
-   * If `providers` were an array, we'd use .find().
    */
   const getProviderById = useCallback((providerId) => {
     // Since our mock `providers` is an object, not an array
@@ -58,7 +49,6 @@ export const CoreProvider = ({ children }) => {
 
   /**
    * (READ) Gets a single office.
-   * Same as providers, our mock `offices` is a single object.
    */
   const getOfficeById = useCallback((officeId) => {
     if (offices.id === officeId) {
@@ -67,7 +57,6 @@ export const CoreProvider = ({ children }) => {
     return null;
   }, [offices]);
 
-  // --- ADD NEW GETTERS ---
 
   /**
    * (READ) Gets a single appointment type from the list by its ID.
@@ -85,13 +74,12 @@ export const CoreProvider = ({ children }) => {
 
 
   // --- Value ---
-  // Memoize the context value to prevent unnecessary re-renders
   const value = useMemo(() => ({
     // State (READ)
-    providers,     // The main provider object
-    offices,       // The main office object
-    procedures,    // The full array of all procedures
-    appointmentTypes, // <-- ADDED
+    providers,     
+    offices,       
+    procedures,    
+    appointmentTypes, 
     operatories, 
     downloadableForms,
     loading,
@@ -102,15 +90,15 @@ export const CoreProvider = ({ children }) => {
     getProcedureByCode,
     getProviderById,
     getOfficeById,
-    getAppointmentTypeById, // <-- ADDED
-    getPatientFacingAppointmentTypes, // <-- ADDED
+    getAppointmentTypeById, 
+    getPatientFacingAppointmentTypes, 
     
   }), [
     providers, 
     offices, 
     procedures, 
-    appointmentTypes, // <-- ADDED
-    operatories,      // <-- ADDED
+    appointmentTypes, 
+    operatories,      
     downloadableForms,
     loading, 
     error,
@@ -118,8 +106,8 @@ export const CoreProvider = ({ children }) => {
     getProcedureByCode,
     getProviderById,
     getOfficeById,
-    getAppointmentTypeById, // <-- ADDED
-    getPatientFacingAppointmentTypes // <-- ADDED (it's a memoized value, not function)
+    getAppointmentTypeById, 
+    getPatientFacingAppointmentTypes 
   ]);
 
   // --- Render ---

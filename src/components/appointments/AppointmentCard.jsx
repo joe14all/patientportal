@@ -1,27 +1,23 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCoreData } from '../../contexts';
+import { CHECK_IN_WINDOW_MINUTES, APPOINTMENT_STATUS } from '../../constants'; // <--- 1. IMPORT
 import styles from './AppointmentCard.module.css';
 
-/**
- * A reusable card component to display a single appointment.
- * It handles both upcoming and past appointments and shows relevant actions.
- */
 const AppointmentCard = ({ 
   appt, 
   onCancel, 
-  onReschedule, // This prop will be used to trigger the reschedule modal
+  onReschedule, 
+  onCheckIn, // <--- 2. NEW PROP
   isLoading, 
   isPast = false 
 }) => {
   const navigate = useNavigate();
   const { getProviderById, getOfficeById } = useCoreData();
 
-  // Get provider and office details from CoreContext
   const provider = getProviderById(appt.providerId);
   const office = getOfficeById(appt.officeId);
 
-  // Format date and time
   const apptDate = new Date(appt.startDateTime);
   const date = apptDate.toLocaleDateString(undefined, {
     weekday: 'long',
@@ -34,51 +30,90 @@ const AppointmentCard = ({
     minute: '2-digit',
   });
 
-  // --- Action Handlers ---
+  // --- 3. CHECK-IN LOGIC ---
+  // Determine if we are within the window (e.g. 30 mins before)
+  // NOTE: For testing with MOCK DATA from 2025, we are hardcoding "now".
+  // In a real app, use: const now = new Date();
+  const MOCK_NOW = new Date('2025-11-15T12:00:00Z'); 
   
-  const handleViewSummary = () => {
-    // This route doesn't exist yet, but we're preparing for it
-    navigate(`/visits/${appt.linkedRecords.visitSummaryId}`);
-  };
+  const timeDiffMinutes = (apptDate - MOCK_NOW) / (1000 * 60);
+  
+  const canCheckIn = 
+    !isPast &&
+    appt.status === APPOINTMENT_STATUS.CONFIRMED &&
+    !appt.checkIn && // Not checked in yet
+    timeDiffMinutes <= CHECK_IN_WINDOW_MINUTES && // Within 30 mins
+    timeDiffMinutes > -15; // And not more than 15 mins late
 
-  const handleViewInvoice = () => {
-    // This navigates to the billing page,
-    // which would ideally be able to highlight a specific invoice
-    navigate(`/billing?invoiceId=${appt.linkedRecords.invoiceId}`);
-  };
+  // --- Handlers ---
+  const handleViewSummary = () => navigate(`/visits/${appt.linkedRecords.visitSummaryId}`);
+  const handleViewInvoice = () => navigate(`/billing?invoiceId=${appt.linkedRecords.invoiceId}`);
 
   return (
     <div className={`card ${styles.appointmentCard} ${isPast ? styles.past : ''}`}>
-      {/* --- Card Header: Date, Time, Status --- */}
       <div className={styles.cardHeader}>
         <div className={styles.dateTime}>
           <span className={styles.date}>{date}</span>
           <span className={styles.time}>{time}</span>
         </div>
         <span className={`${styles.status} ${styles[appt.status.toLowerCase()] || styles.pending}`}>
-          {appt.status}
+          {appt.status === APPOINTMENT_STATUS.CHECKED_IN ? 'Checked In' : appt.status}
         </span>
       </div>
 
-      {/* --- Card Body: Details --- */}
       <div className={styles.cardBody}>
         <h3>{appt.appointmentType}</h3>
         <p>{appt.reasonForVisit}</p>
-        <div className={styles.details}>
-          <span>
-            <strong>Provider:</strong> {provider?.preferredName || 'N/A'}
-          </span>
-          <span>
-            <strong>Location:</strong> {office?.name || 'N/A'}
-          </span>
-        </div>
+        
+        {/* --- 4. SHOW VIDEO LINK IF TELEHEALTH --- */}
+        {appt.systemInfo.isTelehealth ? (
+           <div className={styles.telehealthBanner}>
+             <strong>Video Visit</strong>
+             {canCheckIn || appt.status === APPOINTMENT_STATUS.CHECKED_IN ? (
+               <a 
+                 href={appt.systemInfo.telehealthUrl} 
+                 target="_blank" 
+                 rel="noreferrer"
+                 className={styles.videoButton}
+               >
+                 Join Video Call
+               </a>
+             ) : (
+               <span>(Link available 30m before)</span>
+             )}
+           </div>
+        ) : (
+          <div className={styles.details}>
+            <span><strong>Provider:</strong> {provider?.preferredName || 'N/A'}</span>
+            <span>
+               <strong>Location:</strong> 
+               {/* Map Link */}
+               {office?.contact?.address?.googleMapsUrl ? (
+                 <a href={office.contact.address.googleMapsUrl} target="_blank" rel="noreferrer" style={{marginLeft: '0.5rem'}}>
+                   {office.name} (Map)
+                 </a>
+               ) : (
+                 office?.name || 'N/A'
+               )}
+            </span>
+          </div>
+        )}
       </div>
 
-      {/* --- Action Buttons --- */}
       <div className={styles.cardActions}>
-        {/* Actions for Upcoming Appointments */}
         {!isPast && appt.status !== 'Cancelled' && (
           <>
+            {/* --- 5. CHECK IN BUTTON --- */}
+            {canCheckIn && !appt.systemInfo.isTelehealth && (
+              <button 
+                className="primary" // Use primary style for emphasis
+                onClick={() => onCheckIn(appt)}
+                disabled={isLoading}
+              >
+                I'm Here (Check In)
+              </button>
+            )}
+
             <button 
               className="secondary danger"
               onClick={() => onCancel(appt.id)}
@@ -96,24 +131,13 @@ const AppointmentCard = ({
           </>
         )}
 
-        {/* Actions for Past Appointments */}
         {isPast && (
           <>
             {appt.linkedRecords?.visitSummaryId && (
-              <button 
-                className="secondary" 
-                onClick={handleViewSummary}
-              >
-                View Visit Summary
-              </button>
+              <button className="secondary" onClick={handleViewSummary}>View Summary</button>
             )}
             {appt.linkedRecords?.invoiceId && (
-              <button 
-                className="secondary" 
-                onClick={handleViewInvoice}
-              >
-                View Invoice
-              </button>
+              <button className="secondary" onClick={handleViewInvoice}>View Invoice</button>
             )}
           </>
         )}

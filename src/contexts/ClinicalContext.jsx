@@ -3,7 +3,8 @@
 import React, { createContext, useContext, useState, useMemo, useCallback } from 'react';
 import { mockApi } from '../_mock'; 
 import { useEngagementData } from './EngagementContext'; 
-import { formatCurrency } from '../utils/formatting'; // <-- ADDED FOR CONSISTENCY
+import { formatCurrency } from '../utils/formatting';
+import { APPOINTMENT_STATUS } from '../constants'; // <--- 1. Import Constants
 
 // 1. Create the context
 export const ClinicalContext = createContext(null);
@@ -18,6 +19,9 @@ export const ClinicalProvider = ({ children }) => {
   const [visitSummaries, setVisitSummaries] = useState(mockApi.clinical.visitSummaries);
   const [treatmentPlans, setTreatmentPlans] = useState(mockApi.clinical.treatmentPlans);
   const [availableSlots, setAvailableSlots] = useState(mockApi.clinical.availableSlots);
+  
+  // --- 2. New State for Check-In Questions ---
+  const [checkInQuestions, setCheckInQuestions] = useState(mockApi.clinical.checkInQuestions);
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -50,7 +54,7 @@ export const ClinicalProvider = ({ children }) => {
         ...newAppointmentData,
         id: `appt-uuid-${Date.now()}`,
         patientId: "patient-uuid-001", 
-        status: "Confirmed", 
+        status: APPOINTMENT_STATUS.CONFIRMED, // Use constant
         confirmation: {
           status: "Confirmed",
           method: "Online Portal",
@@ -89,12 +93,12 @@ export const ClinicalProvider = ({ children }) => {
         'Scheduling',
         `This is an automated confirmation that your appointment for "${newAppointment.appointmentType}" on ${date} has been successfully booked.`,
         [], // attachments
-        systemAuthor // <-- 2. PASS AUTHOR
+        systemAuthor 
       );
     } catch (msgErr) {
       console.error("Failed to create automated message:", msgErr);
     }
-  }, [createNewThread, systemAuthor]); // <-- 3. ADD DEPENDENCY
+  }, [createNewThread, systemAuthor]); 
 
   /**
    * (UPDATE) Cancels an existing appointment.
@@ -104,10 +108,10 @@ export const ClinicalProvider = ({ children }) => {
       
       let apptToReturn = null;
       const newAppointments = appointments.map(appt => {
-        if (appt.id === appointmentId && (appt.status === "Confirmed" || appt.status === "Pending")) {
+        if (appt.id === appointmentId && (appt.status === APPOINTMENT_STATUS.CONFIRMED || appt.status === APPOINTMENT_STATUS.PENDING)) {
           apptToReturn = {
             ...appt,
-            status: "Cancelled",
+            status: APPOINTMENT_STATUS.CANCELLED, // Use constant
             cancellation: {
               cancelledAt: new Date().toISOString(),
               cancelledBy: "Patient",
@@ -133,13 +137,13 @@ export const ClinicalProvider = ({ children }) => {
         `Appointment Cancelled: ${cancelledAppt.appointmentType}`,
         'Scheduling',
         `This is an automated confirmation that your appointment for "${cancelledAppt.appointmentType}" on ${date} has been cancelled.`,
-        [], // attachments
-        systemAuthor // <-- 2. PASS AUTHOR
+        [], 
+        systemAuthor 
       );
     } catch (msgErr) {
       console.error("Failed to create automated message:", msgErr);
     }
-  }, [createNewThread, appointments, systemAuthor]); // <-- 3. ADD DEPENDENCIES
+  }, [createNewThread, appointments, systemAuthor]);
 
   /**
    * (UPDATE) Reschedules an existing appointment.
@@ -152,14 +156,14 @@ export const ClinicalProvider = ({ children }) => {
       
       const newAppointments = appointments.map(appt => {
         if (appt.id === appointmentId) {
-          if (appt.status === "Cancelled") throw new Error("Cannot reschedule a cancelled appointment.");
+          if (appt.status === APPOINTMENT_STATUS.CANCELLED) throw new Error("Cannot reschedule a cancelled appointment.");
           
           providerId = appt.providerId;
           apptToReturn = {
             ...appt,
             startDateTime: newStart,
             endDateTime: newEnd,
-            status: "Confirmed", // Re-confirm
+            status: APPOINTMENT_STATUS.CONFIRMED, // Re-confirm
             systemInfo: {
               ...appt.systemInfo,
               updatedAt: new Date().toISOString(),
@@ -199,13 +203,40 @@ export const ClinicalProvider = ({ children }) => {
         `Appointment Rescheduled: ${rescheduledAppt.appointmentType}`,
         'Scheduling',
         `This is an automated confirmation that your appointment for "${rescheduledAppt.appointmentType}" has been rescheduled to ${date}.`,
-        [], // attachments
-        systemAuthor // <-- 2. PASS AUTHOR
+        [], 
+        systemAuthor 
       );
     } catch (msgErr) {
       console.error("Failed to create automated message:", msgErr);
     }
-  }, [createNewThread, appointments, systemAuthor]); // <-- 3. ADD DEPENDENCIES
+  }, [createNewThread, appointments, systemAuthor]); 
+
+  /**
+   * (UPDATE) Performs a self-check-in for an appointment.
+   * 3. New Function for Self Check-In
+   */
+  const checkInAppointment = useCallback(async (appointmentId, responses) => {
+    await simulateApi(() => {
+      setAppointments(prev => prev.map(appt => {
+        if (appt.id === appointmentId) {
+          // In a real app, we would save 'responses' to a questionnaire response record
+          return {
+            ...appt,
+            status: APPOINTMENT_STATUS.CHECKED_IN, // Update status to CheckedIn
+            checkIn: {
+              checkInTime: new Date().toISOString(),
+              method: "Portal Mobile",
+            },
+            systemInfo: {
+              ...appt.systemInfo,
+              updatedAt: new Date().toISOString(),
+            }
+          };
+        }
+        return appt;
+      }));
+    });
+  }, []);
 
   
   const acceptTreatmentPlan = useCallback(async (planId) => {
@@ -217,7 +248,7 @@ export const ClinicalProvider = ({ children }) => {
               ...plan,
               status: "Accepted",
               acceptedAt: new Date().toISOString(),
-              patientSignatureId: `doc-uuid-signature-${Date.now()}`, // Mock signature
+              patientSignatureId: `doc-uuid-signature-${Date.now()}`, 
             };
             return planToReturn;
           }
@@ -234,13 +265,13 @@ export const ClinicalProvider = ({ children }) => {
         `Treatment Plan Accepted: ${acceptedPlan.planName}`,
         'Clinical',
         `Thank you for accepting your treatment plan: "${acceptedPlan.planName}". Our team will reach out to schedule your first procedure.`,
-        [], // attachments
-        systemAuthor // <-- 2. PASS AUTHOR
+        [], 
+        systemAuthor 
       );
     } catch (msgErr) {
       console.error("Failed to create automated message:", msgErr);
     }
-  }, [createNewThread, treatmentPlans, systemAuthor]); // <-- 3. ADD DEPENDENCIES
+  }, [createNewThread, treatmentPlans, systemAuthor]); 
 
   const rejectTreatmentPlan = useCallback(async (planId, reason) => {
     const rejectedPlan = await simulateApi(() => {
@@ -267,13 +298,13 @@ export const ClinicalProvider = ({ children }) => {
         `Treatment Plan Declined: ${rejectedPlan.planName}`,
         'Clinical',
         `This is a notification that you have declined the treatment plan: "${rejectedPlan.planName}". Our team may follow up with you.`,
-        [], // attachments
-        systemAuthor // <-- 2. PASS AUTHOR
+        [], 
+        systemAuthor 
       );
     } catch (msgErr) {
       console.error("Failed to create automated message:", msgErr);
     }
-  }, [createNewThread, treatmentPlans, systemAuthor]); // <-- 3. ADD DEPENDENCIES
+  }, [createNewThread, treatmentPlans, systemAuthor]); 
 
 
   // --- Value ---
@@ -282,12 +313,14 @@ export const ClinicalProvider = ({ children }) => {
     visitSummaries,
     treatmentPlans,
     availableSlots, 
+    checkInQuestions, // <--- 4. Expose Questions
     loading,
     error,
     
     bookAppointment,
     cancelAppointment,
     rescheduleAppointment,
+    checkInAppointment, // <--- 5. Expose Check-In Function
     acceptTreatmentPlan,
     rejectTreatmentPlan,
     
@@ -296,11 +329,13 @@ export const ClinicalProvider = ({ children }) => {
     visitSummaries, 
     treatmentPlans, 
     availableSlots, 
+    checkInQuestions, // <--- Dependency
     loading, 
     error,
     bookAppointment,
     cancelAppointment,
     rescheduleAppointment,
+    checkInAppointment, // <--- Dependency
     acceptTreatmentPlan,
     rejectTreatmentPlan
   ]);
