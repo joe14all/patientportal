@@ -5,11 +5,23 @@ import styles from './DocumentList.module.css';
 /**
  * Renders the categorized lists of documents.
  */
-const DocumentList = ({ categorizedDocuments, onArchive, onPreview, loading }) => {
+const DocumentList = ({ 
+  categorizedDocuments, 
+  onArchive, 
+  onRestore, // <-- NEW
+  onPreview, 
+  onRename,  // <-- NEW
+  loading,
+  isShowingArchived // <-- NEW: To decide which actions to show
+}) => {
   const categories = Object.keys(categorizedDocuments);
 
   if (categories.length === 0 && !loading) {
-    return <p>You have no documents.</p>;
+    return (
+      <div className={styles.emptyState}>
+        <p>You have no {isShowingArchived ? 'archived' : ''} documents.</p>
+      </div>
+    );
   }
 
   return (
@@ -23,8 +35,11 @@ const DocumentList = ({ categorizedDocuments, onArchive, onPreview, loading }) =
                 key={doc.id}
                 doc={doc}
                 onArchive={onArchive}
+                onRestore={onRestore} // Pass down
                 onPreview={onPreview}
+                onRename={onRename}   // Pass down
                 loading={loading}
+                isArchived={isShowingArchived} // Pass down status
               />
             ))}
           </ul>

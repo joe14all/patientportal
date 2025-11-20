@@ -15,3 +15,21 @@ export const DOCUMENT_CATEGORIES = [
   "Consent Form",
   "Other",
 ];
+
+// --- NEW: Sort Options ---
+export const DOCUMENT_SORT_OPTIONS = [
+  { label: "Date: Newest First", value: "date_desc" },
+  { label: "Date: Oldest First", value: "date_asc" },
+  { label: "Name: A-Z", value: "name_asc" },
+  { label: "Name: Z-A", value: "name_desc" },
+];
+
+// --- NEW: Context Type Mapping ---
+// Maps the backend 'linkContext.type' to a user-friendly label
+export const DOCUMENT_CONTEXT_TYPES = {
+  InsurancePolicy: "Policy Document",
+  VisitSummary: "Visit Record",
+  MessageThread: "Message Attachment",
+  Invoice: "Billing Record",
+  Consent: "Signed Form",
+};

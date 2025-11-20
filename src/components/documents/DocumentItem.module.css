@@ -1,6 +1,5 @@
 .docItem {
   display: grid;
-  /* Grid: Icon | Info | Actions */
   grid-template-columns: auto 1fr auto;
   align-items: center;
   gap: 1rem;
@@ -14,7 +13,6 @@
 .docItem:hover {
   background-color: var(--bg-surface-hover);
   border-color: var(--primary);
-  /* Add a subtle shadow on hover */
   box-shadow: 0 4px 6px -1px rgba(0,0,0,0.03);
 }
 
@@ -22,14 +20,20 @@ body.dark .docItem:hover {
    box-shadow: none;
 }
 
+/* Visual distinction for archived items */
+.archivedItem {
+  opacity: 0.8;
+  background-color: var(--bg-body);
+  border-style: dashed;
+}
+
 .docIcon {
-  /* Make the icon a styled box */
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 40px; /* Larger */
-  height: 40px; /* Larger */
-  border-radius: 0.5rem; /* Rounded corners */
+  width: 40px;
+  height: 40px;
+  border-radius: 0.5rem;
   background-color: var(--primary-light);
   color: var(--primary);
   flex-shrink: 0;
@@ -43,6 +47,9 @@ body.dark .docItem:hover {
 .docInfo {
   flex-grow: 1;
   min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
 }
 
 .docName {
@@ -52,56 +59,91 @@ body.dark .docItem:hover {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  font-size: 1rem; /* Slightly larger */
-  transition: color 0.2s ease;
+  font-size: 1rem;
+}
+
+/* --- Meta Row (Holds Date, Badges, Tags) --- */
+.metaRow {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap; /* Ensure tags wrap on small screens */
+  margin-top: 0.25rem;
 }
 
 .docMeta {
-  display: block;
   font-size: 0.875rem;
   color: var(--text-secondary);
 }
 
-.docActions {
-  display: flex;
-  gap: 0.5rem;
+/* --- 1. Context Badge (System) --- */
+.contextBadge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.1rem 0.5rem;
+  border-radius: 99px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  background-color: var(--neutral-200);
+  color: var(--neutral-700);
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+body.dark .contextBadge {
+  background-color: var(--neutral-700);
+  color: var(--neutral-300);
 }
 
-/* --- Responsive layout for mobile --- */
+/* --- 2. User Tag Group --- */
+.tagGroup {
+  display: flex;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+}
+
+/* --- 3. User Tag (Individual) --- */
+.userTag {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  background-color: var(--bg-surface-hover);
+  padding: 0.1rem 0.4rem;
+  border-radius: 0.25rem;
+  border: 1px solid var(--border-color);
+  white-space: nowrap;
+}
+body.dark .userTag {
+  background-color: var(--neutral-800);
+  border-color: var(--neutral-700);
+}
+
+
+.docActions {
+  display: flex;
+  gap: 0.25rem;
+}
+
 @media (max-width: 640px) {
   .docItem {
-    /* Grid: Icon | Info */
-    /* ....   | Actions */
     grid-template-columns: auto 1fr;
     grid-template-rows: auto auto;
     gap: 0.5rem 1rem;
   }
   
   .docIcon {
-    /* Top-left */
     grid-row: 1 / span 2;
     grid-column: 1 / 2;
-    /* Make icon smaller on mobile to save space */
     width: 36px;
     height: 36px;
   }
   
   .docInfo {
-    /* Top-right */
     grid-row: 1 / 2;
     grid-column: 2 / 3;
   }
   
   .docActions {
-    /* Bottom-right */
     grid-row: 2 / 3;
     grid-column: 2 / 3;
-    
-    /* --- THIS IS THE ONLY CHANGE --- */
-    justify-content: flex-end; /* Was flex-start, this looks tidier */
-  }
-  
-  .docName {
-    font-size: 0.9rem; /* Smaller on mobile */
+    justify-content: flex-end;
   }
 }

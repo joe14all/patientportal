@@ -50,13 +50,11 @@ export const EngagementProvider = ({ children }) => {
   };
 
   // --- Message Functions ---
-  // ... (sendMessage and createNewThread functions remain unchanged) ...
   
   /**
    * (CREATE) Sends a new message (reply) in an existing thread.
    */
   const sendMessage = useCallback(async (threadId, body, attachments = []) => {
-    // This function is for patient replies, so it correctly uses patientAuthor
     await simulateApi(() => {
       const newPost = {
         id: `msg-post-uuid-${Date.now()}`,
@@ -96,19 +94,14 @@ export const EngagementProvider = ({ children }) => {
         })
       );
     });
-  }, [patientAuthor]); // <-- Add dependency
+  }, [patientAuthor]);
 
   /**
    * (CREATE) Creates a new message thread.
-   * Can be initiated by the patient or by the system (automated).
-   * --- 2. UPDATE FUNCTION SIGNATURE ---
    */
   const createNewThread = useCallback(async (subject, category, body, attachments = [], authorInfo = null) => {
     
-    // --- 3. Determine the author ---
     const author = authorInfo || patientAuthor;
-    
-    // --- 4. Determine read status and thread status ---
     const isPatientInitiated = author.type === 'Patient';
     
     await simulateApi(() => {
@@ -118,15 +111,15 @@ export const EngagementProvider = ({ children }) => {
 
       const newThread = {
         id: newThreadId,
-        patientId: "patient-uuid-001", // Get from auth
-        initiatingUserId: author.id, // <-- Use determined author ID
+        patientId: "patient-uuid-001", 
+        initiatingUserId: author.id, 
         subject: subject,
         category: category,
         status: isPatientInitiated ? "PendingStaff" : "PendingPatient", 
         priority: "Normal",
         assignment: {
           assignedType: "Provider",
-          assignedId: "provider-uuid-001", // Default provider
+          assignedId: "provider-uuid-001",
         },
         readStatus: {
           isReadByPatient: isPatientInitiated,
@@ -134,7 +127,7 @@ export const EngagementProvider = ({ children }) => {
         },
         lastMessage: {
           timestamp: timestamp,
-          authorType: author.type, // <-- Use determined author
+          authorType: author.type, 
           snippet: body.substring(0, 50) + "...",
         },
         systemInfo: {
@@ -147,9 +140,9 @@ export const EngagementProvider = ({ children }) => {
       const firstPost = {
         id: newPostId,
         threadId: newThreadId,
-        authorType: author.type, // <-- Use determined author
-        authorId: author.id, // <-- Use determined author
-        authorName: author.name, // <-- Use determined author
+        authorType: author.type, 
+        authorId: author.id, 
+        authorName: author.name, 
         body: body,
         attachments: attachments,
         createdAt: timestamp,
@@ -158,13 +151,12 @@ export const EngagementProvider = ({ children }) => {
       setThreads(prev => [newThread, ...prev]);
       setPosts(prev => [firstPost, ...prev]);
     });
-  }, [patientAuthor, systemAuthor]); // <-- Add dependencies
+  }, [patientAuthor, systemAuthor]);
 
   /**
    * (UPDATE) Marks a thread as read by the patient.
    */
   const markThreadAsRead = useCallback(async (threadId) => {
-    // This is a "silent" API call, no loading spinner
     setThreads(prev =>
       prev.map(thread =>
         (thread.id === threadId && !thread.readStatus.isReadByPatient)
@@ -181,24 +173,16 @@ export const EngagementProvider = ({ children }) => {
    * (CREATE) Uploads a new document.
    */
   const uploadDocument = useCallback(async (file, category, linkContext = null) => {
-    // `file` is a File object.
-    
-    // --- THIS IS THE FIX ---
-    // Create a temporary local URL for the file.
-    // This allows the <embed> or <img> tag to preview it immediately.
-    // In a real app, this URL would be replaced by an S3 or blob storage URL
-    // after the upload completes. For our mock, this is perfect.
     const fileUrl = URL.createObjectURL(file);
     
     const newDoc = await simulateApi(() => {
       const newDoc = {
         id: `doc-uuid-${Date.now()}`,
-        patientId: "patient-uuid-001", // Get from auth
-        uploadedByUserId: "user-uuid-001", // Get from auth
+        patientId: "patient-uuid-001", 
+        uploadedByUserId: "user-uuid-001", 
         fileName: file.name || "new-file.pdf",
         storage: {
           provider: "Mock",
-          // --- USE THE NEW URL ---
           url: fileUrl, 
           fileType: file.type || "application/pdf",
           fileSize: file.size || 123456,
@@ -213,11 +197,10 @@ export const EngagementProvider = ({ children }) => {
       };
 
       setDocuments(prev => [newDoc, ...prev]);
-      return newDoc; // Return the new doc so it can be attached to a message
+      return newDoc; 
     });
     
     return newDoc;
-    
   }, []);
 
   /**
@@ -225,12 +208,11 @@ export const EngagementProvider = ({ children }) => {
    */
   const archiveDocument = useCallback(async (documentId) => {
     await simulateApi(() => {
-      // --- NEW: Revoke Object URL to prevent memory leaks ---
+      // --- Revoke Object URL to prevent memory leaks ---
       const docToArchive = documents.find(doc => doc.id === documentId);
       if (docToArchive && docToArchive.storage.url.startsWith('blob:')) {
         URL.revokeObjectURL(docToArchive.storage.url);
       }
-      // ----------------------------------------------------
 
       setDocuments(prev =>
         prev.map(doc =>
@@ -240,11 +222,42 @@ export const EngagementProvider = ({ children }) => {
         )
       );
     });
-  }, [documents]); // <-- Add documents dependency
+  }, [documents]);
+
+  /**
+   * (UPDATE) Restores an archived document (Undo).
+   * --- NEW FUNCTION ---
+   */
+  const restoreDocument = useCallback(async (documentId) => {
+    await simulateApi(() => {
+      setDocuments(prev =>
+        prev.map(doc =>
+          doc.id === documentId
+            ? { ...doc, systemInfo: { ...doc.systemInfo, status: "Active" } }
+            : doc
+        )
+      );
+    });
+  }, []);
+
+  /**
+   * (UPDATE) Updates document metadata (e.g. Rename).
+   * --- NEW FUNCTION ---
+   */
+  const updateDocument = useCallback(async (documentId, updates) => {
+    await simulateApi(() => {
+      setDocuments(prev =>
+        prev.map(doc =>
+          doc.id === documentId
+            ? { ...doc, ...updates }
+            : doc
+        )
+      );
+    });
+  }, []);
 
 
   // --- Value ---
-  // Memoize the context value to prevent unnecessary re-renders
   const value = useMemo(() => ({
     // State (READ)
     messageThreads: threads,
@@ -259,8 +272,10 @@ export const EngagementProvider = ({ children }) => {
     markThreadAsRead,
     uploadDocument,
     archiveDocument,
+    restoreDocument, // <--- Exported
+    updateDocument,  // <--- Exported
     
-    // --- 5. EXPORT THE SYSTEM AUTHOR FOR OTHER CONTEXTS ---
+    // System Author
     systemAuthor
     
   }), [
@@ -274,7 +289,9 @@ export const EngagementProvider = ({ children }) => {
     markThreadAsRead,
     uploadDocument,
     archiveDocument,
-    systemAuthor // <-- Add dependency
+    restoreDocument, // <--- Dependency
+    updateDocument,  // <--- Dependency
+    systemAuthor
   ]);
 
   // --- Render ---

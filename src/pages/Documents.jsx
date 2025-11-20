@@ -2,29 +2,38 @@ import React, { useState, useMemo, useCallback } from 'react';
 import { useEngagementData } from '../contexts';
 import styles from './Documents.module.css';
 
-// --- 1. Import all the new components ---
+// --- 1. Import components ---
 import DocumentUploadCard from '../components/documents/DocumentUploadCard';
 import DocumentList from '../components/documents/DocumentList';
 import DocumentPreviewModal from '../components/documents/DocumentPreviewModal';
-// (Icons are no longer needed here)
+import DocumentFilters from '../components/documents/DocumentFilters';
+import DocumentRenameModal from '../components/documents/DocumentRenameModal';
 
 const Documents = () => {
   const { 
     documents, 
     uploadDocument, 
-    archiveDocument, 
+    archiveDocument,
+    restoreDocument, // <-- New from context
+    updateDocument,  // <-- New from context (for renaming)
     loading, 
     error 
   } = useEngagementData();
 
-  // --- 2. State for preview modal ---
+  // --- 2. State for Modals ---
   const [previewDoc, setPreviewDoc] = useState(null);
+  const [renamingDoc, setRenamingDoc] = useState(null); // For rename modal
 
-  // --- 3. Handlers are simplified and passed down ---
+  // --- 3. State for Filters/Sorting ---
+  const [searchQuery, setSearchQuery] = useState('');
+  const [sortOption, setSortOption] = useState('date_desc'); // Default: Newest first
+  const [showArchived, setShowArchived] = useState(false);   // Default: Show Active
+
+  // --- 4. Handlers ---
+
   const handleUpload = useCallback(async (file, category) => {
-    // The component's internal state handles loading
     await uploadDocument(file, category);
-  }, [uploadDocument]); // Add dependency
+  }, [uploadDocument]);
 
   const handleDelete = useCallback(async (docId) => {
     if (window.confirm("Are you sure you want to archive this document?")) {
@@ -34,21 +43,70 @@ const Documents = () => {
         console.error("Archive failed", err);
       }
     }
-  }, [archiveDocument]); // Add dependency
+  }, [archiveDocument]);
 
-  const handlePreview = (doc) => {
-    setPreviewDoc(doc);
+  const handleRestore = useCallback(async (docId) => {
+    if (window.confirm("Restore this document to your active list?")) {
+      try {
+        await restoreDocument(docId);
+      } catch (err) {
+        console.error("Restore failed", err);
+      }
+    }
+  }, [restoreDocument]);
+
+  const handleRename = (doc) => {
+    setRenamingDoc(doc);
   };
 
-  const handleClosePreview = () => {
-    setPreviewDoc(null);
-  };
+  const handleSaveRename = async (docId, updates) => { // Changed 'newName' to 'updates'
+  try {
+    // 'updates' is now { fileName: "...", tags: [...] }
+    // This matches exactly what updateDocument expects!
+    await updateDocument(docId, updates);
+    setRenamingDoc(null);
+  } catch (err) {
+    console.error("Rename failed", err);
+  }
+};
 
-  // --- 4. Data processing remains the same ---
-  const categorizedDocuments = useMemo(() => {
-    const activeDocs = documents.filter(doc => doc.systemInfo.status === 'Active');
-    
-    return activeDocs.reduce((acc, doc) => {
+  // --- 5. Filtering & Sorting Logic ---
+  const processedDocuments = useMemo(() => {
+    // A. Filter by Status (Active vs Archived)
+    let result = documents.filter(doc => 
+      showArchived 
+        ? doc.systemInfo.status === 'Archived' 
+        : doc.systemInfo.status === 'Active'
+    );
+
+    // B. Filter by Search Query
+    if (searchQuery.trim()) {
+      const lowerQuery = searchQuery.toLowerCase();
+      result = result.filter(doc => 
+        doc.fileName.toLowerCase().includes(lowerQuery) ||
+        doc.tags.some(tag => tag.toLowerCase().includes(lowerQuery)) ||
+        doc.category.toLowerCase().includes(lowerQuery)
+      );
+    }
+
+    // C. Sort
+    result.sort((a, b) => {
+      switch (sortOption) {
+        case 'date_desc':
+          return new Date(b.systemInfo.createdAt) - new Date(a.systemInfo.createdAt);
+        case 'date_asc':
+          return new Date(a.systemInfo.createdAt) - new Date(b.systemInfo.createdAt);
+        case 'name_asc':
+          return a.fileName.localeCompare(b.fileName);
+        case 'name_desc':
+          return b.fileName.localeCompare(a.fileName);
+        default:
+          return 0;
+      }
+    });
+
+    // D. Group by Category
+    return result.reduce((acc, doc) => {
       const category = doc.category || 'Uncategorized';
       if (!acc[category]) {
         acc[category] = [];
@@ -56,7 +114,7 @@ const Documents = () => {
       acc[category].push(doc);
       return acc;
     }, {});
-  }, [documents]);
+  }, [documents, showArchived, searchQuery, sortOption]);
 
 
   return (
@@ -68,25 +126,48 @@ const Documents = () => {
 
       {error && <p className="error-text">Error: {error}</p>}
 
-      {/* --- 5. Render the new components --- */}
-      
+      {/* --- Filters & Upload --- */}
       <DocumentUploadCard 
         onUpload={handleUpload}
         loading={loading}
       />
 
-      {loading && documents.length === 0 && <p>Loading documents...</p>}
-      
-      <DocumentList
-        categorizedDocuments={categorizedDocuments}
-        onArchive={handleDelete}
-        onPreview={handlePreview}
-        loading={loading}
+      <DocumentFilters
+        searchQuery={searchQuery}
+        onSearchChange={setSearchQuery}
+        sortOption={sortOption}
+        onSortChange={setSortOption}
+        showArchived={showArchived}
+        onToggleArchived={setShowArchived}
       />
 
+      {/* --- Document List --- */}
+      {loading && documents.length === 0 ? (
+        <p>Loading documents...</p>
+      ) : (
+        <DocumentList
+          categorizedDocuments={processedDocuments}
+          onArchive={handleDelete}
+          onRestore={handleRestore} // Pass restore handler
+          onPreview={setPreviewDoc} // Simple setter works here
+          onRename={handleRename}   // Pass rename handler
+          loading={loading}
+          isShowingArchived={showArchived} // Let list know context
+        />
+      )}
+
+      {/* --- Modals --- */}
       <DocumentPreviewModal
         doc={previewDoc}
-        onClose={handleClosePreview}
+        onClose={() => setPreviewDoc(null)}
+      />
+
+      <DocumentRenameModal
+        isOpen={!!renamingDoc}
+        doc={renamingDoc}
+        onClose={() => setRenamingDoc(null)}
+        onSave={handleSaveRename}
+        loading={loading}
       />
     </div>
   );
