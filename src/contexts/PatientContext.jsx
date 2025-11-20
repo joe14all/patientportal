@@ -1,6 +1,7 @@
 /* eslint-disable react-refresh/only-export-components */
 import React, { createContext, useContext, useState, useMemo, useCallback } from 'react';
-import { mockApi } from '../_mock'; // Import the initial mock data
+import { mockApi } from '../_mock';
+import { s3Service } from '../_mock/storage/s3';
 
 // 1. Create the context
 export const PatientContext = createContext(null);
@@ -196,18 +197,34 @@ export const PatientProvider = ({ children }) => {
   /**
    * (UPDATE) Updates just the patient's profile image URL.
    */
-  const updateProfilePicture = useCallback(async (newImageUrl) => {
-    // We use a shorter delay for a snappy UI update
+  const updateProfilePicture = useCallback(async (dataUrlOrFile) => {
+    // Handle crop result (DataURL) or raw File
+    let publicUrl = null;
+
+    // If it's a base64 string (from cropper), we need to convert to Blob to "upload"
+    if (typeof dataUrlOrFile === 'string' && dataUrlOrFile.startsWith('data:')) {
+       const res = await fetch(dataUrlOrFile);
+       const blob = await res.blob();
+       const file = new File([blob], "profile-pic.jpg", { type: "image/jpeg" });
+       
+       // Upload to "S3"
+       const uploadResult = await s3Service.upload(file, 'profile');
+       publicUrl = uploadResult.url;
+    } else if (dataUrlOrFile === null) {
+       // Handle removal
+       publicUrl = null; 
+    }
+
     await simulateApi(() => {
       setPatient(prevPatient => ({
         ...prevPatient,
         systemInfo: {
           ...prevPatient.systemInfo,
-          profileImageUrl: newImageUrl, // Set the new URL (or null)
+          profileImageUrl: publicUrl, 
           updatedAt: new Date().toISOString()
         }
       }));
-    }, 200); // 200ms delay
+    }, 500); 
   }, []);
 
   // --- Value ---

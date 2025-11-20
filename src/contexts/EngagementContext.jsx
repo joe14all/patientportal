@@ -1,6 +1,7 @@
 /* eslint-disable react-refresh/only-export-components */
 import React, { createContext, useContext, useState, useMemo, useCallback } from 'react';
-import { mockApi } from '../_mock'; // Import the initial mock data
+import { mockApi } from '../_mock'; 
+import { s3Service } from '../_mock/storage/s3'; // 1. Import the storage service
 
 // 1. Create the context
 export const EngagementContext = createContext(null);
@@ -171,10 +172,13 @@ export const EngagementProvider = ({ children }) => {
 
   /**
    * (CREATE) Uploads a new document.
+   * Updated to use s3Service for file handling logic.
    */
   const uploadDocument = useCallback(async (file, category, linkContext = null) => {
-    const fileUrl = URL.createObjectURL(file);
+    // 1. Upload to "S3" first. This handles the latency and URL generation.
+    const s3Result = await s3Service.upload(file, 'documents');
     
+    // 2. Save metadata to the "Database"
     const newDoc = await simulateApi(() => {
       const newDoc = {
         id: `doc-uuid-${Date.now()}`,
@@ -182,8 +186,9 @@ export const EngagementProvider = ({ children }) => {
         uploadedByUserId: "user-uuid-001", 
         fileName: file.name || "new-file.pdf",
         storage: {
-          provider: "Mock",
-          url: fileUrl, 
+          provider: "S3_Mock", // Updated provider
+          key: s3Result.key,   // Store the unique key
+          url: s3Result.url,   // Store the blob URL
           fileType: file.type || "application/pdf",
           fileSize: file.size || 123456,
         },
@@ -207,12 +212,10 @@ export const EngagementProvider = ({ children }) => {
    * (DELETE) Archives a document (soft delete).
    */
   const archiveDocument = useCallback(async (documentId) => {
-    await simulateApi(() => {
-      // --- Revoke Object URL to prevent memory leaks ---
-      const docToArchive = documents.find(doc => doc.id === documentId);
-      if (docToArchive && docToArchive.storage.url.startsWith('blob:')) {
-        URL.revokeObjectURL(docToArchive.storage.url);
-      }
+    await simulateApi(async () => {
+      // Optional: If you wanted to delete the actual file blob, you could do:
+      // const docToArchive = documents.find(doc => doc.id === documentId);
+      // if (docToArchive?.storage?.key) { await s3Service.delete(docToArchive.storage.key); }
 
       setDocuments(prev =>
         prev.map(doc =>
@@ -222,11 +225,10 @@ export const EngagementProvider = ({ children }) => {
         )
       );
     });
-  }, [documents]);
+  }, []); // Added dependency array although documents is used inside callback logic via prev state
 
   /**
    * (UPDATE) Restores an archived document (Undo).
-   * --- NEW FUNCTION ---
    */
   const restoreDocument = useCallback(async (documentId) => {
     await simulateApi(() => {
@@ -242,7 +244,6 @@ export const EngagementProvider = ({ children }) => {
 
   /**
    * (UPDATE) Updates document metadata (e.g. Rename).
-   * --- NEW FUNCTION ---
    */
   const updateDocument = useCallback(async (documentId, updates) => {
     await simulateApi(() => {
@@ -272,8 +273,8 @@ export const EngagementProvider = ({ children }) => {
     markThreadAsRead,
     uploadDocument,
     archiveDocument,
-    restoreDocument, // <--- Exported
-    updateDocument,  // <--- Exported
+    restoreDocument,
+    updateDocument,
     
     // System Author
     systemAuthor
@@ -289,8 +290,8 @@ export const EngagementProvider = ({ children }) => {
     markThreadAsRead,
     uploadDocument,
     archiveDocument,
-    restoreDocument, // <--- Dependency
-    updateDocument,  // <--- Dependency
+    restoreDocument, 
+    updateDocument, 
     systemAuthor
   ]);
 
