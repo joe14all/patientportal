@@ -33,6 +33,7 @@ import offices from "./data/core/offices.json";
 import procedures from "./data/core/procedures.json";
 import appointmentTypes from "./data/core/appointment_types.json";
 import operatories from "./data/core/operatories.json";
+import downloadableForms from "./data/core/downloadable_forms.json";
 
 // --- API ---
 // This mock API object is what your React components will import.
@@ -79,5 +80,6 @@ export const mockApi = {
     procedures,
     appointmentTypes,
     operatories,
+    downloadableForms,
   },
 };

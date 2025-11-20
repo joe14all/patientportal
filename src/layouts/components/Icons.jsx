@@ -260,3 +260,24 @@ export const IconRefresh = (props) => (
     <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
   </svg>
 );
+
+export const IconCheck = (props) => (
+  <svg {...iconProps} {...props}>
+    <polyline points="20 6 9 17 4 12"></polyline>
+  </svg>
+);
+
+export const IconAlertCircle = (props) => (
+  <svg {...iconProps} {...props}>
+    <circle cx="12" cy="12" r="10"></circle>
+    <line x1="12" y1="8" x2="12" y2="12"></line>
+    <line x1="12" y1="16" x2="12.01" y2="16"></line>
+  </svg>
+);
+
+export const IconClock = (props) => (
+  <svg {...iconProps} {...props}>
+    <circle cx="12" cy="12" r="10"></circle>
+    <polyline points="12 6 12 12 16 14"></polyline>
+  </svg>
+);

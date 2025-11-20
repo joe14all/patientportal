@@ -1,0 +1,195 @@
+.formsCard {
+  margin-bottom: 2.5rem;
+  padding: 1.5rem;
+}
+
+.header {
+  margin-bottom: 1.5rem;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 1rem;
+}
+
+.formGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+}
+
+@media (min-width: 768px) {
+  .formGrid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.formItem {
+  display: flex;
+  flex-direction: column;
+  padding: 1.25rem;
+  border: 1px solid var(--border-color);
+  border-radius: 0.75rem;
+  background-color: var(--bg-body);
+  transition: all 0.2s ease;
+}
+
+/* Status-based borders */
+.formItem.rejected { border-left: 4px solid var(--error-500); }
+.formItem.expired { border-left: 4px solid var(--warning-500); }
+.formItem.complete { border-left: 4px solid var(--success-500); background-color: var(--bg-surface); }
+.formItem.pending { border-left: 4px solid var(--neutral-400); }
+
+.itemHeader {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.iconWrapper {
+  color: var(--primary);
+  margin-top: 0.2rem;
+}
+
+.formInfo {
+  flex-grow: 1;
+}
+
+.formInfo strong {
+  display: block;
+  font-size: 1rem;
+  color: var(--text-primary);
+}
+
+.freq {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* --- Badges --- */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.2rem 0.6rem;
+  border-radius: 99px;
+  text-transform: uppercase;
+}
+
+/* Light Mode Colors */
+.success { background-color: var(--success-100); color: var(--success-500); }
+.warning { background-color: var(--warning-100); color: var(--warning-500); }
+.error   { background-color: var(--error-100); color: var(--error-500); }
+.neutral { background-color: var(--neutral-200); color: var(--neutral-800); }
+
+/* Dark Mode Colors - High Contrast Updates */
+body.dark .success { 
+  background-color: var(--success-bg); 
+  color: var(--success-500); 
+  border: 1px solid var(--success-bg);
+}
+body.dark .warning { 
+  background-color: var(--warning-bg); 
+  color: var(--warning-500); 
+  border: 1px solid var(--warning-bg);
+}
+body.dark .error { 
+  background-color: var(--error-bg);   
+  color: var(--error-500);   
+  border: 1px solid var(--error-bg);
+}
+body.dark .neutral { 
+  background-color: var(--bg-surface-hover); 
+  color: var(--text-secondary); 
+  border: 1px solid var(--border-color); 
+}
+
+
+/* --- Messages --- */
+.feedbackMsg {
+  font-size: 0.85rem;
+  color: var(--error-500);
+  background-color: var(--error-100);
+  padding: 0.5rem;
+  border-radius: 0.25rem;
+  margin-bottom: 1rem;
+}
+body.dark .feedbackMsg {
+  background-color: var(--error-bg);
+  color: var(--error-500);
+}
+
+.expired .feedbackMsg {
+  color: var(--warning-500);
+  background-color: var(--warning-100);
+}
+body.dark .expired .feedbackMsg {
+  background-color: var(--warning-bg);
+  color: var(--warning-500);
+}
+
+/* --- Actions --- */
+.actions {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  margin-top: auto; /* Push to bottom */
+  padding-top: 1rem;
+  border-top: 1px solid var(--border-color);
+}
+
+.actionLink {
+  font-size: 0.85rem;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: var(--primary);
+  text-decoration: none;
+}
+.actionLink:hover { text-decoration: underline; }
+
+/* --- UPDATED UPLOAD BUTTON STYLES --- */
+.uploadBtn {
+  margin-left: auto; /* Push to right */
+  font-size: 0.85rem;
+  padding: 0.5rem 1rem; /* Larger padding */
+  
+  /* Layout */
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem; /* Space between icon and text */
+  
+  /* Appearance (Primary Button Style) */
+  background-color: var(--primary);
+  color: var(--text-inverted);
+  border: 1px solid var(--primary);
+  border-radius: 0.5rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+.uploadBtn:hover:not(:disabled) {
+  background-color: var(--primary-hover);
+  border-color: var(--primary-hover);
+}
+
+.uploadBtn:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+.uploadBtn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  background-color: var(--neutral-400);
+  border-color: var(--neutral-400);
+}
+
+/* Ensure icon fits nicely */
+.uploadBtn svg {
+  width: 16px;
+  height: 16px;
+}

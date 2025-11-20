@@ -8,6 +8,7 @@ import DocumentList from '../components/documents/DocumentList';
 import DocumentPreviewModal from '../components/documents/DocumentPreviewModal';
 import DocumentFilters from '../components/documents/DocumentFilters';
 import DocumentRenameModal from '../components/documents/DocumentRenameModal';
+import DownloadableForms from '../components/documents/DownloadableForms'; 
 
 const Documents = () => {
   const { 
@@ -33,6 +34,30 @@ const Documents = () => {
 
   const handleUpload = useCallback(async (file, category) => {
     await uploadDocument(file, category);
+  }, [uploadDocument]);
+
+  const handleFormUpload = useCallback(async (file, formDef) => {
+    if (!file || !formDef) return;
+
+    try {
+      // 1. Define the "Context" so the system knows this file belongs to this form
+      const linkContext = {
+        type: 'FormDefinition',
+        id: formDef.id,
+        description: formDef.title
+      };
+      
+      // 2. Use the form's default category
+      const category = formDef.defaultCategory || 'Consent Form';
+
+      // 3. Upload
+      await uploadDocument(file, category, linkContext);
+      
+      // The list will auto-update because 'documents' context will change
+    } catch (err) {
+      console.error("Form upload failed", err);
+      // Ideally set an error state here to show a toast
+    }
   }, [uploadDocument]);
 
   const handleDelete = useCallback(async (docId) => {
@@ -125,6 +150,11 @@ const Documents = () => {
       </p>
 
       {error && <p className="error-text">Error: {error}</p>}
+      {/*  Download Section */}
+      <DownloadableForms 
+        onFormUpload={handleFormUpload}
+        loading={loading}
+      />
 
       {/* --- Filters & Upload --- */}
       <DocumentUploadCard 

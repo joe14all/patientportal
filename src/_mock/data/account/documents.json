@@ -1,135 +1,86 @@
 [
   {
-    "id": "doc-uuid-001",
+    "id": "doc-form-001",
     "patientId": "patient-uuid-001",
     "uploadedByUserId": "user-uuid-001",
-    "fileName": "Delta_Dental_Card_Front.jpg",
-    "storage": {
-      "provider": "Mock",
-      "url": "/src/assets/Test/Test.jpg",
-      "fileType": "image/jpeg",
-      "fileSize": 102400
-    },
-    "category": "Insurance Card",
-    "linkContext": {
-      "type": "InsurancePolicy",
-      "id": "ins-uuid-001",
-      "description": "Primary Dental Policy"
-    },
-    "tags": ["Insurance", "2025"],
-    "systemInfo": {
-      "createdAt": "2025-01-10T10:00:00Z",
-      "status": "Active"
-    }
-  },
-  {
-    "id": "doc-uuid-002",
-    "patientId": "patient-uuid-001",
-    "uploadedByUserId": "provider-uuid-001",
-    "fileName": "Post_Op_Instructions_Wisdom_Teeth.pdf",
+    "fileName": "Signed_Registration.pdf",
     "storage": {
       "provider": "Mock",
       "url": "/src/assets/Test/Test.pdf",
       "fileType": "application/pdf",
-      "fileSize": 450000
-    },
-    "category": "Clinical Instruction",
-    "linkContext": {
-      "type": "VisitSummary",
-      "id": "visit-uuid-001",
-      "description": "Visit on Nov 20, 2025"
-    },
-    "tags": ["Surgery", "Instructions"],
-    "systemInfo": {
-      "createdAt": "2025-11-20T11:30:00Z",
-      "status": "Active"
-    }
-  },
-  {
-    "id": "doc-uuid-003",
-    "patientId": "patient-uuid-001",
-    "uploadedByUserId": "user-uuid-001",
-    "fileName": "Referral_Letter_Dr_Smith.pdf",
-    "storage": {
-      "provider": "Mock",
-      "url": "/src/assets/Test/Test.pdf",
-      "fileType": "application/pdf",
-      "fileSize": 125000
-    },
-    "category": "Referral Letter",
-    "linkContext": {
-      "type": "MessageThread",
-      "id": "msg-thread-uuid-001",
-      "description": "Attached to message regarding treatment plan"
-    },
-    "tags": ["Referral", "Specialist"],
-    "systemInfo": {
-      "createdAt": "2025-11-15T14:00:00Z",
-      "status": "Active"
-    }
-  },
-  {
-    "id": "doc-uuid-004",
-    "patientId": "patient-uuid-001",
-    "uploadedByUserId": "system",
-    "fileName": "Invoice_INV-2025-1001.pdf",
-    "storage": {
-      "provider": "Mock",
-      "url": "/src/assets/Test/Test.pdf",
-      "fileType": "application/pdf",
-      "fileSize": 89000
-    },
-    "category": "Payment Receipt",
-    "linkContext": {
-      "type": "Invoice",
-      "id": "inv-uuid-001",
-      "description": "Invoice #INV-2025-1001"
-    },
-    "tags": ["Billing", "Receipt"],
-    "systemInfo": {
-      "createdAt": "2025-12-05T09:00:00Z",
-      "status": "Active"
-    }
-  },
-  {
-    "id": "doc-uuid-005",
-    "patientId": "patient-uuid-001",
-    "uploadedByUserId": "user-uuid-001",
-    "fileName": "Old_Xray_Full_Mouth_2020.jpg",
-    "storage": {
-      "provider": "Mock",
-      "url": "/src/assets/Test/Test.jpg",
-      "fileType": "image/jpeg",
-      "fileSize": 2500000
-    },
-    "category": "X-Rays / Imaging",
-    "linkContext": null,
-    "tags": ["X-Ray", "2020", "Archived"],
-    "systemInfo": {
-      "createdAt": "2020-06-15T09:30:00Z",
-      "status": "Archived"
-    }
-  },
-  {
-    "id": "doc-uuid-006",
-    "patientId": "patient-uuid-001",
-    "uploadedByUserId": "user-uuid-001",
-    "fileName": "Signed_Consent_Form.pdf",
-    "storage": {
-      "provider": "Mock",
-      "url": "/src/assets/Test/Test.pdf",
-      "fileType": "application/pdf",
-      "fileSize": 150000
+      "fileSize": 400000
     },
     "category": "Consent Form",
     "linkContext": {
-      "type": "Consent",
-      "id": "consent-uuid-001",
-      "description": "HIPAA Notice"
+      "type": "FormDefinition",
+      "id": "form-reg-001", 
+      "description": "New Patient Registration"
     },
-    "tags": ["Legal", "Consent"],
+    "verification": {
+      "status": "Verified",
+      "verifiedBy": "user-staff-001",
+      "verifiedAt": "2024-01-15T10:00:00Z"
+    },
+    "tags": ["Registration", "Signed"],
     "systemInfo": {
-      "createdAt": "2024-01-15T09:00:00Z",
+      "createdAt": "2024-01-15T09:50:00Z",
+      "status": "Active"
+    }
+  },
+  {
+    "id": "doc-form-002",
+    "patientId": "patient-uuid-001",
+    "uploadedByUserId": "user-uuid-001",
+    "fileName": "Financial_Policy_2023.pdf",
+    "storage": {
+      "provider": "Mock",
+      "url": "/src/assets/Test/Test.pdf",
+      "fileType": "application/pdf",
+      "fileSize": 120000
+    },
+    "category": "Consent Form",
+    "linkContext": {
+      "type": "FormDefinition",
+      "id": "form-fin-001",
+      "description": "Financial Policy"
+    },
+    "verification": {
+      "status": "Verified",
+      "verifiedBy": "user-staff-001",
+      "verifiedAt": "2023-05-10T10:00:00Z"
+    },
+    "tags": ["Financial", "Expired"],
+    "systemInfo": {
+      "createdAt": "2023-05-10T09:50:00Z",
+      "status": "Active"
+    }
+  },
+  {
+    "id": "doc-form-003",
+    "patientId": "patient-uuid-001",
+    "uploadedByUserId": "user-uuid-001",
+    "fileName": "HIPAA_Upload_Attempt.pdf",
+    "storage": {
+      "provider": "Mock",
+      "url": "/src/assets/Test/Test.pdf",
+      "fileType": "application/pdf",
+      "fileSize": 130000
+    },
+    "category": "Consent Form",
+    "linkContext": {
+      "type": "FormDefinition",
+      "id": "form-hipaa-001",
+      "description": "HIPAA Auth"
+    },
+    "verification": {
+      "status": "Rejected",
+      "verifiedBy": "user-staff-002",
+      "verifiedAt": "2025-11-18T10:00:00Z",
+      "reason": "Signature missing on page 2."
+    },
+    "tags": ["HIPAA", "Rejected"],
+    "systemInfo": {
+      "createdAt": "2025-11-18T09:00:00Z",
       "status": "Active"
     }
   }

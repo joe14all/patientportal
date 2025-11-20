@@ -1,0 +1,42 @@
+[
+  {
+    "id": "form-reg-001",
+    "title": "New Patient Registration",
+    "description": "Required for all new patients.",
+    "fileName": "Registration_Packet_v2.pdf",
+    "fileUrl": "/src/assets/Test/Test.pdf",
+    "frequency": "Once",
+    "required": true,
+    "defaultCategory": "Registration"
+  },
+  {
+    "id": "form-hipaa-001",
+    "title": "HIPAA Release Authorization",
+    "description": "Authorize us to share your records.",
+    "fileName": "HIPAA_Auth_Form.pdf",
+    "fileUrl": "/src/assets/Test/Test.pdf",
+    "frequency": "Once",
+    "required": true,
+    "defaultCategory": "Consent Form"
+  },
+  {
+    "id": "form-fin-001",
+    "title": "Financial Policy Agreement",
+    "description": "Must be updated every year.",
+    "fileName": "Financial_Policy_2025.pdf",
+    "fileUrl": "/src/assets/Test/Test.pdf",
+    "frequency": "Annually",
+    "required": true,
+    "defaultCategory": "Consent Form"
+  },
+  {
+    "id": "form-covid-001",
+    "title": "Health Screening (COVID-19)",
+    "description": "Required before every in-person visit.",
+    "fileName": "Health_Screen_v4.pdf",
+    "fileUrl": "/src/assets/Test/Test.pdf",
+    "frequency": "PerVisit",
+    "required": true,
+    "defaultCategory": "Clinical Form"
+  }
+]

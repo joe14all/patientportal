@@ -19,6 +19,7 @@ export const CoreProvider = ({ children }) => {
   // --- ADD NEW STATE ---
   const [appointmentTypes, setAppointmentTypes] = useState(mockApi.core.appointmentTypes);
   const [operatories, setOperatories] = useState(mockApi.core.operatories);
+  const [downloadableForms, setDownloadableForms] = useState(mockApi.core.downloadableForms);
 
   // This context has no "actions", so loading/error state
   // is less critical unless we were simulating an initial fetch.
@@ -91,7 +92,8 @@ export const CoreProvider = ({ children }) => {
     offices,       // The main office object
     procedures,    // The full array of all procedures
     appointmentTypes, // <-- ADDED
-    operatories,      // <-- ADDED
+    operatories, 
+    downloadableForms,
     loading,
     error,
     
@@ -109,6 +111,7 @@ export const CoreProvider = ({ children }) => {
     procedures, 
     appointmentTypes, // <-- ADDED
     operatories,      // <-- ADDED
+    downloadableForms,
     loading, 
     error,
     getProcedureById,
