@@ -350,19 +350,26 @@ const TrophyWidget = () => {
 
   return (
     <div className={styles.trophyWidget} onClick={() => navigate('/education')}>
-      <div className={styles.trophyWidgetContent}>
-        <span className={styles.trophyWidgetIcon}>🏆</span>
-        <div className={styles.trophyWidgetText}>
-          <strong>{stats.trophiesEarned} badges earned</strong>
-          <span> • {stats.totalViewed} lessons completed</span>
+      <div className={styles.trophyWidgetHeader}>
+        <div className={styles.trophyWidgetLeft}>
+          <span className={styles.trophyWidgetIcon}>🏆</span>
+          <div className={styles.trophyWidgetText}>
+            <h3>Learning Achievements</h3>
+            <p>
+              <strong>{stats.trophiesEarned}</strong> {stats.trophiesEarned === 1 ? 'badge' : 'badges'} earned • <strong>{stats.totalViewed}</strong> {stats.totalViewed === 1 ? 'lesson' : 'lessons'} completed
+            </p>
+          </div>
         </div>
+        <span className={styles.trophyWidgetArrow}>→</span>
       </div>
       {stats.recentTrophies?.length > 0 && (
         <div className={styles.trophyWidgetBadges}>
+          <span className={styles.badgesLabel}>Recent Achievements:</span>
           {stats.recentTrophies.map((trophy, idx) => (
-            <span key={idx} className={styles.trophyWidgetBadge}>
-              {trophy.icon} {trophy.name}
-            </span>
+            <div key={idx} className={styles.trophyWidgetBadge}>
+              <span className={styles.badgeIcon}>{trophy.icon}</span>
+              <span className={styles.badgeName}>{trophy.name}</span>
+            </div>
           ))}
         </div>
       )}

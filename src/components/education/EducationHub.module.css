@@ -203,35 +203,40 @@ body.dark .categoryTab:hover {
   gap: 1rem;
 }
 
+/* ===== Content Cards - Apple Style ===== */
 .contentCard {
-  background: rgba(255, 255, 255, 0.8);
-  backdrop-filter: blur(20px) saturate(180%);
-  border: 0.5px solid rgba(0, 0, 0, 0.1);
+  background: var(--card-bg);
+  border: 1px solid rgba(0, 0, 0, 0.06);
   border-radius: 16px;
   overflow: hidden;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  cursor: pointer;
 }
 
 body.dark .contentCard {
-  background: rgba(30, 30, 30, 0.7);
-  border: 0.5px solid rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.08);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
 }
 
 .contentCard:hover {
-  transform: translateY(-2px) scale(1.01);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
-  border-color: rgba(37, 99, 235, 0.3);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.08);
+  border-color: rgba(0, 0, 0, 0.12);
 }
 
 body.dark .contentCard:hover {
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.5);
+  border-color: rgba(255, 255, 255, 0.15);
 }
 
-.contentCard.recommended {
-  border-color: rgba(37, 99, 235, 0.4);
-  box-shadow: 0 4px 16px rgba(37, 99, 235, 0.15);
+.contentCard.viewed {
+  opacity: 0.85;
+}
+
+.contentCard.viewed:hover {
+  opacity: 1;
 }
 
 .recommendedBadge {
@@ -252,91 +257,95 @@ body.dark .contentCard:hover {
 
 .cardThumbnail {
   position: relative;
-  height: 180px;
-  background: linear-gradient(135deg, rgba(219, 234, 254, 0.5) 0%, rgba(191, 219, 254, 0.5) 100%);
+  height: 160px;
+  background: linear-gradient(135deg, rgba(0, 122, 255, 0.05), rgba(88, 86, 214, 0.05));
   display: flex;
   align-items: center;
   justify-content: center;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.04);
 }
 
 body.dark .cardThumbnail {
-  background: linear-gradient(135deg, rgba(55, 65, 81, 0.5) 0%, rgba(31, 41, 55, 0.5) 100%);
+  background: linear-gradient(135deg, rgba(10, 132, 255, 0.08), rgba(94, 92, 230, 0.08));
+  border-bottom-color: rgba(255, 255, 255, 0.06);
 }
 
 .thumbnailIcon {
-  font-size: 5rem;
+  font-size: 4rem;
   line-height: 1;
+  filter: grayscale(0.1) brightness(1.1);
 }
 
 .typeIcon {
   position: absolute;
-  bottom: 0.75rem;
-  right: 0.75rem;
-  font-size: 1.5rem;
-  background: rgba(255, 255, 255, 0.9);
+  bottom: 10px;
+  right: 10px;
+  font-size: 1.25rem;
+  background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(10px);
-  width: 40px;
-  height: 40px;
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  border: 0.5px solid rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(0, 0, 0, 0.04);
 }
 
 body.dark .typeIcon {
-  background: rgba(30, 30, 30, 0.9);
-  border: 0.5px solid rgba(255, 255, 255, 0.1);
+  background: rgba(30, 30, 30, 0.95);
+  border-color: rgba(255, 255, 255, 0.08);
 }
 
 .cardContent {
-  padding: 1.25rem;
+  padding: 16px;
 }
 
 .cardTitle {
-  font-size: 1.0625rem;
+  font-size: 17px;
   font-weight: 600;
   color: var(--text-primary);
-  margin: 0 0 0.625rem;
-  line-height: 1.3;
-  letter-spacing: -0.3px;
+  margin: 0 0 6px;
+  line-height: 1.35;
+  letter-spacing: -0.4px;
 }
 
 .cardDescription {
-  font-size: 0.9375rem;
+  font-size: 14px;
   color: var(--text-secondary);
   line-height: 1.5;
-  margin: 0 0 1rem;
+  margin: 0 0 12px;
 }
 
 .cardMeta {
   display: flex;
-  gap: 0.75rem;
+  gap: 8px;
   align-items: center;
-  margin-bottom: 1rem;
-  font-size: 0.8125rem;
+  margin-bottom: 12px;
+  font-size: 13px;
   color: var(--text-secondary);
+  flex-wrap: wrap;
 }
 
-.duration {
-  display: flex;
+.metaItem {
+  display: inline-flex;
   align-items: center;
-  gap: 0.375rem;
+  font-weight: 500;
 }
 
 .kidBadge {
-  padding: 0.25rem 0.625rem;
-  background: #fef3c7;
-  color: #92400e;
-  border-radius: 8px;
+  padding: 3px 8px;
+  background: rgba(255, 204, 0, 0.15);
+  color: var(--text-primary);
+  border-radius: 6px;
   font-weight: 600;
-  font-size: 0.75rem;
+  font-size: 11px;
+  letter-spacing: 0.2px;
 }
 
 body.dark .kidBadge {
-  background: rgba(251, 191, 36, 0.15);
-  color: #fbbf24;
+  background: rgba(255, 214, 10, 0.2);
 }
 
 .badge {
@@ -353,26 +362,56 @@ body.dark .badge {
   background: rgba(37, 99, 235, 0.12);
 }
 
-.learnButton {
+.actionButton {
   width: 100%;
-  padding: 0.75rem 1rem;
-  font-size: 0.9375rem;
+  padding: 11px 16px;
+  font-size: 15px;
   font-weight: 600;
-  background: var(--primary);
+  background: #007AFF;
   color: white;
   border: none;
-  border-radius: 12px;
+  border-radius: 10px;
   cursor: pointer;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 3px rgba(0, 122, 255, 0.2);
 }
 
-.learnButton:hover {
-  background: rgba(37, 99, 235, 0.9);
+.actionButton:hover {
+  background: #0051D5;
   transform: scale(1.01);
+  box-shadow: 0 2px 8px rgba(0, 122, 255, 0.3);
 }
 
-.learnButton:active {
+.actionButton:active {
   transform: scale(0.98);
+  box-shadow: 0 1px 2px rgba(0, 122, 255, 0.2);
+}
+
+.viewed .actionButton {
+  background: rgba(120, 120, 128, 0.16);
+  color: var(--text-primary);
+  box-shadow: none;
+}
+
+.viewed .actionButton:hover {
+  background: rgba(120, 120, 128, 0.24);
+}
+
+body.dark .actionButton {
+  background: #0A84FF;
+}
+
+body.dark .actionButton:hover {
+  background: #409CFF;
+}
+
+body.dark .viewed .actionButton {
+  background: rgba(142, 142, 147, 0.18);
+  color: var(--text-primary);
+}
+
+body.dark .viewed .actionButton:hover {
+  background: rgba(142, 142, 147, 0.28);
 }
 
 /* Empty State */
@@ -420,5 +459,251 @@ body.dark .badge {
 
   .header h2 {
     font-size: 1.5rem;
+  }
+}
+/* ===== Trophy Achievement Banner ===== */
+.trophyBanner {
+  background: linear-gradient(135deg, rgba(251, 191, 36, 0.1), rgba(245, 158, 11, 0.08));
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 2px solid rgba(251, 191, 36, 0.3);
+  border-radius: 20px;
+  padding: 2rem;
+  margin-bottom: 2.5rem;
+  box-shadow: 0 10px 40px rgba(251, 191, 36, 0.15);
+  animation: slideInDown 0.5s ease;
+}
+
+body.dark .trophyBanner {
+  background: linear-gradient(135deg, rgba(251, 191, 36, 0.15), rgba(245, 158, 11, 0.12));
+  border-color: rgba(251, 191, 36, 0.4);
+}
+
+@keyframes slideInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.trophyHeader {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  margin-bottom: 1.5rem;
+}
+
+.trophyIcon {
+  font-size: 3.5rem;
+  filter: drop-shadow(0 4px 12px rgba(251, 191, 36, 0.4));
+  animation: trophyBounce 2s ease-in-out infinite;
+}
+
+@keyframes trophyBounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+.trophyText {
+  flex: 1;
+}
+
+.trophyTitle {
+  font-size: 1.625rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 0.5rem;
+  letter-spacing: -0.5px;
+}
+
+.trophyStats {
+  font-size: 1.0625rem;
+  color: var(--text-secondary);
+  margin: 0;
+  font-weight: 500;
+}
+
+.trophyStats strong {
+  color: var(--primary-600);
+  font-weight: 700;
+}
+
+body.dark .trophyStats strong {
+  color: var(--primary-400);
+}
+
+.recentBadges {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+  padding-top: 1.5rem;
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+body.dark .recentBadges {
+  border-top-color: rgba(255, 255, 255, 0.1);
+}
+
+.badgesLabel {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-right: 0.5rem;
+}
+
+.badgeItem {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  padding: 0.75rem 1.25rem;
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(251, 191, 36, 0.3);
+  border-radius: 12px;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+}
+
+body.dark .badgeItem {
+  background: rgba(44, 44, 46, 0.8);
+  border-color: rgba(251, 191, 36, 0.4);
+}
+
+.badgeItem:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 20px rgba(251, 191, 36, 0.2);
+}
+
+.badgeIcon {
+  font-size: 1.5rem;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+}
+
+.badgeName {
+  font-weight: 600;
+}
+
+/* ===== Apple-Inspired Status Badges ===== */
+.completedBadge {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 32px;
+  height: 32px;
+  background: #34C759;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(52, 199, 89, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  z-index: 3;
+  animation: snapIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes snapIn {
+  0% {
+    transform: scale(0) rotate(-180deg);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.2) rotate(10deg);
+  }
+  100% {
+    transform: scale(1) rotate(0deg);
+    opacity: 1;
+  }
+}
+
+.checkmark {
+  color: white;
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.recommendedTag {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  padding: 6px 12px;
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(10px) saturate(180%);
+  -webkit-backdrop-filter: blur(10px) saturate(180%);
+  color: white;
+  font-size: 11px;
+  font-weight: 600;
+  border-radius: 12px;
+  letter-spacing: 0.3px;
+  z-index: 3;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+body.dark .recommendedTag {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.earnBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  background: rgba(255, 204, 0, 0.1);
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 12px;
+}
+
+body.dark .earnBadge {
+  background: rgba(255, 214, 10, 0.15);
+}
+
+.trophy {
+  font-size: 16px;
+  line-height: 1;
+}
+
+@media (max-width: 768px) {
+  .trophyBanner {
+    padding: 1.5rem;
+  }
+
+  .trophyHeader {
+    margin-bottom: 1rem;
+  }
+
+  .trophyIcon {
+    font-size: 2.5rem;
+  }
+
+  .trophyTitle {
+    font-size: 1.25rem;
+  }
+
+  .trophyStats {
+    font-size: 0.9375rem;
+  }
+
+  .recentBadges {
+    gap: 0.75rem;
+    padding-top: 1rem;
+  }
+
+  .badgeItem {
+    padding: 0.625rem 1rem;
+    font-size: 0.875rem;
+  }
+
+  .badgeIcon {
+    font-size: 1.25rem;
   }
 }

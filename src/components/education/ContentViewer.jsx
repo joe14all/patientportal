@@ -4,15 +4,22 @@ import { useEngagementData } from '../../contexts';
 import styles from './ContentViewer.module.css';
 
 /**
- * Content Viewer Component
- * Displays different types of educational content (video, article, interactive, checklist)
- * with streamlined viewing experience and automatic trophy awarding
+ * Content Viewer Component - Enhanced UX
+ * Beautiful, spacious modal for viewing educational content
  */
 const ContentViewer = ({ content, isOpen, onClose }) => {
   const { markEducationContentViewed, awardTrophy } = useEngagementData();
   const [progress, setProgress] = useState(0);
-  const [watched, setWatched] = useState(false);
+  const [completed, setCompleted] = useState(false);
   const [checklistItems, setChecklistItems] = useState([]);
+
+  // Reset state when modal opens/closes
+  useEffect(() => {
+    if (isOpen) {
+      setProgress(0);
+      setCompleted(false);
+    }
+  }, [isOpen]);
 
   useEffect(() => {
     if (content?.type === 'checklist' && content.checklistData) {
@@ -26,10 +33,10 @@ const ContentViewer = ({ content, isOpen, onClose }) => {
     }
   }, [content]);
 
-  const handleMarkWatched = async () => {
+  const handleComplete = async () => {
     if (content) {
       await markEducationContentViewed(content.id);
-      setWatched(true);
+      setCompleted(true);
       
       // Award trophy if content has a completion badge
       if (content.completionBadge) {
@@ -40,6 +47,11 @@ const ContentViewer = ({ content, isOpen, onClose }) => {
           earnedAt: new Date().toISOString()
         });
       }
+      
+      // Auto-close modal after a short delay to show success message
+      setTimeout(() => {
+        onClose();
+      }, 2000);
     }
   };
 
@@ -52,8 +64,8 @@ const ContentViewer = ({ content, isOpen, onClose }) => {
       const newProgress = (completedCount / updated.length) * 100;
       setProgress(newProgress);
       
-      if (newProgress === 100 && !watched) {
-        handleMarkWatched();
+      if (newProgress === 100 && !completed) {
+        handleComplete();
       }
       
       return updated;
@@ -61,183 +73,247 @@ const ContentViewer = ({ content, isOpen, onClose }) => {
   };
 
   const renderVideoContent = () => (
-    <div className={styles.videoContainer}>
-      <div className={styles.videoPlaceholder}>
-        <span className={styles.playIcon}>▶️</span>
-        <p>Video Player</p>
-        <p className={styles.videoTitle}>{content.title}</p>
-        <p className={styles.videoDuration}>Duration: {content.duration}</p>
+    <div className={styles.contentSection}>
+      <div className={styles.videoWrapper}>
+        <div className={styles.videoPlaceholder}>
+          <div className={styles.playButton}>
+            <span className={styles.playIcon}>▶</span>
+          </div>
+          <div className={styles.videoOverlay}>
+            <span className={styles.videoLabel}>Video Lesson</span>
+          </div>
+        </div>
       </div>
-      <div className={styles.videoDescription}>
-        <h3>About this video</h3>
-        <p>{content.description}</p>
-        {content.videoTranscript && (
-          <details className={styles.transcript}>
-            <summary>📝 View Transcript</summary>
-            <p>{content.videoTranscript}</p>
-          </details>
+      
+      <div className={styles.contentBody}>
+        <div className={styles.contentHeader}>
+          <span className={styles.typeBadge}>🎥 Video</span>
+          <h2 className={styles.contentTitle}>{content.title}</h2>
+          <div className={styles.metaTags}>
+            <span className={styles.metaTag}>⏱ 5 min</span>
+            <span className={styles.metaTag}>⭐ Beginner Friendly</span>
+          </div>
+        </div>
+
+        <p className={styles.contentDescription}>{content.description}</p>
+
+        <div className={styles.transcriptSection}>
+          <h3 className={styles.sectionTitle}>
+            <span className={styles.sectionIcon}>📝</span>
+            Video Transcript
+          </h3>
+          <p className={styles.transcriptText}>
+            This is where the video transcript would appear, allowing you to read along or review 
+            the content at your own pace. You can reference key points and important information 
+            covered in the video.
+          </p>
+        </div>
+
+        {!completed ? (
+          <button className={styles.primaryButton} onClick={handleComplete}>
+            <span className={styles.buttonIcon}>✓</span>
+            Mark as Watched
+          </button>
+        ) : (
+          <div className={styles.successMessage}>
+            <span className={styles.successIcon}>🎉</span>
+            <span>Great job! You've completed this lesson</span>
+          </div>
         )}
       </div>
-      {!completed && (
-        <button onClick={handleComplete} className={styles.completeButton}>
-          ✓ Mark as Watched
-        </button>
-      )}
-      {completed && (
-        <div className={styles.completionBadge}>
-          🎉 Completed! {content.completionBadge && `You earned: ${content.completionBadge}`}
-        </div>
-      )}
     </div>
   );
 
   const renderArticleContent = () => (
-    <div className={styles.articleContainer}>
-      <h2 className={styles.articleTitle}>{content.title}</h2>
-      <div className={styles.articleMeta}>
-        <span>📖 {content.duration}</span>
-        <span>By Dental Health Experts</span>
-      </div>
-      <div className={styles.articleBody}>
-        <p>{content.description}</p>
-        <div className={styles.articleContent}>
-          {content.articleSections?.map((section, index) => (
-            <div key={index} className={styles.section}>
-              <h3>{section.heading}</h3>
-              <p>{section.content}</p>
-            </div>
-          )) || (
-            <>
-              <h3>Introduction</h3>
-              <p>This comprehensive guide covers everything you need to know about {content.title.toLowerCase()}.</p>
-              
-              <h3>Key Points</h3>
-              <ul>
-                <li>Understanding the importance of proper dental care</li>
-                <li>Step-by-step instructions and best practices</li>
-                <li>Common mistakes to avoid</li>
-                <li>When to consult your dentist</li>
-              </ul>
+    <div className={styles.contentSection}>
+      <div className={styles.contentBody}>
+        <div className={styles.contentHeader}>
+          <span className={styles.typeBadge}>📖 Article</span>
+          <h2 className={styles.contentTitle}>{content.title}</h2>
+          <div className={styles.metaTags}>
+            <span className={styles.metaTag}>📚 3 min read</span>
+            <span className={styles.metaTag}>💡 Essential Knowledge</span>
+          </div>
+        </div>
 
-              <h3>Conclusion</h3>
-              <p>By following these guidelines, you'll maintain excellent oral health and prevent common dental issues.</p>
-            </>
-          )}
+        <p className={styles.contentDescription}>{content.description}</p>
+
+        <div className={styles.articleSections}>
+          <div className={styles.articleSection}>
+            <h3 className={styles.sectionTitle}>
+              <span className={styles.sectionIcon}>💡</span>
+              Overview
+            </h3>
+            <p>Learn essential information about dental health practices that will help you maintain 
+            a healthy smile and prevent common oral health issues.</p>
+          </div>
+
+          <div className={styles.articleSection}>
+            <h3 className={styles.sectionTitle}>
+              <span className={styles.sectionIcon}>🔑</span>
+              Key Takeaways
+            </h3>
+            <ul className={styles.bulletList}>
+              <li>Evidence-based dental health information</li>
+              <li>Expert-recommended best practices</li>
+              <li>Answers to your most common questions</li>
+              <li>Practical tips for daily oral care</li>
+            </ul>
+          </div>
+
+          <div className={styles.articleSection}>
+            <h3 className={styles.sectionTitle}>
+              <span className={styles.sectionIcon}>✨</span>
+              Remember
+            </h3>
+            <p>Understanding these concepts will help you maintain excellent oral health and make 
+            informed decisions about your dental care.</p>
+          </div>
         </div>
+
+        {!completed ? (
+          <button className={styles.primaryButton} onClick={handleComplete}>
+            <span className={styles.buttonIcon}>✓</span>
+            I've Read This
+          </button>
+        ) : (
+          <div className={styles.successMessage}>
+            <span className={styles.successIcon}>🎉</span>
+            <span>Excellent! You've completed this article</span>
+          </div>
+        )}
       </div>
-      {!completed && (
-        <button onClick={handleComplete} className={styles.completeButton}>
-          ✓ Mark as Read
-        </button>
-      )}
-      {completed && (
-        <div className={styles.completionBadge}>
-          🎉 Completed! {content.completionBadge && `You earned: ${content.completionBadge}`}
-        </div>
-      )}
     </div>
   );
 
   const renderInteractiveContent = () => (
-    <div className={styles.interactiveContainer}>
-      <h2 className={styles.interactiveTitle}>{content.title}</h2>
-      <p className={styles.interactiveDescription}>{content.description}</p>
-      
-      <div className={styles.interactiveDemo}>
-        <div className={styles.demoPlaceholder}>
-          <span className={styles.interactiveIcon}>🎮</span>
-          <p>Interactive Module</p>
-          <p>Click and drag to learn proper technique</p>
+    <div className={styles.contentSection}>
+      <div className={styles.contentBody}>
+        <div className={styles.contentHeader}>
+          <span className={styles.typeBadge}>🎮 Interactive</span>
+          <h2 className={styles.contentTitle}>{content.title}</h2>
         </div>
-        
-        <div className={styles.progressBar}>
-          <div className={styles.progressFill} style={{ width: `${progress}%` }}></div>
+
+        <p className={styles.contentDescription}>{content.description}</p>
+
+        <div className={styles.interactiveSection}>
+          <h3 className={styles.sectionTitle}>
+            <span className={styles.sectionIcon}>👆</span>
+            Hands-On Learning
+          </h3>
+          <p className={styles.sectionSubtext}>
+            Follow along with our step-by-step demonstration to master the proper technique
+          </p>
+
+          <div className={styles.progressWrapper}>
+            <div className={styles.progressBar}>
+              <div className={styles.progressFill} style={{ width: `${progress}%` }}></div>
+            </div>
+            <div className={styles.progressLabel}>
+              <span className={styles.progressPercent}>{progress}%</span>
+              <span className={styles.progressText}>Complete</span>
+            </div>
+          </div>
+
+          <div className={styles.buttonGroup}>
+            <button 
+              className={progress === 100 ? styles.successButton : styles.primaryButton}
+              onClick={() => setProgress(Math.min(100, progress + 25))}
+              disabled={progress === 100}
+            >
+              {progress === 100 ? '✓ All Steps Done' : '→ Next Step'}
+            </button>
+            <button 
+              className={styles.secondaryButton}
+              onClick={() => setProgress(0)}
+            >
+              ↻ Start Over
+            </button>
+          </div>
         </div>
-        <p className={styles.progressText}>{Math.round(progress)}% Complete</p>
-        
-        <div className={styles.interactiveSteps}>
-          <button 
-            className={styles.stepButton}
-            onClick={() => setProgress(Math.min(100, progress + 33.33))}
-          >
-            Next Step →
+
+        {progress === 100 && !completed && (
+          <button className={styles.primaryButton} onClick={handleComplete}>
+            <span className={styles.buttonIcon}>✓</span>
+            Complete This Tutorial
           </button>
-        </div>
+        )}
+        
+        {completed && (
+          <div className={styles.successMessage}>
+            <span className={styles.successIcon}>🎉</span>
+            <span>Awesome! You've mastered this skill</span>
+          </div>
+        )}
       </div>
-
-      {progress === 100 && !completed && (
-        <button onClick={handleComplete} className={styles.completeButton}>
-          ✓ Mark as Completed
-        </button>
-      )}
-      {completed && (
-        <div className={styles.completionBadge}>
-          🎉 Completed! {content.completionBadge && `You earned: ${content.completionBadge}`}
-        </div>
-      )}
     </div>
   );
 
-  const renderChecklistContent = () => (
-    <div className={styles.checklistContainer}>
-      <h2 className={styles.checklistTitle}>{content.title}</h2>
-      <p className={styles.checklistDescription}>{content.description}</p>
-      
-      <div className={styles.progressBar}>
-        <div className={styles.progressFill} style={{ width: `${progress}%` }}></div>
-      </div>
-      <p className={styles.progressText}>
-        {checklistItems.filter(item => item.checked).length} of {checklistItems.length} completed
-      </p>
+  const renderChecklistContent = () => {
+    const completedCount = checklistItems.filter(i => i.checked).length;
+    const totalCount = checklistItems.length;
 
-      <div className={styles.checklistItems}>
-        {checklistItems.map(item => (
-          <label key={item.id} className={styles.checklistItem}>
-            <input
-              type="checkbox"
-              checked={item.checked}
-              onChange={() => handleChecklistToggle(item.id)}
-              className={styles.checkbox}
-            />
-            <span className={item.checked ? styles.checkedText : ''}>{item.text}</span>
-          </label>
-        ))}
-      </div>
+    return (
+      <div className={styles.contentSection}>
+        <div className={styles.contentBody}>
+          <div className={styles.contentHeader}>
+            <span className={styles.typeBadge}>✅ Care Checklist</span>
+            <h2 className={styles.contentTitle}>{content.title}</h2>
+          </div>
 
-      {completed && (
-        <div className={styles.completionBadge}>
-          🎉 All Done! {content.completionBadge && `You earned: ${content.completionBadge}`}
+          <p className={styles.contentDescription}>{content.description}</p>
+
+          <div className={styles.progressWrapper}>
+            <div className={styles.progressBar}>
+              <div className={styles.progressFill} style={{ width: `${progress}%` }}></div>
+            </div>
+            <div className={styles.progressLabel}>
+              <span className={styles.progressPercent}>{Math.round(progress)}%</span>
+              <span className={styles.progressText}>Completed • {completedCount} of {totalCount} items</span>
+            </div>
+          </div>
+
+          <div className={styles.checklistWrapper}>
+            {checklistItems.map(item => (
+              <label key={item.id} className={styles.checklistItem}>
+                <div className={styles.checkboxWrapper}>
+                  <input
+                    type="checkbox"
+                    checked={item.checked}
+                    onChange={() => handleChecklistToggle(item.id)}
+                    className={styles.checkbox}
+                  />
+                  <span className={styles.customCheckbox}>
+                    {item.checked && <span className={styles.checkmark}>✓</span>}
+                  </span>
+                </div>
+                <span className={item.checked ? styles.checkedText : styles.uncheckedText}>
+                  {item.text}
+                </span>
+              </label>
+            ))}
+          </div>
+
+          {completed && (
+            <div className={styles.successMessage}>
+              <span className={styles.successIcon}>🎉</span>
+              <span>Perfect! You've completed all care steps</span>
+            </div>
+          )}
         </div>
-      )}
-    </div>
-  );
-
-  const renderContent = () => {
-    if (!content) return null;
-
-    switch (content.type) {
-      case 'video':
-        return renderVideoContent();
-      case 'article':
-        return renderArticleContent();
-      case 'interactive':
-        return renderInteractiveContent();
-      case 'checklist':
-        return renderChecklistContent();
-      default:
-        return <p>Content type not supported</p>;
-    }
+      </div>
+    );
   };
 
+  if (!content) return null;
+
   return (
-    <Modal
-      isOpen={isOpen}
-      onClose={onClose}
-      title={content?.type === 'article' ? '' : content?.title}
-      size="large"
-    >
-      <div className={styles.contentViewer}>
-        {renderContent()}
+    <Modal isOpen={isOpen} onClose={onClose} title="" size="large">
+      <div className={styles.viewerContainer}>
+        {content.type === 'video' && renderVideoContent()}
+        {content.type === 'article' && renderArticleContent()}
+        {content.type === 'interactive' && renderInteractiveContent()}
+        {content.type === 'checklist' && renderChecklistContent()}
       </div>
     </Modal>
   );

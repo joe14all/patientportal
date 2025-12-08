@@ -22,7 +22,6 @@ const Modal = ({
   isLoading = false, // This is the GLOBAL loading state
   primaryActionDisabled = false, // <-- 1. ADD NEW PROP
   modalClassName = '',
-  size = 'medium', // Add size prop
 }) => {
   const [isProcessing, setIsProcessing] = useState(false);
   // --- 2. REMOVED internalError state ---
@@ -105,26 +104,38 @@ const Modal = ({
       aria-labelledby="modal-title"
     >
       <div 
-        className={`card ${styles.modalCard} ${size === 'xlarge' ? styles.xlarge : ''} ${modalClassName}`}
+        className={`card ${styles.modalCard} ${modalClassName}`}
         onClick={(e) => e.stopPropagation()}
       >
-        <div className={styles.modalHeader}>
-          <h2 id="modal-title" className={styles.modalTitle}>
-            {title}
-          </h2>
+        {title && (
+          <div className={styles.modalHeader}>
+            <h2 id="modal-title" className={styles.modalTitle}>
+              {title}
+            </h2>
+            <button 
+              type="button" 
+              className="icon-button" 
+              onClick={handleOverlayClick} 
+              disabled={isFormLoading}
+            >
+              <IconClose />
+            </button>
+          </div>
+        )}
+        
+        {!title && (
           <button 
             type="button" 
-            className="icon-button" 
+            className={`icon-button ${styles.closeButtonOnly}`}
             onClick={handleOverlayClick} 
-            disabled={isFormLoading} // <-- Use this
+            disabled={isFormLoading}
           >
             <IconClose />
           </button>
-        </div>
+        )}
 
         <div className={styles.modalBody}>
           {children}
-          {/* --- 6. REMOVED error display area --- */}
         </div>
 
         {(primaryActionText || secondaryActionText) && (

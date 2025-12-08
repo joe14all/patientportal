@@ -234,21 +234,25 @@ const EducationHub = () => {
 
   return (
     <div className={styles.educationHub}>
-      {/* Trophy Display */}
+      {/* Trophy Achievement Banner */}
       {educationStats.trophiesEarned > 0 && (
         <div className={styles.trophyBanner}>
-          <div className={styles.trophyContent}>
+          <div className={styles.trophyHeader}>
             <span className={styles.trophyIcon}>🏆</span>
-            <div>
-              <h3>Education Champion!</h3>
-              <p>You've earned {educationStats.trophiesEarned} {educationStats.trophiesEarned === 1 ? 'badge' : 'badges'} • {educationStats.totalViewed} lessons completed</p>
+            <div className={styles.trophyText}>
+              <h3 className={styles.trophyTitle}>Your Learning Achievements</h3>
+              <p className={styles.trophyStats}>
+                <strong>{educationStats.trophiesEarned}</strong> {educationStats.trophiesEarned === 1 ? 'badge' : 'badges'} earned • <strong>{educationStats.totalViewed}</strong> {educationStats.totalViewed === 1 ? 'lesson' : 'lessons'} completed
+              </p>
             </div>
           </div>
           {educationStats.recentTrophies.length > 0 && (
             <div className={styles.recentBadges}>
+              <span className={styles.badgesLabel}>Recent:</span>
               {educationStats.recentTrophies.map((trophy, index) => (
                 <div key={index} className={styles.badgeItem} title={trophy.name}>
-                  <span>{trophy.icon || '🏅'}</span>
+                  <span className={styles.badgeIcon}>{trophy.icon || '🏅'}</span>
+                  <span className={styles.badgeName}>{trophy.name}</span>
                 </div>
               ))}
             </div>
@@ -257,11 +261,13 @@ const EducationHub = () => {
       )}
 
       <div className={styles.header}>
-        <h2>Dental Health Education Hub</h2>
+        <h2>Dental Health Education</h2>
         <p className={styles.subtitle}>
-          Learn about your dental health with personalized content
+          Learn about your dental health with personalized, expert-approved content
         </p>
       </div>
+
+      
 
       {/* Personalized Recommendations */}
       {recommendedContent.length > 0 && (
@@ -353,35 +359,47 @@ const EducationHub = () => {
 };
 
 const ContentCard = ({ content, getTypeIcon, isRecommended = false, onView, isViewed }) => (
-  <div className={`${styles.contentCard} ${isRecommended ? styles.recommended : ''} ${isViewed ? styles.viewed : ''}`}>
-    {isRecommended && (
-      <div className={styles.recommendedBadge}>Recommended for You</div>
+  <div className={`${styles.contentCard} ${isViewed ? styles.viewed : ''}`} onClick={onView}>
+    {/* Status Badge - Top Right */}
+    {isViewed ? (
+      <div className={styles.completedBadge}>
+        <span className={styles.checkmark}>✓</span>
+      </div>
+    ) : isRecommended && (
+      <div className={styles.recommendedTag}>
+        For You
+      </div>
     )}
-    {isViewed && (
-      <div className={styles.viewedBadge}>✓ Completed</div>
-    )}
+    
     <div className={styles.cardThumbnail}>
       <span className={styles.thumbnailIcon}>{content.thumbnail}</span>
       <span className={styles.typeIcon}>{getTypeIcon(content.type)}</span>
     </div>
+    
     <div className={styles.cardContent}>
       <h4 className={styles.cardTitle}>{content.title}</h4>
       <p className={styles.cardDescription}>{content.description}</p>
+      
       <div className={styles.cardMeta}>
-        <span className={styles.duration}>⏱️ {content.duration}</span>
+        <span className={styles.metaItem}>
+          {content.duration}
+        </span>
         {content.isKidFriendly && (
-          <span className={styles.kidBadge}>👶 Kid-Friendly</span>
+          <span className={styles.kidBadge}>
+            Kid-Friendly
+          </span>
         )}
       </div>
+      
       {content.completionBadge && !isViewed && (
-        <div className={styles.badge}>
-          🏆 Earn: <strong>{content.completionBadge}</strong>
+        <div className={styles.earnBadge}>
+          <span className={styles.trophy}>🏆</span>
+          <span>{content.completionBadge}</span>
         </div>
       )}
-      <button className={styles.learnButton} onClick={onView}>
-        {isViewed ? 'View Again' :
-         content.type === 'video' ? 'Watch Now' : 
-         content.type === 'interactive' ? 'Try Interactive' : 'Read More'}
+      
+      <button className={styles.actionButton}>
+        {isViewed ? 'Review' : 'Start'}
       </button>
     </div>
   </div>
