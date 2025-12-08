@@ -591,6 +591,36 @@ body.dark .badgeItem {
   font-weight: 600;
 }
 
+/* Milestone Preview */
+.milestonePreview {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem 1.5rem;
+  margin-top: 1rem;
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(10px);
+  border-radius: 12px;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+body.dark .milestonePreview {
+  background: rgba(30, 30, 30, 0.6);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+.milestonePreview .milestoneIcon {
+  font-size: 1.75rem;
+  line-height: 1;
+}
+
+.milestonePreview .milestoneText {
+  flex: 1;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
 /* ===== Apple-Inspired Status Badges ===== */
 .completedBadge {
   position: absolute;

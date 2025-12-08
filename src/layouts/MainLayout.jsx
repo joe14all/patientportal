@@ -59,6 +59,7 @@ const MainLayout = () => {
       <QuickActions 
         unreadCount={unreadCount}
         upcomingApptCount={upcomingApptCount}
+        isMenuOpen={isMobileMenuOpen}
       />
 
       {/* Live Chat Button */}

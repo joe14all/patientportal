@@ -123,3 +123,10 @@
     display: block; /* Show the new menu wrapper */
   }
 }
+
+/* Print Styles */
+@media print {
+  .header {
+    display: none !important;
+  }
+}

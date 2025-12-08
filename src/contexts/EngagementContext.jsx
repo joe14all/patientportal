@@ -312,13 +312,183 @@ export const EngagementProvider = ({ children }) => {
    * Get education progress stats
    */
   const getEducationStats = useCallback(() => {
+    // Group trophies by category
+    const categories = {
+      basics: trophies.filter(t => ['Brushing Master', 'Flossing Pro'].includes(t.name)),
+      procedures: trophies.filter(t => ['Crown Expert', 'Root Canal Scholar'].includes(t.name)),
+      prevention: trophies.filter(t => ['Gum Health Guardian', 'Prevention Champion'].includes(t.name)),
+      aftercare: trophies.filter(t => ['Extraction Expert', 'Implant Care Pro'].includes(t.name)),
+      engagement: trophies.filter(t => ['Appointment Star', 'Perfect Attendance', 'Financial Fitness', 'Billing Champion', 'Wellness Warrior'].includes(t.name)),
+      documents: trophies.filter(t => ['Document Pro', 'Paperwork Champion', 'Form Master'].includes(t.name)),
+      health: trophies.filter(t => ['Health Historian', 'Medical Record Keeper', 'Proactive Patient'].includes(t.name)),
+    };
+
+    // Define milestones
+    const milestones = [
+      { name: 'First Steps', target: 1, icon: '🌟', achieved: viewedContent.length >= 1 },
+      { name: 'Learning Path', target: 3, icon: '📚', achieved: viewedContent.length >= 3 },
+      { name: 'Knowledge Seeker', target: 5, icon: '🎓', achieved: viewedContent.length >= 5 },
+      { name: 'Dental Expert', target: 10, icon: '🏆', achieved: viewedContent.length >= 10 },
+    ];
+
+    const nextMilestone = milestones.find(m => !m.achieved);
+
     return {
       totalViewed: viewedContent.length,
       trophiesEarned: trophies.length,
       viewedContent: viewedContent,
-      recentTrophies: trophies.slice(-3).reverse()
+      recentTrophies: trophies.slice(-3).reverse(),
+      categories,
+      milestones,
+      nextMilestone,
+      progress: nextMilestone ? Math.round((viewedContent.length / nextMilestone.target) * 100) : 100
     };
   }, [viewedContent, trophies]);
+
+  /**
+   * Calculate and award engagement trophies based on patient behavior
+   */
+  const calculateEngagementTrophies = useCallback((appointmentData, billingData, documentData, healthData) => {
+    const earnedTrophies = [];
+
+    // Appointment-based trophies
+    if (appointmentData) {
+      const { completedCount, cancelledCount, totalScheduled } = appointmentData;
+      
+      // Appointment Star: 3+ completed appointments
+      if (completedCount >= 3 && !trophies.some(t => t.name === 'Appointment Star')) {
+        earnedTrophies.push({
+          name: 'Appointment Star',
+          icon: '⭐',
+          category: 'engagement',
+          description: 'Completed 3 appointments'
+        });
+      }
+
+      // Perfect Attendance: 5+ completed with no cancellations
+      if (completedCount >= 5 && cancelledCount === 0 && !trophies.some(t => t.name === 'Perfect Attendance')) {
+        earnedTrophies.push({
+          name: 'Perfect Attendance',
+          icon: '🎖️',
+          category: 'engagement',
+          description: '5 appointments with no cancellations'
+        });
+      }
+    }
+
+    // Billing-based trophies
+    if (billingData) {
+      const { paidOnTime, totalDue, paymentsCount } = billingData;
+      
+      // Financial Fitness: Current on all bills (totalDue = 0)
+      if (totalDue === 0 && paymentsCount > 0 && !trophies.some(t => t.name === 'Financial Fitness')) {
+        earnedTrophies.push({
+          name: 'Financial Fitness',
+          icon: '💵',
+          category: 'engagement',
+          description: 'All bills paid in full'
+        });
+      }
+
+      // Billing Champion: 5+ on-time payments
+      if (paidOnTime >= 5 && !trophies.some(t => t.name === 'Billing Champion')) {
+        earnedTrophies.push({
+          name: 'Billing Champion',
+          icon: '💯',
+          category: 'engagement',
+          description: '5+ payments made on time'
+        });
+      }
+    }
+
+    // Document-based trophies
+    if (documentData) {
+      const { verifiedCount, totalRequired, allCompleted } = documentData;
+      
+      // Document Pro: Upload first required document
+      if (verifiedCount >= 1 && !trophies.some(t => t.name === 'Document Pro')) {
+        earnedTrophies.push({
+          name: 'Document Pro',
+          icon: '📄',
+          category: 'documents',
+          description: 'First document verified'
+        });
+      }
+
+      // Paperwork Champion: All required documents completed
+      if (allCompleted && totalRequired > 0 && !trophies.some(t => t.name === 'Paperwork Champion')) {
+        earnedTrophies.push({
+          name: 'Paperwork Champion',
+          icon: '📋',
+          category: 'documents',
+          description: 'All required documents completed'
+        });
+      }
+
+      // Form Master: 5+ documents verified
+      if (verifiedCount >= 5 && !trophies.some(t => t.name === 'Form Master')) {
+        earnedTrophies.push({
+          name: 'Form Master',
+          icon: '📑',
+          category: 'documents',
+          description: '5+ documents verified'
+        });
+      }
+    }
+
+    // Medical History-based trophies
+    if (healthData) {
+      const { hasHistory, isRecent, updateCount } = healthData;
+      
+      // Health Historian: Submit first medical history
+      if (hasHistory && !trophies.some(t => t.name === 'Health Historian')) {
+        earnedTrophies.push({
+          name: 'Health Historian',
+          icon: '📝',
+          category: 'health',
+          description: 'Medical history submitted'
+        });
+      }
+
+      // Medical Record Keeper: Keep history updated (within 6 months)
+      if (isRecent && !trophies.some(t => t.name === 'Medical Record Keeper')) {
+        earnedTrophies.push({
+          name: 'Medical Record Keeper',
+          icon: '🏥',
+          category: 'health',
+          description: 'Medical history up to date'
+        });
+      }
+
+      // Proactive Patient: 3+ medical history updates
+      if (updateCount >= 3 && !trophies.some(t => t.name === 'Proactive Patient')) {
+        earnedTrophies.push({
+          name: 'Proactive Patient',
+          icon: '🌟',
+          category: 'health',
+          description: 'Regular health updates'
+        });
+      }
+    }
+
+    // Combined trophy: Wellness Warrior (3+ appointments AND current on bills)
+    if (appointmentData?.completedCount >= 3 && billingData?.totalDue === 0 && 
+        !trophies.some(t => t.name === 'Wellness Warrior')) {
+      earnedTrophies.push({
+        name: 'Wellness Warrior',
+        icon: '🦸',
+        category: 'engagement',
+        description: 'Great appointments & billing record'
+      });
+    }
+
+    // Award all earned trophies
+    earnedTrophies.forEach(trophy => {
+      awardTrophy(trophy);
+    });
+
+    return earnedTrophies;
+  }, [trophies, awardTrophy]);
 
 
   // --- Value ---
@@ -346,6 +516,7 @@ export const EngagementProvider = ({ children }) => {
     awardTrophy,
     isContentViewed,
     getEducationStats,
+    calculateEngagementTrophies,
     
     // System Author
     systemAuthor
@@ -369,6 +540,7 @@ export const EngagementProvider = ({ children }) => {
     awardTrophy,
     isContentViewed,
     getEducationStats,
+    calculateEngagementTrophies,
     systemAuthor
   ]);
 

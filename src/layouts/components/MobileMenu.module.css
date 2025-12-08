@@ -71,7 +71,7 @@ body.dark .menuHeader {
   right: 0;
   bottom: 0;
   background-color: var(--bg-body);
-  z-index: 5; /* Below header (10) but above content (1) */
+  z-index: 100; /* Above everything including QuickActions */
   
   /* Animation */
   transform: translateX(-100%);
@@ -122,9 +122,8 @@ body.dark .menuHeader {
 
 .footer {
   flex-shrink: 0; /* Prevents the footer from shrinking */
-  padding: 2rem; /* Give it its own padding */
-  padding-top: 1.5rem; /* A bit less padding on top */
-  margin-top: 0; /* Remove old margin */
+  padding: 1.5rem 2rem; /* Match header padding */
+  padding-bottom: 2rem; /* Extra padding at bottom for safety */
   border-top: 1px solid var(--border-color);
   display: flex;
   flex-direction: column;

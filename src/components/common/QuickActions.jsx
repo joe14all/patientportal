@@ -7,9 +7,12 @@ import styles from './QuickActions.module.css';
  * Apple-inspired design with focused actions for mobile users
  * Provides one-tap access to most critical patient actions
  */
-const QuickActions = ({ unreadCount = 0, upcomingApptCount = 0 }) => {
+const QuickActions = ({ unreadCount = 0, upcomingApptCount = 0, isMenuOpen = false }) => {
   const navigate = useNavigate();
   const location = useLocation();
+
+  // Hide the quick actions bar when menu is open
+  if (isMenuOpen) return null;
 
   const actions = [
     {

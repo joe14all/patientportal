@@ -224,6 +224,121 @@ body.dark .actionItem.urgent {
   padding: 1rem;
 }
 
+/* Visit Summary Card */
+.visitSummaryCard {
+  margin-top: 1.5rem;
+  padding: 1.5rem;
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  border-radius: 12px;
+}
+
+body.dark .visitSummaryCard {
+  background: rgba(30, 30, 30, 0.7);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+.visitSummaryHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.visitSummaryTitle {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.visitIcon {
+  font-size: 1.5rem;
+  line-height: 1;
+}
+
+.visitSummaryTitle h3 {
+  margin: 0;
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.visitDate {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  padding: 0.25rem 0.75rem;
+  background: rgba(0, 0, 0, 0.04);
+  border-radius: 6px;
+}
+
+body.dark .visitDate {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.visitSummaryText {
+  font-size: 0.9375rem;
+  line-height: 1.6;
+  color: var(--text-secondary);
+  margin: 0 0 1rem;
+}
+
+.nextStepsPreview {
+  display: flex;
+  gap: 0.5rem;
+  padding: 0.75rem;
+  background: rgba(0, 122, 255, 0.05);
+  border-left: 3px solid #007AFF;
+  border-radius: 6px;
+  margin-bottom: 1rem;
+}
+
+body.dark .nextStepsPreview {
+  background: rgba(10, 132, 255, 0.1);
+}
+
+.nextStepsLabel {
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  white-space: nowrap;
+}
+
+.nextStepsText {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  flex: 1;
+}
+
+.viewSummaryButton {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  background: transparent;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  color: var(--primary-600);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+body.dark .viewSummaryButton {
+  border-color: rgba(255, 255, 255, 0.1);
+  color: var(--primary-400);
+}
+
+.viewSummaryButton:hover {
+  background: rgba(0, 122, 255, 0.05);
+  border-color: var(--primary-400);
+  transform: translateY(-1px);
+}
+
+body.dark .viewSummaryButton:hover {
+  background: rgba(10, 132, 255, 0.1);
+}
+
 /* Mobile Responsive */
 @media (max-width: 640px) {
   .journeyCard {

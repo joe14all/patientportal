@@ -26,11 +26,11 @@ const MOCK_TODAY = new Date('2025-11-15T12:00:00Z');
 const Dashboard = () => {
   const navigate = useNavigate();
   const { patient, alerts, medicalHistory } = usePatientData(); 
-  const { appointments, treatmentPlans } = useClinicalData();
+  const { appointments, treatmentPlans, visitSummaries } = useClinicalData();
   const { billingInvoices } = useBillingData();
   
   // --- 1. Get Documents & Forms Data ---
-  const { messageThreads, documents } = useEngagementData(); 
+  const { messageThreads, documents, calculateEngagementTrophies } = useEngagementData(); 
   const { getProviderById, downloadableForms } = useCoreData(); 
 
   // --- Process Data from Contexts ---
@@ -120,6 +120,101 @@ const Dashboard = () => {
     return null;
   }, [downloadableForms, documents]);
 
+  // --- 8. Get most recent visit summary ---
+  const recentVisitSummary = useMemo(() => {
+    if (!visitSummaries || visitSummaries.length === 0) {
+      console.log('No visit summaries found');
+      return null;
+    }
+    
+    const sortedSummaries = [...visitSummaries].sort((a, b) => 
+      new Date(b.visitDate) - new Date(a.visitDate)
+    );
+    
+    console.log('Recent visit summary:', sortedSummaries[0]);
+    return sortedSummaries[0];
+  }, [visitSummaries]);
+
+  // --- 9. Calculate Engagement Trophy Data ---
+  const engagementData = useMemo(() => {
+    // Appointment statistics
+    const completedAppointments = appointments.filter(a => 
+      a.status === 'Completed' && new Date(a.startDateTime) <= MOCK_TODAY
+    );
+    const cancelledAppointments = appointments.filter(a => 
+      a.status === 'Cancelled'
+    );
+    const scheduledAppointments = appointments.filter(a => 
+      a.status === 'Confirmed' || a.status === 'Completed'
+    );
+
+    // Billing statistics
+    const paidInvoices = billingInvoices.filter(inv => 
+      inv.financialSummary.amountDue?.amount === 0
+    );
+    const onTimePayments = billingInvoices.filter(inv => {
+      const dueDate = new Date(inv.financialSummary.dueDate);
+      const paidDate = inv.financialSummary.lastPaymentDate ? new Date(inv.financialSummary.lastPaymentDate) : null;
+      return paidDate && paidDate <= dueDate && inv.financialSummary.amountDue?.amount === 0;
+    });
+
+    // Document statistics
+    const verifiedDocuments = documents.filter(doc => 
+      doc.verification?.status === 'Verified' && doc.systemInfo.status === 'Active'
+    );
+    const requiredForms = downloadableForms?.filter(form => form.required) || [];
+    const allRequiredCompleted = requiredForms.length > 0 && requiredForms.every(form => {
+      return documents.some(doc => 
+        doc.linkContext?.type === 'FormDefinition' && 
+        doc.linkContext?.id === form.id && 
+        doc.verification?.status === 'Verified' &&
+        doc.systemInfo.status === 'Active'
+      );
+    });
+
+    // Medical History statistics
+    const hasHistory = medicalHistory && medicalHistory.length > 0;
+    const latestHistory = hasHistory ? medicalHistory[0] : null;
+    const sixMonthsAgo = new Date();
+    sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
+    const isRecent = latestHistory ? new Date(latestHistory.submissionDate) >= sixMonthsAgo : false;
+
+    return {
+      appointments: {
+        completedCount: completedAppointments.length,
+        cancelledCount: cancelledAppointments.length,
+        totalScheduled: scheduledAppointments.length
+      },
+      billing: {
+        paidOnTime: onTimePayments.length,
+        totalDue: totalDue,
+        paymentsCount: paidInvoices.length
+      },
+      documents: {
+        verifiedCount: verifiedDocuments.length,
+        totalRequired: requiredForms.length,
+        allCompleted: allRequiredCompleted
+      },
+      health: {
+        hasHistory: hasHistory,
+        isRecent: isRecent,
+        updateCount: medicalHistory?.length || 0
+      }
+    };
+  }, [appointments, billingInvoices, totalDue, documents, downloadableForms, medicalHistory]);
+
+  // Calculate and award engagement trophies on mount and when data changes
+  React.useEffect(() => {
+    if (calculateEngagementTrophies && engagementData) {
+      calculateEngagementTrophies(
+        engagementData.appointments, 
+        engagementData.billing,
+        engagementData.documents,
+        engagementData.health
+      );
+    }
+  }, [calculateEngagementTrophies, engagementData]);
+
 
   return (
     <div className={styles.pageWrapper}>
@@ -131,7 +226,7 @@ const Dashboard = () => {
       )}
 
       {/* Trophy/Education Progress Widget */}
-      <TrophyWidget />
+      <TrophyWidget engagementData={engagementData} />
 
       {/* NEW: Personalized Health Journey Section */}
       <HealthJourney
@@ -142,6 +237,7 @@ const Dashboard = () => {
         unreadThread={unreadThread}
         lastHistoryUpdate={lastHistoryUpdate}
         getProviderById={getProviderById}
+        recentVisitSummary={recentVisitSummary}
       />
 
       <h2 className={styles.sectionTitle}>Your Care Overview</h2>
@@ -341,27 +437,203 @@ const DocumentsWidgetContent = ({ form }) => {
 };
 
 // --- Trophy Widget Component ---
-const TrophyWidget = () => {
-  const { getEducationStats } = useEngagementData();
+const TrophyWidget = ({ engagementData }) => {
+  const { getEducationStats, trophies } = useEngagementData();
   const navigate = useNavigate();
   const stats = getEducationStats();
 
-  if (!stats || stats.totalViewed === 0) return null;
+  if (!stats) return null;
+
+  const hasProgress = stats.totalViewed > 0 || stats.trophiesEarned > 0;
+
+  // Map categories to their corresponding pages
+  const getCategoryRoute = (key) => {
+    switch(key) {
+      case 'basics':
+      case 'procedures':
+      case 'prevention':
+      case 'aftercare':
+        return '/education';
+      case 'engagement':
+        return '/appointments';
+      case 'documents':
+        return '/documents';
+      case 'health':
+        return '/history';
+      default:
+        return '/education';
+    }
+  };
+
+  const categoryData = [
+    { key: 'basics', label: 'Basics', icon: '🪥', count: stats.categories.basics.length, route: '/education' },
+    { key: 'procedures', label: 'Procedures', icon: '👑', count: stats.categories.procedures.length, route: '/education' },
+    { key: 'prevention', label: 'Prevention', icon: '🛡️', count: stats.categories.prevention.length, route: '/education' },
+    { key: 'aftercare', label: 'Aftercare', icon: '📋', count: stats.categories.aftercare.length, route: '/education' },
+    { key: 'engagement', label: 'Engagement', icon: '⭐', count: stats.categories.engagement.length, route: '/appointments' },
+    { key: 'documents', label: 'Documents', icon: '📄', count: stats.categories.documents.length, route: '/documents' },
+    { key: 'health', label: 'Health', icon: '🏥', count: stats.categories.health.length, route: '/history' },
+  ].filter(cat => cat.count > 0);
+
+  // Calculate progress toward engagement trophies
+  const engagementProgress = engagementData ? [
+    {
+      name: 'Appointment Star',
+      icon: '⭐',
+      current: engagementData.appointments.completedCount,
+      target: 3,
+      unlocked: trophies.some(t => t.name === 'Appointment Star'),
+      route: '/appointments'
+    },
+    {
+      name: 'Financial Fitness',
+      icon: '💵',
+      current: engagementData.billing.totalDue === 0 ? 1 : 0,
+      target: 1,
+      unlocked: trophies.some(t => t.name === 'Financial Fitness'),
+      description: engagementData.billing.totalDue === 0 ? 'All bills paid!' : `$${engagementData.billing.totalDue.toFixed(2)} remaining`,
+      route: '/billing'
+    },
+    {
+      name: 'Document Pro',
+      icon: '📄',
+      current: engagementData.documents.verifiedCount,
+      target: 1,
+      unlocked: trophies.some(t => t.name === 'Document Pro'),
+      description: engagementData.documents.verifiedCount > 0 ? `${engagementData.documents.verifiedCount} verified` : 'Upload first document',
+      route: '/documents'
+    },
+    {
+      name: 'Paperwork Champion',
+      icon: '📋',
+      current: engagementData.documents.allCompleted ? 1 : 0,
+      target: 1,
+      unlocked: trophies.some(t => t.name === 'Paperwork Champion'),
+      description: engagementData.documents.allCompleted ? 'All forms complete!' : `${engagementData.documents.totalRequired} required forms`,
+      route: '/documents'
+    },
+    {
+      name: 'Health Historian',
+      icon: '📝',
+      current: engagementData.health.hasHistory ? 1 : 0,
+      target: 1,
+      unlocked: trophies.some(t => t.name === 'Health Historian'),
+      description: engagementData.health.hasHistory ? 'History submitted' : 'Submit medical history',
+      route: '/history'
+    },
+    {
+      name: 'Medical Record Keeper',
+      icon: '🏥',
+      current: engagementData.health.isRecent ? 1 : 0,
+      target: 1,
+      unlocked: trophies.some(t => t.name === 'Medical Record Keeper'),
+      description: engagementData.health.isRecent ? 'Up to date!' : 'Update within 6 months',
+      route: '/history'
+    }
+  ].filter(p => !p.unlocked && (p.current > 0 || p.target === 1)) : [];
 
   return (
-    <div className={styles.trophyWidget} onClick={() => navigate('/education')}>
-      <div className={styles.trophyWidgetHeader}>
+    <div className={styles.trophyWidget}>
+      <div className={styles.trophyWidgetHeader} onClick={() => navigate('/education')} style={{ cursor: 'pointer' }}>
         <div className={styles.trophyWidgetLeft}>
           <span className={styles.trophyWidgetIcon}>🏆</span>
           <div className={styles.trophyWidgetText}>
-            <h3>Learning Achievements</h3>
+            <h3>{hasProgress ? 'Your Achievements' : 'Start Your Health Journey'}</h3>
             <p>
-              <strong>{stats.trophiesEarned}</strong> {stats.trophiesEarned === 1 ? 'badge' : 'badges'} earned • <strong>{stats.totalViewed}</strong> {stats.totalViewed === 1 ? 'lesson' : 'lessons'} completed
+              {hasProgress ? (
+                <>
+                  <strong>{stats.trophiesEarned}</strong> {stats.trophiesEarned === 1 ? 'badge' : 'badges'} earned across all activities
+                </>
+              ) : (
+                'Complete appointments, stay up to date, and earn badges'
+              )}
             </p>
           </div>
         </div>
         <span className={styles.trophyWidgetArrow}>→</span>
       </div>
+
+      {/* Milestone Progress */}
+      {stats.nextMilestone && (
+        <div className={styles.milestoneSection}>
+          <div className={styles.milestoneHeader}>
+            <span className={styles.milestoneIcon}>{stats.nextMilestone.icon}</span>
+            <div className={styles.milestoneText}>
+              <span className={styles.milestoneLabel}>{hasProgress ? 'Next Milestone' : 'First Milestone'}</span>
+              <span className={styles.milestoneName}>{stats.nextMilestone.name}</span>
+            </div>
+            <span className={styles.milestoneCount}>{stats.totalViewed}/{stats.nextMilestone.target}</span>
+          </div>
+          <div className={styles.milestoneProgress}>
+            <div className={styles.milestoneProgressBar} style={{ width: `${stats.progress}%` }}></div>
+          </div>
+        </div>
+      )}
+
+      {/* Trophy Categories */}
+      {categoryData.length > 0 && (
+        <div className={styles.categoriesSection}>
+          <span className={styles.categoriesLabel}>Trophy Collections:</span>
+          <div className={styles.categoryGrid}>
+            {categoryData.map((cat) => (
+              <div 
+                key={cat.key} 
+                className={styles.categoryCard}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  navigate(cat.route);
+                }}
+                style={{ cursor: 'pointer' }}
+              >
+                <span className={styles.categoryIcon}>{cat.icon}</span>
+                <span className={styles.categoryLabel}>{cat.label}</span>
+                <span className={styles.categoryCount}>{cat.count}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Engagement Trophy Progress */}
+      {engagementProgress.length > 0 && (
+        <div className={styles.engagementProgress}>
+          <span className={styles.categoriesLabel}>Unlock More Badges:</span>
+          <div className={styles.progressList}>
+            {engagementProgress.map((prog, idx) => (
+              <div 
+                key={idx} 
+                className={styles.progressItem}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  navigate(prog.route);
+                }}
+                style={{ cursor: 'pointer' }}
+              >
+                <div className={styles.progressItemHeader}>
+                  <span className={styles.progressIcon}>{prog.icon}</span>
+                  <div className={styles.progressInfo}>
+                    <span className={styles.progressName}>{prog.name}</span>
+                    {prog.description && (
+                      <span className={styles.progressDesc}>{prog.description}</span>
+                    )}
+                  </div>
+                  <span className={styles.progressCount}>
+                    {prog.current}/{prog.target}
+                  </span>
+                </div>
+                <div className={styles.progressBarContainer}>
+                  <div 
+                    className={styles.progressBarFill} 
+                    style={{ width: `${Math.min((prog.current / prog.target) * 100, 100)}%` }}
+                  ></div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Recent Achievements */}
       {stats.recentTrophies?.length > 0 && (
         <div className={styles.trophyWidgetBadges}>
           <span className={styles.badgesLabel}>Recent Achievements:</span>

@@ -11,7 +11,12 @@ import styles from './InsuranceList.module.css';
 const InsuranceList = ({ onAddClick }) => {
   const { insurancePolicies, loading } = useBillingData();
 
+  console.log('InsuranceList - insurancePolicies:', insurancePolicies);
+  console.log('InsuranceList - loading:', loading);
+
   const activePolicies = insurancePolicies.filter(p => p.status === 'Active');
+  
+  console.log('InsuranceList - activePolicies:', activePolicies);
 
   return (
     <section className={`card ${styles.insuranceCard}`}>

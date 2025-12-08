@@ -282,6 +282,260 @@ body.dark .trophyWidget {
   letter-spacing: -0.5px;
 }
 
+.trophyWidgetLeft {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  flex: 1;
+}
+
+.trophyWidgetArrow {
+  font-size: 1.5rem;
+  color: var(--text-secondary);
+  opacity: 0.6;
+  transition: all 0.3s ease;
+}
+
+.trophyWidget:hover .trophyWidgetArrow {
+  opacity: 1;
+  transform: translateX(4px);
+}
+
+/* Milestone Section */
+.milestoneSection {
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(10px);
+  border-radius: 12px;
+  padding: 1rem 1.25rem;
+  margin-bottom: 1.25rem;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+body.dark .milestoneSection {
+  background: rgba(30, 30, 30, 0.6);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+.milestoneHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.milestoneIcon {
+  font-size: 1.75rem;
+  line-height: 1;
+}
+
+.milestoneText {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+}
+
+.milestoneLabel {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.milestoneName {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.milestoneCount {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--primary-600);
+}
+
+body.dark .milestoneCount {
+  color: var(--primary-400);
+}
+
+.milestoneProgress {
+  height: 8px;
+  background: rgba(0, 0, 0, 0.08);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+body.dark .milestoneProgress {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.milestoneProgressBar {
+  height: 100%;
+  background: linear-gradient(90deg, #FFB800, #FF9500);
+  border-radius: 4px;
+  transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Categories Section */
+.categoriesSection {
+  background: rgba(255, 255, 255, 0.5);
+  backdrop-filter: blur(10px);
+  border-radius: 12px;
+  padding: 1rem 1.25rem;
+  margin-bottom: 1.25rem;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+body.dark .categoriesSection {
+  background: rgba(30, 30, 30, 0.5);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+.categoriesLabel {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 0.75rem;
+}
+
+.categoryGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+  gap: 0.75rem;
+}
+
+.categoryCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.75rem;
+  background: rgba(255, 255, 255, 0.8);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  border-radius: 10px;
+  transition: all 0.2s ease;
+}
+
+body.dark .categoryCard {
+  background: rgba(44, 44, 46, 0.6);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+.categoryCard:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.categoryIcon {
+  font-size: 1.5rem;
+  line-height: 1;
+}
+
+.categoryLabel {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.categoryCount {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--primary-600);
+  line-height: 1;
+}
+
+body.dark .categoryCount {
+  color: var(--primary-400);
+}
+
+/* Engagement Progress Section */
+.engagementProgress {
+  background: rgba(255, 255, 255, 0.5);
+  backdrop-filter: blur(10px);
+  border-radius: 12px;
+  padding: 1rem 1.25rem;
+  margin-bottom: 1.25rem;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+body.dark .engagementProgress {
+  background: rgba(30, 30, 30, 0.5);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+.progressList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.875rem;
+}
+
+.progressItem {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.progressItemHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.progressIcon {
+  font-size: 1.5rem;
+  line-height: 1;
+}
+
+.progressInfo {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+}
+
+.progressName {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.progressDesc {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+}
+
+.progressCount {
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: var(--primary-600);
+}
+
+body.dark .progressCount {
+  color: var(--primary-400);
+}
+
+.progressBarContainer {
+  height: 6px;
+  background: rgba(0, 0, 0, 0.08);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+body.dark .progressBarContainer {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.progressBarFill {
+  height: 100%;
+  background: linear-gradient(90deg, #34C759, #30B350);
+  border-radius: 3px;
+  transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
 .trophyWidgetStats {
   font-size: 1.0625rem;
   color: var(--text-secondary);

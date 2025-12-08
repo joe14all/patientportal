@@ -77,3 +77,27 @@
     bottom: 90px; /* Position above the quick actions bar */
   }
 }
+
+/* Print Styles */
+@media print {
+  .chatButton {
+    display: none !important;
+  }
+  
+  .container {
+    display: block !important;
+  }
+  
+  .contentArea {
+    width: 100% !important;
+    max-width: 100% !important;
+    padding: 0 !important;
+    height: auto !important;
+    overflow: visible !important;
+  }
+  
+  .contentWrapper {
+    max-width: 100% !important;
+    margin: 0 !important;
+  }
+}

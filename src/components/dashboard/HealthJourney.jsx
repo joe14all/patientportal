@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import styles from './HealthJourney.module.css';
 
 /**
@@ -13,9 +13,12 @@ const HealthJourney = ({
   totalDue,
   unreadThread,
   lastHistoryUpdate,
-  getProviderById 
+  getProviderById,
+  recentVisitSummary
 }) => {
   const navigate = useNavigate();
+
+  console.log('HealthJourney render - recentVisitSummary:', recentVisitSummary);
 
   // Calculate priority actions based on patient's current state
   const priorityActions = useMemo(() => {
@@ -237,6 +240,46 @@ const HealthJourney = ({
         <p className={styles.noActionsText}>
           You're doing great! Check back soon for updates.
         </p>
+      )}
+
+      {/* Recent Visit Summary */}
+      {recentVisitSummary && (
+        <div className={styles.visitSummaryCard} onClick={() => console.log('Card clicked')}>
+          <div className={styles.visitSummaryHeader}>
+            <div className={styles.visitSummaryTitle}>
+              <span className={styles.visitIcon}>📋</span>
+              <h3>Latest Visit Summary</h3>
+            </div>
+            <span className={styles.visitDate}>
+              {new Date(recentVisitSummary.visitDate).toLocaleDateString(undefined, { 
+                timeZone: 'UTC',
+                month: 'short', 
+                day: 'numeric' 
+              })}
+            </span>
+          </div>
+          <p className={styles.visitSummaryText}>{recentVisitSummary.summaryNotes}</p>
+          {recentVisitSummary.nextSteps && recentVisitSummary.nextSteps.nextVisitReason && (
+            <div className={styles.nextStepsPreview}>
+              <span className={styles.nextStepsLabel}>Next steps:</span>
+              <span className={styles.nextStepsText}>{recentVisitSummary.nextSteps.nextVisitReason}</span>
+            </div>
+          )}
+          <Link 
+            to={`/visits/${recentVisitSummary.id}`}
+            className={styles.viewSummaryButton}
+            onClick={(e) => {
+              console.log('Link clicked!', recentVisitSummary.id);
+            }}
+            style={{ 
+              display: 'block',
+              textDecoration: 'none',
+              textAlign: 'center'
+            }}
+          >
+            View Full Summary →
+          </Link>
+        </div>
       )}
     </div>
   );

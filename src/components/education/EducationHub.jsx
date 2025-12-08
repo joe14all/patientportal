@@ -235,30 +235,44 @@ const EducationHub = () => {
   return (
     <div className={styles.educationHub}>
       {/* Trophy Achievement Banner */}
-      {educationStats.trophiesEarned > 0 && (
-        <div className={styles.trophyBanner}>
-          <div className={styles.trophyHeader}>
-            <span className={styles.trophyIcon}>🏆</span>
-            <div className={styles.trophyText}>
-              <h3 className={styles.trophyTitle}>Your Learning Achievements</h3>
-              <p className={styles.trophyStats}>
-                <strong>{educationStats.trophiesEarned}</strong> {educationStats.trophiesEarned === 1 ? 'badge' : 'badges'} earned • <strong>{educationStats.totalViewed}</strong> {educationStats.totalViewed === 1 ? 'lesson' : 'lessons'} completed
-              </p>
-            </div>
+      <div className={styles.trophyBanner}>
+        <div className={styles.trophyHeader}>
+          <span className={styles.trophyIcon}>🏆</span>
+          <div className={styles.trophyText}>
+            <h3 className={styles.trophyTitle}>
+              {educationStats.trophiesEarned > 0 ? 'Your Learning Achievements' : 'Build Your Badge Collection'}
+            </h3>
+            <p className={styles.trophyStats}>
+              {educationStats.trophiesEarned > 0 ? (
+                <>
+                  <strong>{educationStats.trophiesEarned}</strong> {educationStats.trophiesEarned === 1 ? 'badge' : 'badges'} earned • <strong>{educationStats.totalViewed}</strong> {educationStats.totalViewed === 1 ? 'lesson' : 'lessons'} completed
+                </>
+              ) : (
+                'Complete lessons to earn badges and track your dental health knowledge'
+              )}
+            </p>
           </div>
-          {educationStats.recentTrophies.length > 0 && (
-            <div className={styles.recentBadges}>
-              <span className={styles.badgesLabel}>Recent:</span>
-              {educationStats.recentTrophies.map((trophy, index) => (
-                <div key={index} className={styles.badgeItem} title={trophy.name}>
-                  <span className={styles.badgeIcon}>{trophy.icon || '🏅'}</span>
-                  <span className={styles.badgeName}>{trophy.name}</span>
-                </div>
-              ))}
-            </div>
-          )}
         </div>
-      )}
+        {educationStats.recentTrophies?.length > 0 && (
+          <div className={styles.recentBadges}>
+            <span className={styles.badgesLabel}>Recent:</span>
+            {educationStats.recentTrophies.map((trophy, index) => (
+              <div key={index} className={styles.badgeItem} title={trophy.name}>
+                <span className={styles.badgeIcon}>{trophy.icon || '🏅'}</span>
+                <span className={styles.badgeName}>{trophy.name}</span>
+              </div>
+            ))}
+          </div>
+        )}
+        {educationStats.nextMilestone && (
+          <div className={styles.milestonePreview}>
+            <span className={styles.milestoneIcon}>{educationStats.nextMilestone.icon}</span>
+            <span className={styles.milestoneText}>
+              {educationStats.totalViewed === 0 ? 'Start your first lesson!' : `${educationStats.nextMilestone.target - educationStats.totalViewed} more to unlock "${educationStats.nextMilestone.name}"`}
+            </span>
+          </div>
+        )}
+      </div>
 
       <div className={styles.header}>
         <h2>Dental Health Education</h2>

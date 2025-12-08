@@ -1,4 +1,5 @@
 import React, { useMemo, useState, Fragment } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useClinicalData, useCoreData } from '../../contexts';
 import { getFriendlyDate } from '../../utils/patientExperience';
 import styles from './TreatmentTimeline.module.css';
@@ -8,6 +9,7 @@ import styles from './TreatmentTimeline.module.css';
  * Visual journey of patient's dental history with milestones and progress tracking
  */
 const TreatmentTimeline = () => {
+  const navigate = useNavigate();
   const { appointments, treatmentPlans } = useClinicalData();
   const { getProviderById } = useCoreData(); 
   // const { getProcedureById } = useCoreData(); // Available for future procedure detail enhancement
@@ -240,7 +242,10 @@ const TreatmentTimeline = () => {
                     </div>
 
                     {event.details.linkedRecords?.visitSummaryId && (
-                      <button className={`${styles.viewButton} secondary`}>
+                      <button 
+                        className={`${styles.viewButton} secondary`}
+                        onClick={() => navigate(`/visits/${event.details.linkedRecords.visitSummaryId}`)}
+                      >
                         View Visit Summary
                       </button>
                     )}

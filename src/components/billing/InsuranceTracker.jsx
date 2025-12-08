@@ -43,17 +43,23 @@ const InsuranceTracker = () => {
       sum + (inv.financialSummary?.amountDue?.amount || 0), 0
     );
 
-    // Use insurance plan data or reasonable defaults
-    const deductible = currentInsurance.deductible || 1500;
-    const deductibleMet = Math.min(totalOutOfPocket, deductible);
+    // Use insurance plan data from coverageDetails
+    const individualDeductible = currentInsurance.coverageDetails?.deductibles?.find(
+      d => d.type === 'Individual' && d.network === 'InNetwork'
+    );
+    const deductible = individualDeductible?.amount || 1500;
+    const deductibleMet = individualDeductible?.met || Math.min(totalOutOfPocket, deductible);
     const deductibleRemaining = Math.max(0, deductible - deductibleMet);
 
-    const outOfPocketMax = currentInsurance.outOfPocketMax || 5000;
+    const outOfPocketMax = 5000; // Dental typically doesn't have OOP max, using placeholder
     const outOfPocketMet = totalOutOfPocket;
     const outOfPocketRemaining = Math.max(0, outOfPocketMax - outOfPocketMet);
 
-    const annualMax = currentInsurance.annualMax || 50000;
-    const annualUsed = totalClaimed;
+    const individualAnnualMax = currentInsurance.coverageDetails?.annualMaximums?.find(
+      m => m.type === 'Individual' && m.network === 'InNetwork'
+    );
+    const annualMax = individualAnnualMax?.amount || 1500;
+    const annualUsed = individualAnnualMax?.used || totalClaimed;
     const annualRemaining = Math.max(0, annualMax - annualUsed);
 
     return {
@@ -136,7 +142,7 @@ const InsuranceTracker = () => {
             >
               {insurancePolicies.map((ins, idx) => (
                 <option key={idx} value={idx}>
-                  {ins.insuranceProvider} - {ins.policyType || 'Dental'}
+                  {ins.carrier?.name || 'Insurance Plan'} - {ins.coveragePriority || 'Primary'}
                 </option>
               ))}
             </select>
@@ -148,26 +154,28 @@ const InsuranceTracker = () => {
       <div className={styles.planCard}>
         <div className={styles.planHeader}>
           <div>
-            <div className={styles.planName}>{currentInsurance.insuranceProvider}</div>
-            <div className={styles.planType}>{currentInsurance.policyType || 'Dental Insurance'}</div>
+            <div className={styles.planName}>{currentInsurance.carrier?.name || 'Insurance Plan'}</div>
+            <div className={styles.planType}>{currentInsurance.plan?.planType || 'Dental Insurance'}</div>
           </div>
           <div className={styles.planBadge}>
-            {currentInsurance.isPrimary ? 'Primary' : 'Secondary'}
+            {currentInsurance.coveragePriority || 'Primary'}
           </div>
         </div>
         <div className={styles.planDetails}>
           <div className={styles.planDetail}>
             <span className={styles.label}>Member ID:</span>
-            <span className={styles.value}>{currentInsurance.policyNumber}</span>
+            <span className={styles.value}>{currentInsurance.subscriber?.subscriberId || currentInsurance.plan?.policyNumber || 'N/A'}</span>
           </div>
           <div className={styles.planDetail}>
             <span className={styles.label}>Group #:</span>
-            <span className={styles.value}>{currentInsurance.groupNumber || 'N/A'}</span>
+            <span className={styles.value}>{currentInsurance.plan?.groupNumber || 'N/A'}</span>
           </div>
           <div className={styles.planDetail}>
             <span className={styles.label}>Effective:</span>
             <span className={styles.value}>
-              {new Date(currentInsurance.effectiveDate).toLocaleDateString()}
+              {currentInsurance.coverageDetails?.effectiveDate 
+                ? new Date(currentInsurance.coverageDetails.effectiveDate).toLocaleDateString() 
+                : 'N/A'}
             </span>
           </div>
         </div>

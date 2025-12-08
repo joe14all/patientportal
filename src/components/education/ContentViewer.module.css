@@ -297,16 +297,9 @@ body.dark .progressBar {
 }
 
 .primaryButton:disabled {
-  background: rgba(120, 120, 128, 0.16);
-  color: rgba(60, 60, 67, 0.6);
-  cursor: not-allowed;
-  transform: none;
-  box-shadow: none;
-}
-
-body.dark .primaryButton:disabled {
-  background: rgba(142, 142, 147, 0.18);
-  color: rgba(235, 235, 245, 0.6);
+  opacity: 0;
+  pointer-events: none;
+  transform: scale(0.95);
 }
 
 .secondaryButton {
@@ -333,6 +326,34 @@ body.dark .secondaryButton {
 
 body.dark .secondaryButton:hover {
   background: rgba(255, 255, 255, 0.1);
+}
+
+.successButton {
+  padding: 1rem 2rem;
+  background: linear-gradient(135deg, #34C759, #30B350);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 2px 12px rgba(52, 199, 89, 0.3);
+  transition: all 0.2s ease;
+}
+
+.successButton:hover {
+  background: linear-gradient(135deg, #30B350, #28A745);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(52, 199, 89, 0.4);
+}
+
+.successButton:active {
+  transform: translateY(0);
+}
+
+.successButton:disabled {
+  opacity: 0;
+  pointer-events: none;
 }
 
 .buttonGroup {

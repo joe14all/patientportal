@@ -96,3 +96,10 @@
   background-color: var(--error-bg);
   color: var(--error-500);
 }
+
+/* Print Styles */
+@media print {
+  .sidebar {
+    display: none !important;
+  }
+}
