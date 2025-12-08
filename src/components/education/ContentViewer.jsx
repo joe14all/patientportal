@@ -305,6 +305,102 @@ const ContentViewer = ({ content, isOpen, onClose }) => {
     );
   };
 
+  const renderGuideContent = () => (
+    <div className={styles.contentSection}>
+      <div className={styles.contentBody}>
+        <div className={styles.contentHeader}>
+          <span className={styles.typeBadge}>📖 Guide</span>
+          <h2 className={styles.contentTitle}>{content.title}</h2>
+          <div className={styles.metaTags}>
+            <span className={styles.metaTag}>📚 Comprehensive Guide</span>
+            <span className={styles.metaTag}>⏱ {content.duration}</span>
+          </div>
+        </div>
+
+        <p className={styles.contentDescription}>{content.description}</p>
+
+        <div className={styles.guideSteps}>
+          <div className={styles.guideStep}>
+            <div className={styles.stepNumber}>1</div>
+            <div className={styles.stepContent}>
+              <h3 className={styles.stepTitle}>Understanding Your Options</h3>
+              <p className={styles.stepText}>
+                Learn about the different methods available and how they work. Professional treatments 
+                offer faster, more dramatic results, while at-home options provide convenience and 
+                gradual improvement over time.
+              </p>
+            </div>
+          </div>
+
+          <div className={styles.guideStep}>
+            <div className={styles.stepNumber}>2</div>
+            <div className={styles.stepContent}>
+              <h3 className={styles.stepTitle}>Professional vs At-Home</h3>
+              <p className={styles.stepText}>
+                <strong>Professional Whitening:</strong> In-office treatments use stronger bleaching agents 
+                and can lighten teeth several shades in one visit. Results are immediate and supervised by 
+                dental professionals.
+              </p>
+              <p className={styles.stepText}>
+                <strong>At-Home Options:</strong> Custom trays, strips, and whitening toothpastes offer 
+                gradual whitening over weeks. More affordable but require consistent use for best results.
+              </p>
+            </div>
+          </div>
+
+          <div className={styles.guideStep}>
+            <div className={styles.stepNumber}>3</div>
+            <div className={styles.stepContent}>
+              <h3 className={styles.stepTitle}>What to Expect</h3>
+              <p className={styles.stepText}>
+                Most people experience some tooth sensitivity during treatment, which is temporary. 
+                Results typically last 6 months to 2 years depending on your habits (coffee, tea, wine, smoking).
+              </p>
+            </div>
+          </div>
+
+          <div className={styles.guideStep}>
+            <div className={styles.stepNumber}>4</div>
+            <div className={styles.stepContent}>
+              <h3 className={styles.stepTitle}>Maintaining Your Results</h3>
+              <ul className={styles.bulletList}>
+                <li>Brush twice daily with whitening toothpaste</li>
+                <li>Limit staining foods and beverages</li>
+                <li>Use a straw for dark-colored drinks</li>
+                <li>Schedule regular dental cleanings</li>
+                <li>Touch-up treatments as needed</li>
+              </ul>
+            </div>
+          </div>
+
+          <div className={styles.importantNote}>
+            <div className={styles.noteIcon}>💡</div>
+            <div className={styles.noteContent}>
+              <h4>Important Considerations</h4>
+              <p>
+                Whitening works best on natural teeth. It won't change the color of crowns, veneers, 
+                or fillings. Consult with your dentist to determine the best option for your specific needs 
+                and to ensure your teeth and gums are healthy before treatment.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {!completed ? (
+          <button className={styles.primaryButton} onClick={handleComplete}>
+            <span className={styles.buttonIcon}>✓</span>
+            I've Completed This Guide
+          </button>
+        ) : (
+          <div className={styles.successMessage}>
+            <span className={styles.successIcon}>🎉</span>
+            <span>Awesome! You've finished this comprehensive guide</span>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+
   if (!content) return null;
 
   return (
@@ -314,6 +410,7 @@ const ContentViewer = ({ content, isOpen, onClose }) => {
         {content.type === 'article' && renderArticleContent()}
         {content.type === 'interactive' && renderInteractiveContent()}
         {content.type === 'checklist' && renderChecklistContent()}
+        {content.type === 'guide' && renderGuideContent()}
       </div>
     </Modal>
   );

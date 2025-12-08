@@ -18,6 +18,35 @@ const EducationHub = () => {
 
   const educationStats = getEducationStats();
 
+  // Filter stats to only show education-related achievements
+  const educationOnlyStats = useMemo(() => {
+    // Only show trophies from education categories (not engagement, documents, health)
+    const educationCategories = ['basics', 'procedures', 'prevention', 'aftercare', 'cosmetic', 'family', 'emergency'];
+    const educationTrophyNames = [
+      'Brushing Master', 'Flossing Pro', 
+      'Crown Expert', 'Root Canal Scholar',
+      'Gum Health Guardian', 'Prevention Champion',
+      'Extraction Expert', 'Implant Care Pro',
+      'Whitening Specialist', 'Cosmetic Expert',
+      'Family Care Champion', 'Emergency Ready'
+    ];
+    
+    const educationTrophies = educationStats.recentTrophies?.filter(trophy => 
+      educationTrophyNames.includes(trophy.name)
+    ) || [];
+    
+    const totalEducationTrophies = (educationStats.categories?.basics?.length || 0) +
+                                    (educationStats.categories?.procedures?.length || 0) +
+                                    (educationStats.categories?.prevention?.length || 0) +
+                                    (educationStats.categories?.aftercare?.length || 0);
+    
+    return {
+      ...educationStats,
+      recentTrophies: educationTrophies,
+      trophiesEarned: totalEducationTrophies
+    };
+  }, [educationStats]);
+
   // Educational content library - wrapped in useMemo to prevent recreation on every render
   const educationContent = useMemo(() => [
     {
@@ -240,12 +269,12 @@ const EducationHub = () => {
           <span className={styles.trophyIcon}>🏆</span>
           <div className={styles.trophyText}>
             <h3 className={styles.trophyTitle}>
-              {educationStats.trophiesEarned > 0 ? 'Your Learning Achievements' : 'Build Your Badge Collection'}
+              {educationOnlyStats.trophiesEarned > 0 ? 'Your Learning Achievements' : 'Build Your Badge Collection'}
             </h3>
             <p className={styles.trophyStats}>
-              {educationStats.trophiesEarned > 0 ? (
+              {educationOnlyStats.trophiesEarned > 0 ? (
                 <>
-                  <strong>{educationStats.trophiesEarned}</strong> {educationStats.trophiesEarned === 1 ? 'badge' : 'badges'} earned • <strong>{educationStats.totalViewed}</strong> {educationStats.totalViewed === 1 ? 'lesson' : 'lessons'} completed
+                  <strong>{educationOnlyStats.trophiesEarned}</strong> {educationOnlyStats.trophiesEarned === 1 ? 'badge' : 'badges'} earned • <strong>{educationOnlyStats.totalViewed}</strong> {educationOnlyStats.totalViewed === 1 ? 'lesson' : 'lessons'} completed
                 </>
               ) : (
                 'Complete lessons to earn badges and track your dental health knowledge'
@@ -253,10 +282,10 @@ const EducationHub = () => {
             </p>
           </div>
         </div>
-        {educationStats.recentTrophies?.length > 0 && (
+        {educationOnlyStats.recentTrophies?.length > 0 && (
           <div className={styles.recentBadges}>
             <span className={styles.badgesLabel}>Recent:</span>
-            {educationStats.recentTrophies.map((trophy, index) => (
+            {educationOnlyStats.recentTrophies.map((trophy, index) => (
               <div key={index} className={styles.badgeItem} title={trophy.name}>
                 <span className={styles.badgeIcon}>{trophy.icon || '🏅'}</span>
                 <span className={styles.badgeName}>{trophy.name}</span>
@@ -264,11 +293,11 @@ const EducationHub = () => {
             ))}
           </div>
         )}
-        {educationStats.nextMilestone && (
+        {educationOnlyStats.nextMilestone && (
           <div className={styles.milestonePreview}>
-            <span className={styles.milestoneIcon}>{educationStats.nextMilestone.icon}</span>
+            <span className={styles.milestoneIcon}>{educationOnlyStats.nextMilestone.icon}</span>
             <span className={styles.milestoneText}>
-              {educationStats.totalViewed === 0 ? 'Start your first lesson!' : `${educationStats.nextMilestone.target - educationStats.totalViewed} more to unlock "${educationStats.nextMilestone.name}"`}
+              {educationOnlyStats.totalViewed === 0 ? 'Start your first lesson!' : `${educationOnlyStats.nextMilestone.target - educationOnlyStats.totalViewed} more to unlock "${educationOnlyStats.nextMilestone.name}"`}
             </span>
           </div>
         )}

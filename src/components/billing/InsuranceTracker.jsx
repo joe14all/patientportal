@@ -18,7 +18,7 @@ import styles from './InsuranceTracker.module.css';
  */
 const InsuranceTracker = () => {
   const { appointments } = useClinicalData();
-  const { insurancePolicies, billingInvoices } = useBillingData();
+  const { insurancePolicies, insuranceClaims, billingInvoices } = useBillingData();
 
   const [selectedPlan, setSelectedPlan] = useState(0);
 
@@ -29,87 +29,142 @@ const InsuranceTracker = () => {
   const metrics = useMemo(() => {
     if (!currentInsurance) return null;
 
-    // Mock calculations based on invoices and appointments
+    // Calculate totals from actual claims for this policy
     const yearToDate = new Date().getFullYear();
-    const currentYearInvoices = billingInvoices?.filter(inv => 
-      new Date(inv.date).getFullYear() === yearToDate
+    const policyClaims = insuranceClaims?.filter(claim => 
+      claim.insurancePolicyId === currentInsurance.id &&
+      new Date(claim.submissionDate).getFullYear() === yearToDate
     ) || [];
 
-    const totalClaimed = currentYearInvoices.reduce((sum, inv) => 
-      sum + (inv.financialSummary?.insurancePayment?.amount || 0), 0
+    const totalClaimed = policyClaims.reduce((sum, claim) => 
+      sum + (claim.totalPaid?.amount || 0), 0
     );
 
-    const totalOutOfPocket = currentYearInvoices.reduce((sum, inv) => 
-      sum + (inv.financialSummary?.amountDue?.amount || 0), 0
+    const totalPatientResponsibility = policyClaims.reduce((sum, claim) => 
+      sum + (claim.patientResponsibility?.amount || 0), 0
     );
 
     // Use insurance plan data from coverageDetails
     const individualDeductible = currentInsurance.coverageDetails?.deductibles?.find(
       d => d.type === 'Individual' && d.network === 'InNetwork'
     );
-    const deductible = individualDeductible?.amount || 1500;
-    const deductibleMet = individualDeductible?.met || Math.min(totalOutOfPocket, deductible);
+    const deductible = individualDeductible?.amount || 50;
+    const deductibleMet = individualDeductible?.met !== undefined ? individualDeductible.met : Math.min(totalPatientResponsibility, deductible);
     const deductibleRemaining = Math.max(0, deductible - deductibleMet);
 
-    const outOfPocketMax = 5000; // Dental typically doesn't have OOP max, using placeholder
-    const outOfPocketMet = totalOutOfPocket;
+    // Dental insurance typically doesn't have out-of-pocket max, but we'll show patient responsibility
+    const outOfPocketMax = 5000; // Placeholder
+    const outOfPocketMet = totalPatientResponsibility;
     const outOfPocketRemaining = Math.max(0, outOfPocketMax - outOfPocketMet);
 
     const individualAnnualMax = currentInsurance.coverageDetails?.annualMaximums?.find(
       m => m.type === 'Individual' && m.network === 'InNetwork'
     );
     const annualMax = individualAnnualMax?.amount || 1500;
-    const annualUsed = individualAnnualMax?.used || totalClaimed;
+    const annualUsed = individualAnnualMax?.used !== undefined ? individualAnnualMax.used : totalClaimed;
     const annualRemaining = Math.max(0, annualMax - annualUsed);
 
     return {
       deductible,
       deductibleMet,
       deductibleRemaining,
-      deductibleProgress: (deductibleMet / deductible) * 100,
+      deductibleProgress: deductible > 0 ? (deductibleMet / deductible) * 100 : 0,
       outOfPocketMax,
       outOfPocketMet,
       outOfPocketRemaining,
-      outOfPocketProgress: (outOfPocketMet / outOfPocketMax) * 100,
+      outOfPocketProgress: outOfPocketMax > 0 ? (outOfPocketMet / outOfPocketMax) * 100 : 0,
       annualMax,
       annualUsed,
       annualRemaining,
-      annualProgress: (annualUsed / annualMax) * 100,
+      annualProgress: annualMax > 0 ? (annualUsed / annualMax) * 100 : 0,
       totalClaimed,
-      claimsCount: currentYearInvoices.length,
+      claimsCount: policyClaims.length,
     };
-  }, [currentInsurance, billingInvoices]);
+  }, [currentInsurance, insuranceClaims]);
 
-  // Benefits data
-  const benefits = [
-    { category: '🦷 Preventive Care', coverage: '100%', details: 'Cleanings, exams, X-rays (2x/year)' },
-    { category: '🔧 Basic Procedures', coverage: '80%', details: 'Fillings, extractions' },
-    { category: '👑 Major Procedures', coverage: '50%', details: 'Crowns, bridges, dentures' },
-    { category: '😁 Orthodontics', coverage: '50%', details: 'Up to $2,000 lifetime max' },
-    { category: '🚨 Emergency Care', coverage: '80%', details: 'Pain relief, urgent treatment' },
-  ];
+  // Benefits data from actual insurance policy
+  const benefits = useMemo(() => {
+    if (!currentInsurance?.coverageDetails?.coverageByFinancialCategory) {
+      return [
+        { category: '🦷 Preventive Care', coverage: '100%', details: 'Cleanings, exams, X-rays (2x/year)' },
+        { category: '🔧 Basic Procedures', coverage: '80%', details: 'Fillings, extractions' },
+        { category: '👑 Major Procedures', coverage: '50%', details: 'Crowns, bridges, dentures' },
+        { category: '😁 Orthodontics', coverage: '50%', details: 'Up to $2,000 lifetime max' },
+        { category: '🚨 Emergency Care', coverage: '80%', details: 'Pain relief, urgent treatment' },
+      ];
+    }
 
-  // Mock recent claims based on recent appointments
+    const categoryIcons = {
+      'Preventive': '🦷',
+      'Basic': '🔧',
+      'Major': '👑',
+      'Orthodontic': '😁',
+      'Emergency': '🚨'
+    };
+
+    return currentInsurance.coverageDetails.coverageByFinancialCategory.map(coverage => {
+      const icon = categoryIcons[coverage.category] || '🏥';
+      const details = [];
+      
+      if (coverage.deductibleApplies) {
+        details.push('Deductible applies');
+      }
+      if (coverage.coPay > 0) {
+        details.push(`$${coverage.coPay} copay`);
+      }
+      if (coverage.lifetimeMax) {
+        details.push(`$${coverage.lifetimeMax.toLocaleString()} lifetime max`);
+      }
+      
+      return {
+        category: `${icon} ${coverage.category}`,
+        coverage: `${coverage.coInsurancePercent}%`,
+        details: details.length > 0 ? details.join(', ') : 'No additional restrictions'
+      };
+    });
+  }, [currentInsurance]);
+
+  // Recent claims from actual insurance claims data
   const recentClaims = useMemo(() => {
-    const recentAppointments = appointments
-      ?.filter(apt => apt.status === 'completed')
-      .slice(0, 5) || [];
+    if (!insuranceClaims || !currentInsurance) return [];
+    
+    return insuranceClaims
+      .filter(claim => claim.insurancePolicyId === currentInsurance.id)
+      .sort((a, b) => new Date(b.submissionDate) - new Date(a.submissionDate))
+      .slice(0, 5)
+      .map(claim => {
+        const statusMap = {
+          'Submitted': 'processing',
+          'InReview': 'processing',
+          'Adjudicated': 'approved',
+          'Paid': 'paid',
+          'Denied': 'denied',
+          'Pending': 'processing'
+        };
 
-    return recentAppointments.map((apt, idx) => ({
-      id: `CLM-${1000 + idx}`,
-      date: apt.date,
-      service: apt.type === 'cleaning' ? 'Routine Cleaning & Exam' : 
-               apt.type === 'consultation' ? 'Consultation' :
-               apt.type === 'treatment' ? 'Dental Treatment' :
-               apt.type === 'follow-up' ? 'Follow-up Visit' :
-               'Dental Service',
-      provider: apt.provider,
-      submitted: apt.date,
-      status: idx === 0 ? 'processing' : idx === 1 ? 'approved' : 'paid',
-      billed: Math.floor(Math.random() * 300) + 100,
-      covered: Math.floor(Math.random() * 200) + 50,
-    }));
-  }, [appointments]);
+        // Get procedure descriptions from line items
+        const procedures = claim.lineItems?.map(item => {
+          const procMap = {
+            'D1110': 'Routine Cleaning',
+            'D0120': 'Periodic Exam',
+            'D0274': 'Bitewing X-rays',
+            'D2391': 'Composite Filling'
+          };
+          return procMap[item.procedureId] || item.procedureId;
+        }).join(', ') || 'Dental Service';
+
+        return {
+          id: claim.carrierClaimId || claim.id,
+          date: claim.submissionDate,
+          service: procedures,
+          submitted: claim.submissionDate,
+          status: statusMap[claim.status] || 'processing',
+          billed: claim.totalCharge?.amount || 0,
+          covered: claim.totalPaid?.amount || 0,
+          adjudicatedDate: claim.adjudicationDate
+        };
+      });
+  }, [insuranceClaims, currentInsurance]);
 
   if (!currentInsurance) {
     return (

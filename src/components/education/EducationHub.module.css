@@ -213,6 +213,8 @@ body.dark .categoryTab:hover {
   position: relative;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
   cursor: pointer;
+  display: flex;
+  flex-direction: column;
 }
 
 body.dark .contentCard {
@@ -300,6 +302,9 @@ body.dark .typeIcon {
 
 .cardContent {
   padding: 16px;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
 }
 
 .cardTitle {
@@ -374,6 +379,7 @@ body.dark .badge {
   cursor: pointer;
   transition: all 0.2s ease;
   box-shadow: 0 1px 3px rgba(0, 122, 255, 0.2);
+  margin-top: auto;
 }
 
 .actionButton:hover {
