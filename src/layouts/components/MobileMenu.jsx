@@ -12,8 +12,10 @@ import {
   IconProfile,
   IconMedicalHistory,
   IconTreatmentPlan,
+  IconTimeline,
+  IconEducation,
   IconLogout,
-  IconUser // --- ADD IconUser ---
+  IconUser
 } from './Icons';
 import styles from './MobileMenu.module.css';
 
@@ -60,20 +62,7 @@ const MobileMenu = ({ isOpen, onCloseMenu }) => {
         </div>
 
         <nav>
-          {/* ... (rest of the NavLink list) ... */}
           <ul className={styles.navList}>
-            <li>
-              <NavLink 
-                to="/" 
-                end
-                onClick={handleNavClick}
-                className={({ isActive }) => 
-                  isActive ? `${styles.navLink} ${styles.active}` : styles.navLink
-                }>
-                <IconDashboard />
-                Dashboard
-              </NavLink>
-            </li>
             <li>
               <NavLink 
                 to="/appointments" 
@@ -86,18 +75,18 @@ const MobileMenu = ({ isOpen, onCloseMenu }) => {
               </NavLink>
             </li>
             
-            {/* --- LINKS --- */}
             <li>
               <NavLink 
-                to="/messages" 
+                to="/timeline" 
                 onClick={handleNavClick}
                 className={({ isActive }) => 
                   isActive ? `${styles.navLink} ${styles.active}` : styles.navLink
                 }>
-                <IconMessages />
-                Messages
+                <IconTimeline />
+                My Journey
               </NavLink>
             </li>
+
             <li>
               <NavLink 
                 to="/billing" 
@@ -106,7 +95,7 @@ const MobileMenu = ({ isOpen, onCloseMenu }) => {
                   isActive ? `${styles.navLink} ${styles.active}` : styles.navLink
                 }>
                 <IconBilling />
-                Billing
+                Billing & Insurance
               </NavLink>
             </li>
 
@@ -144,15 +133,16 @@ const MobileMenu = ({ isOpen, onCloseMenu }) => {
                 Medical History
               </NavLink>
             </li>
+
             <li>
               <NavLink 
-                to="/profile" 
+                to="/education" 
                 onClick={handleNavClick}
                 className={({ isActive }) => 
                   isActive ? `${styles.navLink} ${styles.active}` : styles.navLink
                 }>
-                <IconProfile />
-                Profile
+                <IconEducation />
+                Education
               </NavLink>
             </li>
           </ul>

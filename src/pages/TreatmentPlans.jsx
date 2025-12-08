@@ -49,9 +49,9 @@ const TreatmentPlans = () => {
 
   return (
     <div className={styles.pageWrapper}>
-      <h1>Treatment Plans</h1>
+      <h1>Your Care Plans</h1>
       <p className={styles.pageDescription}>
-        Review, accept, or decline treatment plans proposed by your provider.
+        We've prepared personalized treatment options for you. Take your time reviewing them.
       </p>
 
       {error && <p className="error-text">Error: {error}</p>}
@@ -59,7 +59,7 @@ const TreatmentPlans = () => {
 
       {/* --- Section: Proposed Plans (Action Required) --- */}
       <section className={styles.section}>
-        <h2>Action Required</h2>
+        <h2>Awaiting Your Decision</h2>
         {proposed.length > 0 ? (
           <div className={styles.planList}>
             {proposed.map(plan => (
@@ -74,13 +74,13 @@ const TreatmentPlans = () => {
             ))}
           </div>
         ) : (
-          !loading && <p>You have no pending treatment plans to review.</p>
+          !loading && <p>You're all set! No care plans need your attention right now.</p>
         )}
       </section>
 
       {/* --- Section: Other Plans (History) --- */}
       <section className={styles.section}>
-        <h2>Plan History</h2>
+        <h2>Your Care History</h2>
         {[...accepted, ...other].length > 0 ? (
           <div className={styles.planList}>
             {accepted.map(plan => (

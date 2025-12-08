@@ -20,6 +20,8 @@ import Profile from '../pages/Profile.jsx';
 import MedicalHistory from '../pages/MedicalHistory.jsx';
 import TreatmentPlans from '../pages/TreatmentPlans.jsx';
 import VisitSummary from '../pages/VisitSummary.jsx';
+import Education from '../pages/Education.jsx';
+import Timeline from '../pages/Timeline.jsx';
 
 export const AppRouter = () => (
   <BrowserRouter>
@@ -43,6 +45,8 @@ export const AppRouter = () => (
           <Route path="documents" element={<Documents />} />
           <Route path="profile" element={<Profile />} />
           <Route path="history" element={<MedicalHistory />} />
+          <Route path="education" element={<Education />} />
+          <Route path="timeline" element={<Timeline />} />
           
           <Route path="visits/:visitSummaryId" element={<VisitSummary />} />
           

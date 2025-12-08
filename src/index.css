@@ -162,14 +162,14 @@ button {
   background-color: var(--primary);
   color: var(--text-inverted);
 }
-button:hover:not(:disabled) { /* --- MODIFIED --- */
+/* button:hover:not(:disabled) { 
   background-color: var(--primary-hover);
 }
 button:focus,
 button:focus-visible {
   outline: 4px auto var(--primary);
   outline-offset: 2px;
-}
+} */
 
 /* --- ADDED THIS RULE --- */
 button:disabled,

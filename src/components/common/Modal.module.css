@@ -30,6 +30,16 @@
   animation: zoomIn 0.2s ease forwards;
 }
 
+.modalCard.xlarge {
+  max-width: 1200px;
+  max-height: 90vh;
+}
+
+.modalCard.xlarge .modalBody {
+  max-height: calc(90vh - 140px);
+  overflow-y: auto;
+}
+
 @keyframes zoomIn {
   from { transform: scale(0.95); opacity: 0; }
   to { transform: scale(1); opacity: 1; }

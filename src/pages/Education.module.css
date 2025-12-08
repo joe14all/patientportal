@@ -1,0 +1,12 @@
+.educationPage {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+@media (max-width: 768px) {
+  .educationPage {
+    padding: 1rem;
+    padding-bottom: 6rem; /* Space for mobile quick actions */
+  }
+}

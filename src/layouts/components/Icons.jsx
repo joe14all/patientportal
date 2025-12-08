@@ -304,3 +304,19 @@ export const IconChevronRight = (props) => (
   </svg>
 );
 
+export const IconTimeline = (props) => (
+  <svg {...iconProps} {...props}>
+    <circle cx="12" cy="12" r="10"></circle>
+    <polyline points="12 6 12 12 16 14"></polyline>
+    <circle cx="12" cy="2" r="1" fill="currentColor"></circle>
+    <circle cx="12" cy="22" r="1" fill="currentColor"></circle>
+  </svg>
+);
+
+export const IconEducation = (props) => (
+  <svg {...iconProps} {...props}>
+    <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
+    <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
+  </svg>
+);
+

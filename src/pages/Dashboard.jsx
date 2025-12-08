@@ -16,6 +16,8 @@ import {
   IconDocuments, 
 } from '../layouts/components/Icons';
 import { formatCurrency } from '../utils/formatting';
+import { getTimeBasedGreeting } from '../utils/patientExperience';
+import HealthJourney from '../components/dashboard/HealthJourney';
 import styles from './Dashboard.module.css';
 
 // --- This is our app's "current" time ---
@@ -121,12 +123,28 @@ const Dashboard = () => {
 
   return (
     <div className={styles.pageWrapper}>
-      <h1>Welcome, {patient.preferredName}!</h1>
-      <p className={styles.pageDescription}>Here's your summary for today.</p>
+      <h1>{getTimeBasedGreeting()}, {patient.preferredName}! 👋</h1>
+      <p className={styles.pageDescription}>Let's keep your smile healthy together.</p>
       
       {activeAlerts.length > 0 && (
         <AlertCard alert={activeAlerts[0]} />
       )}
+
+      {/* Trophy/Education Progress Widget */}
+      <TrophyWidget />
+
+      {/* NEW: Personalized Health Journey Section */}
+      <HealthJourney
+        nextAppointment={nextAppointment}
+        actionableForm={actionableForm}
+        pendingPlan={pendingPlan}
+        totalDue={totalDue}
+        unreadThread={unreadThread}
+        lastHistoryUpdate={lastHistoryUpdate}
+        getProviderById={getProviderById}
+      />
+
+      <h2 className={styles.sectionTitle}>Your Care Overview</h2>
 
       <div className={styles.widgetGrid}>
         
@@ -145,7 +163,7 @@ const Dashboard = () => {
         
         {/* Outstanding Balance */}
         <WidgetCard
-          title="Billing"
+          title="Your Account"
           icon={<IconBilling />}
           onClick={() => navigate('/billing')}
         >
@@ -163,7 +181,7 @@ const Dashboard = () => {
 
         {/* Treatment Plan */}
         <WidgetCard
-          title="Treatment Plan"
+          title="Your Care Plan"
           icon={<IconTreatmentPlan />}
           onClick={() => navigate('/plans')}
         >
@@ -172,7 +190,7 @@ const Dashboard = () => {
 
         {/* Medical History */}
         <WidgetCard
-          title="Medical History"
+          title="Health History"
           icon={<IconMedicalHistory />}
           onClick={() => navigate('/history')}
         >
@@ -181,7 +199,7 @@ const Dashboard = () => {
 
         {/* --- NEW: Documents Widget --- */}
         <WidgetCard
-          title="Documents" 
+          title="Your Documents" 
           icon={<IconDocuments />}
           onClick={() => navigate('/documents')}
         >
@@ -319,6 +337,36 @@ const DocumentsWidgetContent = ({ form }) => {
       <p className={styles.formType}>{form.title}</p>
       <p className={styles.actionText}>Click to manage.</p>
     </>
+  );
+};
+
+// --- Trophy Widget Component ---
+const TrophyWidget = () => {
+  const { getEducationStats } = useEngagementData();
+  const navigate = useNavigate();
+  const stats = getEducationStats();
+
+  if (!stats || stats.totalViewed === 0) return null;
+
+  return (
+    <div className={styles.trophyWidget} onClick={() => navigate('/education')}>
+      <div className={styles.trophyWidgetContent}>
+        <span className={styles.trophyWidgetIcon}>🏆</span>
+        <div className={styles.trophyWidgetText}>
+          <strong>{stats.trophiesEarned} badges earned</strong>
+          <span> • {stats.totalViewed} lessons completed</span>
+        </div>
+      </div>
+      {stats.recentTrophies?.length > 0 && (
+        <div className={styles.trophyWidgetBadges}>
+          {stats.recentTrophies.map((trophy, idx) => (
+            <span key={idx} className={styles.trophyWidgetBadge}>
+              {trophy.icon} {trophy.name}
+            </span>
+          ))}
+        </div>
+      )}
+    </div>
   );
 };
 

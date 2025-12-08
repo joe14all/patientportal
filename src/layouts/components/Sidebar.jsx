@@ -11,7 +11,8 @@ import {
   IconProfile,
   IconMedicalHistory,
   IconTreatmentPlan,
-
+  IconTimeline,
+  IconEducation,
   IconLogout 
 } from './Icons';
 import styles from './Sidebar.module.css';
@@ -80,6 +81,22 @@ const Sidebar = () => {
             }>
               <IconMedicalHistory />
               Medical History
+            </NavLink>
+          </li>
+          <li>
+            <NavLink to="/timeline" className={({ isActive }) => 
+              isActive ? `${styles.navLink} ${styles.active}` : styles.navLink
+            }>
+              <IconTimeline />
+              My Journey
+            </NavLink>
+          </li>
+          <li>
+            <NavLink to="/education" className={({ isActive }) => 
+              isActive ? `${styles.navLink} ${styles.active}` : styles.navLink
+            }>
+              <IconEducation />
+              Education
             </NavLink>
           </li>
           <li>

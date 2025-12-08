@@ -12,6 +12,10 @@ export const EngagementProvider = ({ children }) => {
   const [threads, setThreads] = useState(mockApi.engagement.messageThreads);
   const [posts, setPosts] = useState(mockApi.engagement.messagePosts);
   const [documents, setDocuments] = useState(mockApi.engagement.documents);
+  
+  // Education tracking state
+  const [viewedContent, setViewedContent] = useState([]);
+  const [trophies, setTrophies] = useState([]);
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -257,6 +261,65 @@ export const EngagementProvider = ({ children }) => {
     });
   }, []);
 
+  // --- Education Functions ---
+  
+  /**
+   * Mark educational content as viewed
+   */
+  const markEducationContentViewed = useCallback(async (contentId) => {
+    await simulateApi(() => {
+      const viewedEntry = {
+        contentId,
+        viewedAt: new Date().toISOString(),
+        completed: true
+      };
+
+      setViewedContent(prev => {
+        const existing = prev.find(v => v.contentId === contentId);
+        if (existing) return prev;
+        return [...prev, viewedEntry];
+      });
+    });
+  }, []);
+
+  /**
+   * Award a trophy to the patient
+   */
+  const awardTrophy = useCallback(async (trophyData) => {
+    await simulateApi(() => {
+      const newTrophy = {
+        id: `trophy-${Date.now()}`,
+        ...trophyData,
+        earnedAt: new Date().toISOString()
+      };
+
+      setTrophies(prev => {
+        const existing = prev.find(t => t.name === trophyData.name);
+        if (existing) return prev;
+        return [...prev, newTrophy];
+      });
+    });
+  }, []);
+
+  /**
+   * Check if content has been viewed
+   */
+  const isContentViewed = useCallback((contentId) => {
+    return viewedContent.some(v => v.contentId === contentId);
+  }, [viewedContent]);
+
+  /**
+   * Get education progress stats
+   */
+  const getEducationStats = useCallback(() => {
+    return {
+      totalViewed: viewedContent.length,
+      trophiesEarned: trophies.length,
+      viewedContent: viewedContent,
+      recentTrophies: trophies.slice(-3).reverse()
+    };
+  }, [viewedContent, trophies]);
+
 
   // --- Value ---
   const value = useMemo(() => ({
@@ -264,6 +327,8 @@ export const EngagementProvider = ({ children }) => {
     messageThreads: threads,
     messagePosts: posts,
     documents,
+    viewedContent,
+    trophies,
     loading,
     error,
     
@@ -276,13 +341,21 @@ export const EngagementProvider = ({ children }) => {
     restoreDocument,
     updateDocument,
     
+    // Education Functions
+    markEducationContentViewed,
+    awardTrophy,
+    isContentViewed,
+    getEducationStats,
+    
     // System Author
     systemAuthor
     
   }), [
     threads, 
     posts, 
-    documents, 
+    documents,
+    viewedContent,
+    trophies,
     loading, 
     error,
     sendMessage,
@@ -291,7 +364,11 @@ export const EngagementProvider = ({ children }) => {
     uploadDocument,
     archiveDocument,
     restoreDocument, 
-    updateDocument, 
+    updateDocument,
+    markEducationContentViewed,
+    awardTrophy,
+    isContentViewed,
+    getEducationStats,
     systemAuthor
   ]);
 

@@ -88,15 +88,15 @@ const MedicalHistory = () => {
 
 
   if (loading && !formData) {
-    return <p>Loading medical history...</p>;
+    return <p>Loading your health information...</p>;
   }
 
   if (error) {
-    return <p className="error-text">Error loading medical history: {error}</p>;
+    return <p className="error-text">We're having trouble loading your health history. Please try again.</p>;
   }
   
   if (!formData) {
-    return <p>No medical history found.</p>;
+    return <p>Let's get started on your health history.</p>;
   }
 
   // --- Pass down all necessary props to children ---

@@ -1,0 +1,201 @@
+/* Appointment Prep Card */
+.prepCard {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: 1rem;
+  padding: 2rem;
+  margin-top: 1.5rem;
+  box-shadow: var(--shadow-sm);
+}
+
+.prepTitle {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 1.5rem;
+}
+
+/* Sections */
+.expectSection,
+.providerSection,
+.checklistSection,
+.questionsSection {
+  margin-bottom: 2rem;
+}
+
+.sectionTitle {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 1rem;
+  border-bottom: 2px solid var(--primary-300);
+  padding-bottom: 0.5rem;
+}
+
+/* What to Expect */
+.expectText {
+  font-size: 1rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin: 0 0 0.75rem;
+}
+
+.durationText {
+  font-size: 0.9rem;
+  color: var(--primary);
+  margin: 0;
+}
+
+/* Provider Card */
+.providerCard {
+  display: flex;
+  gap: 1.25rem;
+  padding: 1.25rem;
+  background: var(--primary-50);
+  border-radius: 0.75rem;
+  border: 1px solid var(--primary-200);
+}
+
+body.dark .providerCard {
+  background: var(--neutral-800);
+  border-color: var(--primary-700);
+}
+
+.providerImage {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.providerInitials {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: var(--primary);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.providerInfo {
+  flex: 1;
+}
+
+.providerName {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 0.25rem;
+}
+
+.providerQual {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin: 0 0 0.75rem;
+}
+
+.providerBio {
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin: 0;
+  font-style: italic;
+}
+
+/* Preparation List */
+.prepList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.prepItem {
+  display: flex;
+  gap: 1rem;
+  padding: 1rem;
+  margin-bottom: 0.75rem;
+  background: var(--bg-body);
+  border-radius: 0.5rem;
+  border-left: 3px solid var(--primary);
+}
+
+.prepIcon {
+  font-size: 1.5rem;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.prepContent {
+  flex: 1;
+}
+
+.prepItemTitle {
+  display: block;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 0.25rem;
+}
+
+.prepItemDesc {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin: 0;
+}
+
+.prepItemDesc a {
+  color: var(--primary);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.prepItemDesc a:hover {
+  text-decoration: underline;
+}
+
+/* Questions Section */
+.questionsSection {
+  padding: 1.25rem;
+  background: var(--success-100);
+  border-radius: 0.75rem;
+  border: 1px solid var(--success-500);
+  margin-bottom: 0;
+}
+
+body.dark .questionsSection {
+  background: var(--neutral-800);
+  border-color: var(--success-500);
+}
+
+.questionsText {
+  font-size: 1rem;
+  color: var(--text-primary);
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* Mobile Responsive */
+@media (max-width: 640px) {
+  .prepCard {
+    padding: 1.5rem;
+  }
+
+  .providerCard {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .prepItem {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+}

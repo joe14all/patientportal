@@ -4,6 +4,7 @@ import AppointmentList from '../components/appointments/AppointmentList';
 import BookingForm from '../components/appointments/BookingForm';
 import CheckInModal from '../components/appointments/CheckInModal'; 
 import Modal from '../components/common/Modal';
+import SmartScheduling from '../components/appointments/SmartScheduling';
 
 import styles from './Appointments.module.css';
 
@@ -97,7 +98,7 @@ const [checkInTarget, setCheckInTarget] = useState(null);
   return (
     <div className={styles.pageWrapper}>
       <div className={styles.pageHeader}>
-        <h1>Appointments</h1>
+        <h1>Your Appointments</h1>
         {!showBookingForm && (
           <button onClick={handleStartBooking}>
             Book Appointment
@@ -109,6 +110,9 @@ const [checkInTarget, setCheckInTarget] = useState(null);
       </p>
 
       {error && <p className="error-text">Error: {error}</p>}
+
+      {/* Smart Scheduling Recommendations */}
+      {!showBookingForm && <SmartScheduling onBookAppointment={handleStartBooking} />}
 
       {/* --- Conditionally render Booking Form or List --- */}
       {showBookingForm ? (

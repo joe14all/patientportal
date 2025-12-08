@@ -20,6 +20,8 @@
   overflow-y: auto;
   /* Set height for sticky sidebar to work against */
   height: calc(100vh - 60px); /* Full height minus header */
+  /* Add padding at bottom on mobile for quick actions bar */
+  padding-bottom: 5rem;
 }
 
 /* This is the new wrapper for readability */
@@ -34,5 +36,44 @@
   .contentArea {
     /* More "relaxed" padding on desktop */
     padding: 2.5rem;
+    /* Remove extra bottom padding when quick actions are hidden */
+    padding-bottom: 2.5rem;
+  }
+}
+
+/* Live Chat Button */
+.chatButton {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: var(--primary);
+  color: white;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 1000;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.chatButton:hover {
+  transform: scale(1.1);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+}
+
+.chatButton:active {
+  transform: scale(0.95);
+}
+
+/* Mobile: Position chat button above quick actions */
+@media (max-width: 768px) {
+  .chatButton {
+    bottom: 90px; /* Position above the quick actions bar */
   }
 }

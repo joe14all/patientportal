@@ -1,0 +1,261 @@
+/* Health Journey Card */
+.journeyCard {
+  background: linear-gradient(135deg, var(--primary-50) 0%, var(--bg-surface) 100%);
+  border: 2px solid var(--primary-300);
+  border-radius: 1rem;
+  padding: 2rem;
+  margin-bottom: 2rem;
+  box-shadow: var(--shadow-md);
+}
+
+body.dark .journeyCard {
+  background: linear-gradient(135deg, var(--neutral-800) 0%, var(--neutral-900) 100%);
+  border-color: var(--primary-700);
+}
+
+/* Celebration State */
+.celebration {
+  background: linear-gradient(135deg, var(--success-100) 0%, var(--bg-surface) 100%);
+  border-color: var(--success-500);
+}
+
+body.dark .celebration {
+  background: linear-gradient(135deg, var(--neutral-800) 0%, var(--neutral-900) 100%);
+  border-color: var(--success-500);
+}
+
+.celebrationContent {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.celebrationIcon {
+  font-size: 4rem;
+  line-height: 1;
+}
+
+.celebrationTitle {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--success-500);
+  margin: 0 0 0.5rem;
+}
+
+.celebrationText {
+  font-size: 1rem;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+/* Journey Header */
+.journeyHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.journeyTitle {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.progressBadge {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: var(--bg-surface);
+  padding: 0.75rem 1rem;
+  border-radius: 0.75rem;
+  border: 1px solid var(--border-color);
+  min-width: 80px;
+}
+
+.progressNumber {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--primary);
+  line-height: 1;
+}
+
+.progressLabel {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-top: 0.25rem;
+}
+
+/* Progress Bar */
+.progressBar {
+  height: 12px;
+  background: var(--neutral-200);
+  border-radius: 6px;
+  overflow: hidden;
+  margin-bottom: 1.5rem;
+}
+
+body.dark .progressBar {
+  background: var(--neutral-700);
+}
+
+.progressFill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--primary-600) 0%, var(--primary-400) 100%);
+  border-radius: 6px;
+  transition: width 0.6s ease;
+}
+
+/* Actions List */
+.actionsList {
+  margin-top: 1rem;
+}
+
+.actionsIntro {
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  margin: 0 0 1rem;
+}
+
+.actionItem {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.25rem;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: 0.75rem;
+  margin-bottom: 1rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.actionItem:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+  border-color: var(--primary);
+}
+
+.actionItem.urgent {
+  border-color: var(--error-500);
+  border-width: 2px;
+  background: linear-gradient(135deg, var(--error-50) 0%, var(--bg-surface) 100%);
+}
+
+body.dark .actionItem.urgent {
+  background: linear-gradient(135deg, var(--neutral-800) 0%, var(--neutral-900) 100%);
+}
+
+.actionIcon {
+  font-size: 2rem;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.actionContent {
+  flex: 1;
+  min-width: 0; /* Allows text truncation */
+}
+
+.actionTitle {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.urgentBadge {
+  display: inline-block;
+  padding: 0.125rem 0.5rem;
+  background: var(--error-500);
+  color: white;
+  font-size: 0.75rem;
+  font-weight: 700;
+  border-radius: 0.25rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.actionDescription {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin: 0 0 0.5rem;
+}
+
+.actionWhy {
+  font-size: 0.85rem;
+  color: var(--primary);
+  font-style: italic;
+  margin: 0;
+}
+
+.actionButton {
+  flex-shrink: 0;
+  padding: 0.625rem 1.25rem;
+  background: var(--primary);
+  color: white;
+  border: none;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.actionButton:hover {
+  background: var(--primary-hover);
+  transform: scale(1.05);
+}
+
+.noActionsText {
+  text-align: center;
+  color: var(--text-secondary);
+  font-size: 1rem;
+  margin: 1rem 0 0;
+  padding: 1rem;
+}
+
+/* Mobile Responsive */
+@media (max-width: 640px) {
+  .journeyCard {
+    padding: 1.5rem;
+  }
+
+  .journeyHeader {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .progressBadge {
+    align-self: flex-end;
+  }
+
+  .actionItem {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.75rem;
+  }
+
+  .actionIcon {
+    align-self: center;
+  }
+
+  .actionButton {
+    width: 100%;
+  }
+
+  .celebrationContent {
+    flex-direction: column;
+    text-align: center;
+  }
+}

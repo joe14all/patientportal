@@ -11,6 +11,7 @@ import PaymentModal from '../components/common/PaymentModal';
 import Modal from '../components/common/Modal';
 import AddPaymentMethodForm from '../components/billing/AddPaymentMethodForm';
 import AddInsuranceForm from '../components/billing/AddInsuranceForm'; // <-- 1. IMPORT
+import InsuranceTracker from '../components/billing/InsuranceTracker';
 
 const Billing = () => {
   const {
@@ -57,12 +58,15 @@ const Billing = () => {
 
   return (
     <div className={styles.pageWrapper}>
-      <h1>Billing</h1>
+      <h1>Your Account & Payments</h1>
       <p className={styles.pageDescription}>
-        Manage your invoices, payments, and insurance policies.
+        We're here to make billing simple and transparent. Questions? Just ask!
       </p>
 
       {error && <p className="error-text">Error: {error}</p>}
+
+      {/* Insurance Benefits Tracker */}
+      <InsuranceTracker />
 
       {/* --- 5. Main Billing Layout Grid --- */}
       <div className={styles.billingLayout}>

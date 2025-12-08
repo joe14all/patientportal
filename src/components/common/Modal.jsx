@@ -22,6 +22,7 @@ const Modal = ({
   isLoading = false, // This is the GLOBAL loading state
   primaryActionDisabled = false, // <-- 1. ADD NEW PROP
   modalClassName = '',
+  size = 'medium', // Add size prop
 }) => {
   const [isProcessing, setIsProcessing] = useState(false);
   // --- 2. REMOVED internalError state ---
@@ -104,7 +105,7 @@ const Modal = ({
       aria-labelledby="modal-title"
     >
       <div 
-        className={`card ${styles.modalCard} ${modalClassName}`}
+        className={`card ${styles.modalCard} ${size === 'xlarge' ? styles.xlarge : ''} ${modalClassName}`}
         onClick={(e) => e.stopPropagation()}
       >
         <div className={styles.modalHeader}>

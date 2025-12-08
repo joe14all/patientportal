@@ -1,0 +1,12 @@
+.timelinePage {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+@media (max-width: 768px) {
+  .timelinePage {
+    padding: 1rem;
+    padding-bottom: 6rem; /* Space for mobile quick actions */
+  }
+}
